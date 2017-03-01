@@ -17,10 +17,12 @@ export default {
     answer: ''
   }),
 
-  tasks: [
-    function* askQuestion() {
-      this.answer = 'hello'
+  tasks: function (t) {
+    return {
+      askQuestion: t(function () {
+        this.answer = 'hello'
+      })
     }
-  ]
+  }
 }
 </script>
