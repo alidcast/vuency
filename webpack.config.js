@@ -1,11 +1,13 @@
-var path = require('path')
+var resolve = require('path').resolve
 var webpack = require('webpack')
 var merge = require('webpack-merge')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 
-var projectRoot = path.resolve(__dirname, './')
-var devRoot = path.resolve(__dirname, './demo')
-var prodRoot = path.resolve(__dirname, './src')
+var projectRoot = resolve(__dirname, './')
+var srcRoot = resolve(__dirname, './src')
+var testRoot = resolve(__dirname, './test')
+var devRoot = resolve(__dirname, './demo')
+var prodRoot = resolve(__dirname, './dist')
 
 const baseConfig = {
   resolve: {
@@ -14,16 +16,24 @@ const baseConfig = {
     ],
     alias: { // create an alias for commonly used modules
       'vue$': 'vue/dist/vue.common.js', // vue standalone build
-      'src': prodRoot,
+      'src': srcRoot,
       'demo': devRoot
     },
     modules: [ // directory to search when resolving modules
-      prodRoot,
-      "node_modules"
+      srcRoot, "node_modules"
     ]
   },
   module: {
     rules: [ // specify how module is created
+      {
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        enforce: "pre",
+        include: [srcRoot, testRoot],
+        options: {
+          formatter: require('eslint-friendly-formatter')
+        }
+      },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
@@ -74,7 +84,7 @@ const devConfig = {
       }),
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.HotModuleReplacementPlugin(),
-      new webpack.NoErrorsPlugin(),
+      new webpack.NoEmitOnErrorsPlugin(),
       new HtmlWebpackPlugin({
         template: `${devRoot}/index.html`,
         inject: true
@@ -83,9 +93,9 @@ const devConfig = {
 }
 
 const prodConfig = {
-  entry: `${prodRoot}/index.js`,
+  entry: `${srcRoot}/index.js`,
   output: {
-    path: path.resolve(__dirname, './dist'),
+    path: prodRoot,
     publicPath: '/dist/',
     filename: 'build.js',
     library: 'vueMobiledocEditor',

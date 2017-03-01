@@ -1,7 +1,7 @@
 import setupTaskFactory from './plugin/core/index'
 import assert, { isFn } from './util/assert'
 
-export default function (Vue) {
+export default function(Vue) {
   Vue.mixin({ created: initTasks })
 }
 
@@ -11,8 +11,7 @@ export default function (Vue) {
  */
 function initTasks() {
   let host = this,
-      set = this.$set,
-      opts = this.$options
+      opts = host.$options
 
   if (opts.tasks) {
     // since multiple instances are created with same definition, tasks must
@@ -22,8 +21,8 @@ function initTasks() {
 
     // initialize the tasks function with task factory function
     // so that task actions can be converted to task objects
-    let createTask = setupTaskFactory(host)
-    let tasks = opts.tasks(createTask)
+    let createTask = setupTaskFactory(host),
+        tasks = opts.tasks(createTask)
 
     // inject task into host component
     Object.keys(tasks).forEach(key => {
