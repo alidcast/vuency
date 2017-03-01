@@ -2,12 +2,12 @@
   <div id="app" class="component">
     <h1>{{pluginName}}</h1>
 
-    <!-- <p>
-      {{ this.answer }}
-    </p>
     <button @click="askQuestion.run()">
       Get Answer
-    </button> -->
+    </button>
+    <p>
+      {{ answer }}
+    </p>
   </div>
 </template>
 
@@ -17,13 +17,14 @@ export default {
   data: () => ({
     pluginName: "Vuency",
     answer: ''
-  })
-  // ,
-  //
-  // tasks: [
-  //   function* askQuestion() {
-  //     this.answer = 'hello'
-  //   }
-  // ]
+  }),
+
+  tasks: function(t) {
+    return {
+      askQuestion: t(function () {
+        this.answer = 'hello'
+      })
+    }
+  }
 }
 </script>
