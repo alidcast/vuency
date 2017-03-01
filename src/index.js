@@ -1,5 +1,13 @@
 import applyMixin from './mixin'
 
-export default function install(Vue) {
+function plugin(Vue) {
+  if (plugin.installed) return
   applyMixin(Vue)
 }
+
+// auto install in dist mode
+if (typeof window !== 'undefined' && window.Vue) {
+  plugin(window.Vue)
+}
+
+export default plugin

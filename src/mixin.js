@@ -1,8 +1,17 @@
 import setupTaskFactory from './plugin/core/index'
 import assert, { isFn } from './util/assert'
 
+let _Vue
 export default function(Vue) {
-  Vue.mixin({ created: initTasks })
+  _Vue = Vue
+
+  Vue.mixin({
+    beforeCreate() {
+      console.log('vuency ' + 0)
+    },
+    created: initTasks
+  })
+  console.log('mixin install called')
 }
 
 /**
@@ -11,7 +20,7 @@ export default function(Vue) {
  */
 function initTasks() {
   let host = this,
-      opts = host.$options
+      opts = this.$options
 
   if (opts.tasks) {
     // since multiple instances are created with same definition, tasks must
@@ -26,7 +35,9 @@ function initTasks() {
 
     // inject task into host component
     Object.keys(tasks).forEach(key => {
-      host[key] = tasks[key]
+      _Vue.util.defineReactive(host, key, tasks[key])
+      // host[key] = tasks[key]
+      console.log(host[key])
     })
   }
 }
