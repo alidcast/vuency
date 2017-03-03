@@ -1,8 +1,10 @@
 import initTaskFactory from './plugin/index'
+import asyncHelpers from './util/async'
 import assert, { isFn } from './util/assert'
 
 export default function(Vue) {
   Vue.mixin({ created: initTasks })
+  // TODO make sure tasks are destroyed
 }
 
 /**
@@ -17,9 +19,9 @@ function initTasks() {
     assert(isFn(opts.tasks), 'The Tasks property must be a function')
 
     // initialize the tasks function with task factory function
-    // so that task actions can be converted to task objects
+    // so that task actions can be converted to task objects,
     let createTask = initTaskFactory(host),
-        tasks = opts.tasks(createTask)
+        tasks = opts.tasks(createTask, asyncHelpers)
 
     // inject task into host component
     Object.keys(tasks).forEach(key => {
