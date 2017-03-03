@@ -1,3 +1,8 @@
+/**
+ * Creates a Queue implementation using array properties.
+ * @param  {Array}  queue - starting queue
+ * @constructs Queue
+ */
 export function createQueue(queue = []) {
   return {
     /**
