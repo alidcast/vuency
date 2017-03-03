@@ -2,29 +2,21 @@
   <div id="app" class="component">
     <h1>{{pluginName}}</h1>
 
-    <button @click="askQuestion.run()">
-      Get Answer
-    </button>
-    <p>
-      {{ answer }}
-    </p>
+    <Test />
   </div>
 </template>
 
 
 <script>
+import Test from './Test'
+
 export default {
   data: () => ({
-    pluginName: "Vuency",
-    answer: ''
+    pluginName: "Vuency"
   }),
-
-  tasks: function(t) {
-    return {
-      askQuestion: t(function () {
-        this.answer = 'hello'
-      })
-    }
+  
+  components: {
+    Test
   }
 }
 </script>
