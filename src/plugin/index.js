@@ -1,5 +1,5 @@
 import createTaskProperty from './task-property'
-import createTaskModifiers from './modifiers/task-modifiers'
+import createTaskModifiers from './task-modifiers'
 import assert, { isFn } from '../util/assert'
 
 /**
@@ -18,8 +18,8 @@ export default function initTaskFactory(host) {
     assert(isFn(operation), 'All task actions must be functions')
     assert(!host[operation.name], `The task name must be unique`)
 
-    let { states, actions } = createTaskProperty(host, operation),
-        { policy, modifiers } = createTaskModifiers('enqueue', 1)
+    let { policy, modifiers } = createTaskModifiers('enqueue', 1),
+        { states, actions } = createTaskProperty(host, operation, policy)
 
     return {
       name: operation.name,
