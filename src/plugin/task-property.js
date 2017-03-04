@@ -12,54 +12,63 @@ import createTaskStepper from './task-stepper'
 export default function createTaskProperty(host, operation, policy) {
   let scheduler
 
+  /**
+   * Sets the task's reactive properties.
+   */
+  function setReactiveProperties(tp) {
+    tp.isActive = scheduler.isActive
+    tp.isIdle = scheduler.isIdle
+  }
+
   return {
-    states: {
-      get isActive() {
-        return scheduler ? scheduler.isActive : false
-      },
+    isActive: false,
+    isIdle: true,
 
-      get isIdle() {
-        return !this.isActive
-      },
+    // get state() {
+    //   if (isActive) return 'active'
+    //   else return 'idle'
+    // }
 
-      get state() {
-        if (this.isActive) return 'active'
-        else return 'idle'
-      }
+    /**
+     * Creates a new task instance and schedules it to run.
+     */
+    async run(...args) {
+      if (!scheduler) scheduler = createTaskScheduler(policy)
+
+      operation = operation.bind(host, ...args) // bind comp `this` context
+
+      let updateTask = () => {
+            scheduler.update()
+            setReactiveProperties(this)
+          },
+          ti = createTaskInstance(operation),
+          stepper = createTaskStepper(ti, updateTask),
+          schedulerTi = addStepperMethods(ti, stepper)
+
+      scheduler.schedule(schedulerTi)
+      await waitForRunning(ti._runningOperation)
+      return ti
     },
 
-    actions: {
-      /**
-       * Creates a new task instance and schedules it to run.
-       */
-      async run(...args) {
-        if (!scheduler) scheduler = createTaskScheduler(policy)
+    /**
+     * Cancels all active task instances.
+     */
+    abort() {
 
-        operation = operation.bind(host, ...args) // bind comp `this` context
-        let taskInstance = createTaskInstance(operation),
-            updateSchedule = scheduler.update.bind(scheduler), // ?
-            stepper = createTaskStepper(taskInstance, updateSchedule)
-
-        // add the necessary stepper methods to the task instance so that
-        // the execution of task can be delegated to scheduler
-        taskInstance._run = stepper.stepThrough
-        taskInstance._cancel = stepper.handleCancel
-        scheduler.schedule(taskInstance)
-
-        await waitForRunning(taskInstance._runningOperation)
-        return taskInstance
-      },
-
-      /**
-       * Cancels all active task instances.
-       */
-      abort() {
-
-      }
-      // TODO
-      // add events
     }
+    // TODO
+    // add events
   }
+}
+
+/**
+ * Add the necessary stepper methods to the task instance so that
+ * the execution of task can be delegated to scheduler.
+ */
+function addStepperMethods(ti, stepper) {
+  ti._run = stepper.stepThrough.bind(stepper)
+  ti._cancel = stepper.handleCancel.bind(stepper)
+  return ti
 }
 
 /**

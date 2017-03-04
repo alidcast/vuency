@@ -86,7 +86,7 @@ export function createQueue(queue = []) {
     },
 
     get isActive() {
-      return this.size
+      return this.size > 0
     }
   }
 }

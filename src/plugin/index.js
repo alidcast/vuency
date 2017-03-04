@@ -18,13 +18,10 @@ export default function initTaskFactory(host) {
     assert(isFn(operation), 'All task actions must be functions')
     assert(!host[operation.name], `The task name must be unique`)
 
-    let { policy, modifiers } = createTaskModifiers('enqueue', 1),
-        { states, actions } = createTaskProperty(host, operation, policy)
+    let { policy, modifiers } = createTaskModifiers('enqueue', 1)
 
     return {
-      name: operation.name,
-      ...states,
-      ...actions,
+      ...createTaskProperty(host, operation, policy),
       policy,
       ...modifiers
     }
