@@ -1,11 +1,11 @@
-import Vue from 'vue'
+// import Vue from 'vue'
 import createTaskInstance from './task-instance'
 import createTaskScheduler from './task-scheduler'
 import createTaskStepper from './task-stepper'
 
 /**
  * A {TaskProperty}
- * @param {Object} host - the Vue component instance
+ * @param {Vue} host - the Vue component instance
  * @param {Function} operation - the task method to run
  * @param {Object} policy - the task scheduling policy
  * @constructor Task Property
@@ -14,30 +14,24 @@ export default function createTaskProperty(host, operation, policy) {
   let scheduler
 
   /**
-   * Set reactive task properties and force component instance to update.
+   * Updates reactive task properties and force component instance to update.
    */
-  function setReactiveProperties(tp) {
-    tp.isActive = scheduler.isActive
-    tp.isIdle = !scheduler.isActive
+  function setReactiveProperties(tp, isRunning) {
+    tp.isActive = isRunning
+    tp.isIdle = !isRunning
     host.$forceUpdate()
   }
 
   /**
-   * Create a Vue watcher to update task properties when the
-   *  scheduler's queues change.
+   * Runs the task instance
+   * and updates the task property and scheduler appropriately.
    */
-  function createWatcher(tp) {
-    let Watcher = Vue.extend({
-      data: () => ({
-        waiting: scheduler.waitingQueue,
-        running: scheduler.runningQueue
-      }),
-      watch: {
-        waiting: setReactiveProperties.bind(null, tp),
-        running: setReactiveProperties.bind(null, tp)
-      }
-    })
-    return new Watcher()
+  async function runTaskInstance(tp, stepper) {
+    setReactiveProperties(tp, true)
+    let running = await stepper.stepThrough(stepper)
+    setReactiveProperties(tp, false)
+    scheduler.update()
+    return running
   }
 
   return {
@@ -48,19 +42,18 @@ export default function createTaskProperty(host, operation, policy) {
      * Creates a new task instance and schedules it to run.
      */
     async run(...args) {
-      if (!scheduler) {
-        scheduler = createTaskScheduler(policy)
-        createWatcher(this)
-      }
-
-      operation = operation.bind(host, ...args) // bind comp `this` context
+      if (!scheduler) scheduler = createTaskScheduler(policy)
+      operation = operation.bind(host, ...args) // inject component context
 
       let ti = createTaskInstance(operation),
-          updateSchedule = scheduler.update.bind(scheduler),
-          stepper = createTaskStepper(ti, updateSchedule),
-          schedulerTi = addStepperMethods(ti, stepper)
+          stepper = createTaskStepper(ti)
 
-      scheduler.schedule(schedulerTi)
+      // adds the necessary stepper methods to the task instance so that
+      // the execution of task can be delegated to scheduler
+      ti._run = runTaskInstance.bind(null, this, stepper)
+      ti._cancel = stepper.handleCancel
+      scheduler.schedule(ti)
+
       return await waitForRunning(ti._runningOperation)
     },
 
@@ -75,17 +68,7 @@ export default function createTaskProperty(host, operation, policy) {
   }
 }
 
-/**
- * Add the necessary stepper methods to the task instance so that
- * the execution of task can be delegated to scheduler.
- */
-function addStepperMethods(ti, stepper) {
-  ti._run = stepper.stepThrough.bind(stepper)
-  ti._cancel = stepper.handleCancel.bind(stepper)
-  return ti
-}
-
-/**
+/** TODO might not need promise, once its set, it's finished?
  * Waits for running to be set and then turns it into a promise.
  */
 function waitForRunning(running) {
@@ -94,3 +77,22 @@ function waitForRunning(running) {
     setTimeout(waitForRunning, 30)
   })
 }
+
+// /**
+//  * Create a Vue watcher to update task properties when the
+//  *  scheduler's running queue changes.
+//  */
+// function createWatcher(tp) {
+//   // let updateTp = setReactiveProperties.bind(null, tp)
+//   const Watcher = Vue.extend({
+//     data: () => ({
+//       waiting: scheduler.waiting.alias(),
+//       running: scheduler.running.alias()
+//     }),
+//     watch: {
+//       waiting: updateTp,
+//       running: updateTp
+//     }
+//   })
+//   return new Watcher()
+// }

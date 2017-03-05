@@ -7,32 +7,28 @@ import { isPromise } from '../util/assert'
 *  until the ti is `Resolved`.
 *
 *  @param {Generator} gen - task operation
-*  @param {Object} ti - task instance
-*  @param {Function} updateTask - updates scheduler and task properties
+*  @param {TaskInstance} ti
 *  @constructs Task Stepper
 */
-export default function createTaskStepper(ti, updateSchedule) {
+export default function createTaskStepper(ti) {
   let iter = ti.operation() // start generator
 
   return {
     handleCancel() {
       if (ti.isOver) return this
       ti.isCanceled = true
-      updateSchedule()
       return ti
     },
 
     handleError(err) {
       ti.isRejected = true
       ti.error = err
-      updateSchedule()
       return ti
     },
 
     handleSuccess(val) {
       ti.isResolved = true
       ti.value = val
-      updateSchedule()
       return ti
     },
 

@@ -4,7 +4,7 @@ import assert, { isFn } from './util/assert'
 
 export default function(Vue) {
   Vue.mixin({
-    beforeCreate: initTasks,
+    beforeCreate: initTasks
     // TODO
     // beforeDestory {}
   })
