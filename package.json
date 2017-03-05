@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --inline --hot",
     "e2e": "cross-env NODE_ENV=testing node test/e2e/runner.js --env chrome --config test/e2e/nightwatch.conf.js",
-    "unit": "cross-env NODE_ENV=testing karma start test/unit/karma.conf.js",
+    "unit": "cross-env NODE_ENV=testing karma start test/unit/karma.conf.js --single-run",
     "test": "npm run unit && npm run e2e",
     "purge": "rm -rf dist/",
     "bundle": "cross-env NODE_ENV=production webpack --progress --hide-modules",
@@ -53,7 +53,7 @@
     "karma-sinon-chai": "^1.2.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.26",
-    "karma-webpack": "^1.7.0",
+    "karma-webpack": "^2.0.2",
     "mocha": "^3.2.0",
     "nightwatch": "^0.9.12",
     "selenium-server": "^3.0.1",
@@ -62,7 +62,6 @@
     "vue-class-component": "^4.4.0",
     "vue-loader": "^10.0.0",
     "vue-template-compiler": "^2.1.8",
-    "webpack": "^2.2.0-rc.2",
     "webpack-dev-server": "^2.1.0-beta.9",
     "webpack-merge": "^1.1.2"
   }
