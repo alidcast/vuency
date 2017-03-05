@@ -14,7 +14,7 @@ export default function createTaskProperty(host, operation, policy) {
   let scheduler
 
   /**
-   * Set reactive properties and force component instance to update.
+   * Set reactive task properties and force component instance to update.
    */
   function setReactiveProperties(tp) {
     tp.isActive = scheduler.isActive
