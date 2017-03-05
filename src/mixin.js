@@ -2,9 +2,13 @@ import initTaskFactory from './plugin/index'
 import asyncHelpers from './util/async'
 import assert, { isFn } from './util/assert'
 
+let tasksData = {}
+
 export default function(Vue) {
-  Vue.mixin({ created: initTasks })
-  // TODO make sure tasks are destroyed
+  Vue.mixin({
+    beforeCreate: initTasks,
+    data: () => tasksData
+  })
 }
 
 /**
@@ -23,10 +27,14 @@ function initTasks() {
     let createTask = initTaskFactory(host),
         tasks = opts.tasks(createTask, asyncHelpers)
 
-    // inject task into host component
+    // add each task to data initialization object
     Object.keys(tasks).forEach(key => {
       host[key] = tasks[key]
-      // _Vue.util.defineReactive(host, key, tasks[key])
+      // tasksData[key] = tasks[key]
     })
   }
 }
+
+// TODO
+// created: validateTasks
+// beforeDestory {}

@@ -50,14 +50,14 @@ export default function createTaskScheduler(policy, autorun = true) {
     peekRunning() {
       return running.peekAll()
     },
-    //
-    //  get waitingIsActive() {
-    //    return waiting.isActive
-    //  },
-    //
-    //  get runningIsActive() {
-    //    return running.isActive
-    //  },
+    // TODO might not need these
+    get waitingIsActive() {
+      return waiting.isActive
+    },
+
+    get runningIsActive() {
+      return running.isActive
+    },
 
     get isActive() {
       return waiting.isActive || running.isActive

@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import createTaskInstance from './task-instance'
 import createTaskScheduler from './task-scheduler'
 import createTaskStepper from './task-stepper'
@@ -13,41 +14,54 @@ export default function createTaskProperty(host, operation, policy) {
   let scheduler
 
   /**
-   * Sets the task's reactive properties.
+   * Set reactive properties and force component instance to update.
    */
   function setReactiveProperties(tp) {
     tp.isActive = scheduler.isActive
-    tp.isIdle = scheduler.isIdle
+    tp.isIdle = !scheduler.isActive
+    host.$forceUpdate()
+  }
+
+  /**
+   * Create a Vue watcher to update task properties when the
+   *  scheduler's queues change.
+   */
+  function createWatcher(tp) {
+    let Watcher = Vue.extend({
+      data: () => ({
+        waiting: scheduler.waitingQueue,
+        running: scheduler.runningQueue
+      }),
+      watch: {
+        waiting: setReactiveProperties.bind(null, tp),
+        running: setReactiveProperties.bind(null, tp)
+      }
+    })
+    return new Watcher()
   }
 
   return {
     isActive: false,
     isIdle: true,
 
-    // get state() {
-    //   if (isActive) return 'active'
-    //   else return 'idle'
-    // }
-
     /**
      * Creates a new task instance and schedules it to run.
      */
     async run(...args) {
-      if (!scheduler) scheduler = createTaskScheduler(policy)
+      if (!scheduler) {
+        scheduler = createTaskScheduler(policy)
+        createWatcher(this)
+      }
 
       operation = operation.bind(host, ...args) // bind comp `this` context
 
-      let updateTask = () => {
-            scheduler.update()
-            setReactiveProperties(this)
-          },
-          ti = createTaskInstance(operation),
-          stepper = createTaskStepper(ti, updateTask),
+      let ti = createTaskInstance(operation),
+          updateSchedule = scheduler.update.bind(scheduler),
+          stepper = createTaskStepper(ti, updateSchedule),
           schedulerTi = addStepperMethods(ti, stepper)
 
       scheduler.schedule(schedulerTi)
-      await waitForRunning(ti._runningOperation)
-      return ti
+      return await waitForRunning(ti._runningOperation)
     },
 
     /**

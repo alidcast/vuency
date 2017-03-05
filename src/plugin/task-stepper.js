@@ -2,60 +2,60 @@ import { isPromise } from '../util/assert'
 
 /**
   A {Stepper} is responsible for iterating through the generator function.
-*  It iterates through each yield, while being mindful of the instances state.
-*  As long as the instance is not `Canceled` or `Rejected`, it continues to iterate
-*  until the instance is `Resolved`.
+*  It iterates through each yield, while being mindful of the tis state.
+*  As long as the ti is not `Canceled` or `Rejected`, it continues to iterate
+*  until the ti is `Resolved`.
 *
-*  @param {Generator} gen
-*  @param {instanceInstance} instance
-*  @param {Function} updater - cues Scheduler to update
+*  @param {Generator} gen - task operation
+*  @param {Object} ti - task instance
+*  @param {Function} updateTask - updates scheduler and task properties
 *  @constructs Task Stepper
 */
-export default function createTaskStepper(instance, update) {
-  let iter = instance.operation() // start generator
+export default function createTaskStepper(ti, updateSchedule) {
+  let iter = ti.operation() // start generator
 
   return {
     handleCancel() {
-      if (instance.isOver) return this
-      instance.isCanceled = true
-      update()
-      return this
+      if (ti.isOver) return this
+      ti.isCanceled = true
+      updateSchedule()
+      return ti
     },
 
     handleError(err) {
-      instance.isRejected = true
-      instance.error = err
-      update()
-      return this
+      ti.isRejected = true
+      ti.error = err
+      updateSchedule()
+      return ti
     },
 
     handleSuccess(val) {
-      instance.isResolved = true
-      instance.value = val
-      update()
-      return this
+      ti.isResolved = true
+      ti.value = val
+      updateSchedule()
+      return ti
     },
 
-    // checks the state of the instance to take appropriate actions
-    // recursively iterates through generator function until instance is finished
+    // checks the state of the ti to take appropriate actions
+    // recursively iterates through generator function until ti is finished
     stepThrough(gen) {
       let stepper = this
 
       function takeAStep(prev = undefined) {
         let output, value
 
-        if (instance.isCanceled) return stepper              // CANCELED / DROPPED
-        if (!instance.hasStarted) instance.hasStarted = true
+        if (ti.isCanceled) return ti                   // CANCELED / DROPPED
+        if (!ti.hasStarted) ti.hasStarted = true
 
         try { // iterate through another yield
           output = iter.next(prev)
           value = output.value
         }
-        catch (err) {                                         // REJECTED
+        catch (err) {                                  // REJECTED
           return stepper.handleError(err)
         }
 
-        if (output.done) {                                    // RESOLVED
+        if (output.done) {                             // RESOLVED
           return stepper.handleSuccess(value)
         }
 
