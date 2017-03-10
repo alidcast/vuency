@@ -1,33 +1,42 @@
+/* eslint-disable no-unused-expressions */
+/* global describe, it, expect */
+
 import Vue from 'vue'
 import Vuency from 'index'
-// import { createTaskInstance, createTaskProperty } from 'task'
-// import createScheduler from 'scheduler'
+import { isObj } from 'src/util/assert'
 
 Vue.use(Vuency)
 
-function* test() { return 'passed' }
-
-function createTasks(tasks) {
-  return {
-    tasks(t) { return Object.keys(tasks).forEach(key => t(tasks[key])) }
-  }
+function * test() {
+  return 'passed'
 }
 
 describe('Tasks API', function() {
-  // it("only accepts a tasks array", () => {
-  //   let wrongVm = () => new Vue(createTasks({ exTask }))
-  //   let correctVm = () => new Vue(createTasks([ exTask ]))
-  //   expect(wrongVm).to.throw(TypeError)
-  //   expect(correctVm).to.not.throw(TypeError)
-  // }
-  //
-  // it("does not allow repeat names", () => {
-  //   let vm = () => new Vue(createTasks([exTask, exTask]))
-  //   expect(vm).to.throw(Error)
-  // })
-  //
-  // it("exposes the registered function as a task", () => {
-  //   let vm = new Vue(createTasks([exTask]))
-  //   expect(vm.exTask).to.not.be.undefined
-  // })
+  it('only accepts a function', () => {
+    Vue.config.errorHandler = function(err, vm, info) {
+      throw new Error(err)
+    }
+
+    let tasksFn = () => new Vue({
+          tasks: (t) => ({
+            test: t(test)
+          })
+        }),
+        tasksArr = () => new Vue({
+          tasks: [test]
+        })
+    expect(tasksFn).to.not.throw(Error)
+    expect(tasksArr).to.throw(Error)
+  })
+
+  it('exposes each registered function as a task object', () => {
+    let vm = new Vue({
+      tasks: (t) => ({
+        ex1: t(test),
+        ex2: t(test)
+      })
+    })
+    expect(isObj(vm.ex1)).to.be.true
+    expect(isObj(vm.ex2)).to.be.true
+  })
 })
