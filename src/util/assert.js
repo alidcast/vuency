@@ -17,3 +17,7 @@ export function isGenFn(fn) {
 export function isPromise(fn) {
   return typeof fn !== 'undefined' && typeof fn.then === 'function'
 }
+
+export function isObj(obj) {
+  return obj !== null && typeof obj === 'object' && !Array.isArray(obj)
+}

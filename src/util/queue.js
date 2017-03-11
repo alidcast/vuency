@@ -63,8 +63,8 @@ export function createQueue(queue = []) {
     },
 
     /**
-     * Empties out entire array.
-     * @param {Boolean} Keep - whether to keep reference to original array
+     * Returns a shallow copy of value inside array.
+     * @param {Number} index - location of value inside array
      */
     peek(index = 0) {
       return queue.slice(index, index + 1).pop()
