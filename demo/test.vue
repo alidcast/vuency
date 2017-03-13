@@ -6,25 +6,26 @@
     <p>
       answer: {{ answer }} <br>
       result: {{ askQuestion.value }} <br>
-      state: {{ askQuestion.state }}
+      state: {{ askQuestion.isActive }}
     </p>
   </div>
 </template>
 
-
 <script>
 export default {
   data: () => ({
-    answer: ''
+    answer: '',
+    num: 0
   }),
 
   tasks: function(t, { pause }) {
     return {
       askQuestion: t(function* () {
-        yield pause(2000)
-        this.answer = 'here'
+        yield pause(1000)
+        this.answer = this.num
+        this.num++
         return 'me too!'
-      })
+      }).concurrency(3)
     }
   }
 }
