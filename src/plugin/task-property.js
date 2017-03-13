@@ -1,7 +1,5 @@
-// import Vue from 'vue'
 import createTaskInstance from './task-instance'
 import createTaskScheduler from './task-scheduler'
-import createTaskStepper from './task-stepper'
 
 /**
  * A {TaskProperty}
@@ -16,27 +14,19 @@ export default function createTaskProperty(host, operation, policy) {
   /**
    * Updates reactive task properties and force component instance to update.
    */
-  function setReactiveProperties(tp, isRunning) {
-    tp.isActive = isRunning
-    tp.isIdle = !isRunning
+  function setReactiveProps(isRunning) {
+    this.isActive = isRunning
+    this.isIdle = !isRunning
     host.$forceUpdate()
-  }
-
-  /**
-   * Runs the task instance
-   * and updates the task property and scheduler appropriately.
-   */
-  async function runTaskInstance(tp, stepper) {
-    setReactiveProperties(tp, true)
-    let running = await stepper.stepThrough(stepper)
-    setReactiveProperties(tp, false)
-    scheduler.update()
-    return running
   }
 
   return {
     isActive: false,
     isIdle: true,
+
+    // TODO
+    // state
+    // last
 
     /**
      * Creates a new task instance and schedules it to run.
@@ -44,16 +34,8 @@ export default function createTaskProperty(host, operation, policy) {
     async run(...args) {
       if (!scheduler) scheduler = createTaskScheduler(policy)
       operation = operation.bind(host, ...args) // inject component context
-
-      let ti = createTaskInstance(operation),
-          stepper = createTaskStepper(ti)
-
-      // adds the necessary stepper methods to the task instance so that
-      // the execution of task can be delegated to scheduler
-      ti._run = runTaskInstance.bind(null, this, stepper)
-      ti._cancel = stepper.handleCancel
+      let ti = createTaskInstance(operation, setReactiveProps.bind(this))
       scheduler.schedule(ti)
-
       return await waitForRunning(ti._runningOperation)
     },
 

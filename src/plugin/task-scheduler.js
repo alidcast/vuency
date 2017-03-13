@@ -4,24 +4,22 @@ import createQueue from '../util/queue'
  * A {Scheduler} is responsible for scheduling and running task instances,
  * as well as updating all 'last' task states.
  *
- * @param {Object} policy - scheduler flow and concurrency policy
- * @param {Boolean} autorun - whether running queue is updated automatically
+ * @param {Object} policy - scheduler run policy
+ * @param {Boolean} autorun - whether scheduler is updated automatically
  * @constructs Task Scheduler
  */
-// TODO
-// 1. make running a pseudo queue? e.g. add and substract concurrency
-//
-// 2. Smarter update
-// Not full? -> start running
-// full? Don't do anything, wait for finihsed task to update.
-//
+
 export default function createTaskScheduler(policy, autorun = true) {
   let waiting = createQueue(),
       running = createQueue(),
       { flow, concurrency } = policy
 
+  function shouldRun() {
+    return waiting.isActive && running.size < concurrency
+  }
+
   function shouldDrop() {
-    return flow === 'drop' && (waiting.size + running.size === concurrency)
+    return flow === 'drop' && (waiting.size + running.size >= concurrency)
   }
 
   function shouldRestart() {
@@ -41,47 +39,48 @@ export default function createTaskScheduler(policy, autorun = true) {
     schedule(ti) { //
       this.lastCalled = ti
       if (!shouldDrop()) {
+        if (shouldRestart()) running.forEach(ti => ti.cancel())
         waiting.add(ti)
-        if (autorun) this.update()
+        if (autorun) this.advance()
       }
       return this
     },
 
     /**
-     * Fill running queue with task intances from waiting queue.
+     * Move task instance from waiting to running queue.
      */
-    _advance() {
-      let lastStarted = saturateRunning(waiting, running, concurrency)
-      if (lastStarted) this.lastStarted = lastStarted
+    advance() {
+      if (shouldRun()) {
+        let ti = waiting.remove().pop()
+        if (ti) {
+          this.lastStarted = ti
+          ti._runningOperation = ti.run()
+          .then(finishedOperation => {
+            running.extract(item => item === ti) // remove itself
+            updateLastFinished(this, ti)
+            return finishedOperation
+          })
+          running.add(ti)
+        }
+      }
       return this
-    },
-
-    /**
-     * Remove all finished task instances from running queue.
-     */
-    _finalize() {
-      let finishedTis = running.extract((ti) => {
-        if (shouldRestart() && !ti.isOver) ti.cancel()
-        return ti.isOver === true
-      })
-      if (finishedTis.length > 0) updateLast(this, finishedTis.pop())
-      return this
-    },
-
-    /**
-     * Fill running queue and removed finished task instances.
-     */
-    update() {
-      this._advance()._finalize()
     },
 
     get isActive() {
       return waiting.isActive || running.isActive
     },
 
+    get concurrency() {
+      return running.size
+    },
+
     waiting: {
       get isActive() {
         return waiting.isActive
+      },
+
+      get size() {
+        return waiting.size
       },
 
       peek() {
@@ -98,6 +97,10 @@ export default function createTaskScheduler(policy, autorun = true) {
         return running.isActive
       },
 
+      get size() {
+        return running.size
+      },
+
       peek() {
         return running.peekAll()
       },
@@ -110,27 +113,10 @@ export default function createTaskScheduler(policy, autorun = true) {
 }
 
 /**
- * Move task instances from waiting to running queue until concurrency is full.
- * @returns {TaskInstance} last started task instance
- */
-function saturateRunning(waiting, running, max) {
-  let last
-  while (waiting.isActive && running.size !== max) {
-    let ti = waiting.remove().pop()
-    if (ti) {
-      ti._runningOperation = ti._run()
-      last = ti
-      running.add(ti)
-    }
-  }
-  return last
-}
-
-/**
  * Updates the scheduler's state based on the finished task instance's state.
  */
-function updateLast(scheduler, ti) {
+function updateLastFinished(scheduler, ti) {
   if (ti.isCanceled) scheduler.lastCanceled = ti
   else if (ti.isRejected) scheduler.lastRejected = ti
-  else scheduler.lastResolved = ti
+  else if (ti.isResolved) scheduler.lastResolved = ti
 }

@@ -1,8 +1,12 @@
+import createTaskStepper from './task-stepper'
+
 /**
  * A {TaskInstance}
  * @constructor Task Instance
  */
-export default function createTaskInstance(operation) {
+export default function createTaskInstance(operation, updateTp) {
+  let stepper
+
   return {
     operation,
     _runningOperation: null,
@@ -22,7 +26,7 @@ export default function createTaskInstance(operation) {
       return this.hasStarted && !this.isOver
     },
 
-    get isOver() {
+    get isFinished() {
       return this.isCanceled || this.isRejected || this.isResolved
     },
 
@@ -33,6 +37,21 @@ export default function createTaskInstance(operation) {
       else if (this.isResolved) return 'resolved'
       else if (this.hasStarted) return 'running'
       else return 'waiting'
+    },
+
+    /**
+     * Runs the task instance and updates the task property appropriately.
+     */
+    run() {
+      if (!stepper) stepper = createTaskStepper(this)
+      updateTp(true)
+      return Promise.resolve(stepper.stepThrough.apply(stepper))
+        .then(updateTp(false))
+    },
+
+    cancel() {
+      if (!stepper) stepper = createTaskStepper(this)
+      return stepper.handleCancel.apply(stepper)
     }
   }
 }
