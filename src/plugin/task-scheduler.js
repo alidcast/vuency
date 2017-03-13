@@ -54,11 +54,13 @@ export default function createTaskScheduler(policy, autorun = true) {
         let ti = waiting.remove().pop()
         if (ti) {
           this.lastStarted = ti
-          ti._runningOperation = ti.run()
-          .then(finishedOperation => {
+          ti._runningInstance = Promise.resolve(
+            ti.start()
+          ).then(finishedInstance => {
             running.extract(item => item === ti) // remove itself
             updateLastFinished(this, ti)
-            return finishedOperation
+            this.advance() 
+            return finishedInstance
           })
           running.add(ti)
         }

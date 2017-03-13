@@ -8,6 +8,7 @@ import { isPromise } from '../util/assert'
 *
 *  @param {Generator} gen - task operation
 *  @param {TaskInstance} ti
+*  @returns {TaskInstance} after operation has finished running
 *  @constructs Task Stepper
 */
 export default function createTaskStepper(ti) {

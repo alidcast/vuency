@@ -59,13 +59,6 @@ describe('Task Scheduler', function() {
     expect(scheduler.running.size).to.equal(2)
   })
 
-  it('does not pass concurrency limit', () => {
-    scheduler.schedule(ti1).schedule(ti2).schedule(ti3)
-      .advance().advance().advance()
-    expect(scheduler.waiting.size).to.equal(1)
-    expect(scheduler.running.size).to.equal(2)
-  })
-
   it('removes one finished task from running', async () => {
     scheduler.schedule(ti1).advance()
     await ti1._runningOperation
@@ -155,4 +148,14 @@ describe('Task Scheduler', function() {
     expect(autoScheduler.lastRejected).to.be.equal(ti4)
     expect(autoScheduler.lastResolved).to.be.equal(ti1)
   })
+
+  it('concurrency - does not pass limit', () => {
+    scheduler.schedule(ti1).schedule(ti2).schedule(ti3)
+      .advance().advance().advance()
+    expect(scheduler.waiting.size).to.equal(1)
+    expect(scheduler.running.size).to.equal(2)
+  })
+
+  // TODO
+  // add modifier tests - drop, restart
 })

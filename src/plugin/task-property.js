@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import createTaskInstance from './task-instance'
 import createTaskScheduler from './task-scheduler'
 
@@ -14,10 +15,26 @@ export default function createTaskProperty(host, operation, policy) {
   /**
    * Updates reactive task properties and force component instance to update.
    */
-  function setReactiveProps(isRunning) {
-    this.isActive = isRunning
-    this.isIdle = !isRunning
+  function setReactiveProps(tp) {
+    tp.isActive = scheduler.running.isActive
+    tp.isIdle = !scheduler.running.isActive
     host.$forceUpdate()
+  }
+
+  /**
+   * Create a Vue watcher to update task properties when the
+   *  scheduler's running queue changes.
+   */
+  function createTaskWatcher(tp) {
+    const Watcher = Vue.extend({
+      data: () => ({
+        running: scheduler.running.alias()
+      }),
+      watch: {
+        running: setReactiveProps.bind(null, tp)
+      }
+    })
+    return new Watcher()
   }
 
   return {
@@ -32,11 +49,16 @@ export default function createTaskProperty(host, operation, policy) {
      * Creates a new task instance and schedules it to run.
      */
     async run(...args) {
-      if (!scheduler) scheduler = createTaskScheduler(policy)
-      operation = operation.bind(host, ...args) // inject component context
-      let ti = createTaskInstance(operation, setReactiveProps.bind(this))
+      if (!scheduler) {
+        scheduler = createTaskScheduler(policy)
+        createTaskWatcher(this)
+      }
+
+      let hostOperation = operation.bind(host, ...args),
+          ti = createTaskInstance(hostOperation)
+
       scheduler.schedule(ti)
-      return await waitForRunning(ti._runningOperation)
+      return await waitForRunning(ti._runningInstance)
     },
 
     /**
@@ -50,31 +72,10 @@ export default function createTaskProperty(host, operation, policy) {
   }
 }
 
-/** TODO might not need promise, once its set, it's finished?
- * Waits for running to be set and then turns it into a promise.
+/**
+ * Waits for running task instance to be set.
  */
 function waitForRunning(running) {
-  return new Promise(function(resolve, reject) {
-    if (running) return resolve(running)
-    setTimeout(waitForRunning, 30)
-  })
+  if (running) return running
+  else setTimeout(waitForRunning, 30)
 }
-
-// /**
-//  * Create a Vue watcher to update task properties when the
-//  *  scheduler's running queue changes.
-//  */
-// function createWatcher(tp) {
-//   // let updateTp = setReactiveProperties.bind(null, tp)
-//   const Watcher = Vue.extend({
-//     data: () => ({
-//       waiting: scheduler.waiting.alias(),
-//       running: scheduler.running.alias()
-//     }),
-//     watch: {
-//       waiting: updateTp,
-//       running: updateTp
-//     }
-//   })
-//   return new Watcher()
-// }

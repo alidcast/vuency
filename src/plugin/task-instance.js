@@ -2,14 +2,15 @@ import createTaskStepper from './task-stepper'
 
 /**
  * A {TaskInstance}
+ * @param {Function} operation - the registered task operation
  * @constructor Task Instance
  */
-export default function createTaskInstance(operation, updateTp) {
+export default function createTaskInstance(operation) {
   let stepper
 
   return {
     operation,
-    _runningOperation: null,
+    _runningInstance: null,
 
     value: null, // set by succesfully completed task
     error: null, // set by unsuccesfully completed task
@@ -39,14 +40,9 @@ export default function createTaskInstance(operation, updateTp) {
       else return 'waiting'
     },
 
-    /**
-     * Runs the task instance and updates the task property appropriately.
-     */
-    run() {
+    start() {
       if (!stepper) stepper = createTaskStepper(this)
-      updateTp(true)
-      return Promise.resolve(stepper.stepThrough.apply(stepper))
-        .then(updateTp(false))
+      return stepper.stepThrough.apply(stepper)
     },
 
     cancel() {
