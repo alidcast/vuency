@@ -59,7 +59,7 @@ export default function createTaskScheduler(policy, autorun = true) {
           ).then(finishedInstance => {
             running.extract(item => item === ti) // remove itself
             updateLastFinished(this, ti)
-            this.advance() 
+            this.advance()
             return finishedInstance
           })
           running.add(ti)

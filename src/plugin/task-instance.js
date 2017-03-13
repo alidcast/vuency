@@ -23,12 +23,12 @@ export default function createTaskInstance(operation) {
       return !this.hasStarted && this.isCanceled
     },
 
-    get isRunning() {
-      return this.hasStarted && !this.isOver
-    },
-
     get isFinished() {
       return this.isCanceled || this.isRejected || this.isResolved
+    },
+
+    get isRunning() {
+      return this.hasStarted && !this.isFinished
     },
 
     get state() {

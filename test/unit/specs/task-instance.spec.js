@@ -34,5 +34,29 @@ describe('Task Instance', function() {
     expect(ti.start).to.not.be.undefined
     expect(ti.cancel).to.not.be.undefined
   })
-  // TODO verify computed states
+
+  it('updates computed isRunning correctly', async () => {
+    ti.hasStarted = true
+    expect(ti.isRunning).to.be.true
+    ti.isResolved = true
+    expect(ti.isRunning).to.be.false
+  })
+
+  it('updates computed isDropped correctly', async () => {
+    ti.isCanceled = true
+    expect(ti.isDropped).to.be.true
+    ti.hasStarted = true
+    expect(ti.isDropped).to.be.false
+  })
+
+  it('updates computed isFinished correctly', async () => {
+    ti.isResolved = true
+    expect(ti.isFinished).to.be.true
+    ti.isResolved = false
+    ti.isCanceled = true
+    expect(ti.isFinished).to.be.true
+    ti.isCanceled = false
+    ti.isRejected = true
+    expect(ti.isFinished).to.be.true
+  })
 })
