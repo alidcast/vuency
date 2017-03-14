@@ -5,7 +5,7 @@ import createQueue from '../util/queue'
  * as well as updating all 'last' task states.
  *
  * @param {Object} policy - scheduler run policy
- * @param {Boolean} autorun - whether scheduler is updated automatically
+ * @param {Boolean} autorun - whether schedule is updated automatically (primarily for testing)
  * @constructs Task Scheduler
  */
 
@@ -19,11 +19,11 @@ export default function createTaskScheduler(policy, autorun = true) {
   }
 
   function shouldDrop() {
-    return flow === 'drop' && (waiting.size + running.size >= concurrency)
+    return flow === 'drop' && (waiting.size + running.size === concurrency)
   }
 
   function shouldRestart() {
-    return flow === 'restart' && (running.isActive && waiting.isActive)
+    return flow === 'restart' && running.size === concurrency
   }
 
   return {
@@ -38,8 +38,9 @@ export default function createTaskScheduler(policy, autorun = true) {
      */
     schedule(ti) { //
       this.lastCalled = ti
-      if (!shouldDrop()) {
-        if (shouldRestart()) running.forEach(ti => ti.cancel())
+      if (shouldDrop()) ti.cancel()
+      else {
+        if (shouldRestart()) running.forEach(instance => instance.cancel())
         waiting.add(ti)
         if (autorun) this.advance()
       }
@@ -54,14 +55,7 @@ export default function createTaskScheduler(policy, autorun = true) {
         let ti = waiting.remove().pop()
         if (ti) {
           this.lastStarted = ti
-          ti._runningInstance = Promise.resolve(
-            ti.start()
-          ).then(finishedInstance => {
-            running.extract(item => item === ti) // remove itself
-            updateLastFinished(this, ti)
-            this.advance()
-            return finishedInstance
-          })
+          ti._runningInstance = runAndFinalize(this, ti, running)
           running.add(ti)
         }
       }
@@ -112,6 +106,21 @@ export default function createTaskScheduler(policy, autorun = true) {
       }
     }
   }
+}
+
+/**
+ * Start the task instance and sets up callbacks to finalize the scheduling of
+ * task when it has finished running.
+ */
+function runAndFinalize(scheduler, ti, running) {
+  return Promise.resolve(
+    ti.start()
+  ).then(finishedInstance => {
+    running.extract(item => item === ti) // remove itself
+    updateLastFinished(scheduler, ti)
+    scheduler.advance()
+    return finishedInstance
+  })
 }
 
 /**
