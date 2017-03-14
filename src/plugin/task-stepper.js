@@ -49,6 +49,7 @@ export default function createTaskStepper(ti) {
           value = output.value
         }
         catch (err) {                                  // REJECTED
+          // TODO better error handling
           return stepper.handleError(err)
         }
 
