@@ -1,4 +1,5 @@
 const resolve = require('path').resolve
+var compsToRouteParams = require('./utilities/routeParams')
 
 module.exports = {
   head: {
@@ -45,29 +46,18 @@ module.exports = {
   },
   plugins: [
     '~plugins/vuency'
-  ]
-  // ,
-  // generate: {
-  //   routeParams: {
-  //     '/guide/:lesson': function() {
-  //       return compsToRouteParams('lesson', [
-  //         'introduction'
-  //       ])
-  //     }
-  //   }
-  // }
+  ],
+  generate: {
+    routeParams: {
+      '/guide/:lesson': function() {
+        return compsToRouteParams('lesson', [
+          'introduction',
+          'managing-concurrency',
+          'function-throttling',
+          'controlling-state',
+          'loading-ui'
+        ])
+      }
+    }
+  }
 }
-
-// /**
-//  * Components to Route Params
-//  * @param {String} param - param to be used as object key
-//  * @param {Object} comps - exported components
-//  * @returns {Array} route params
-//  */
-// module.exports = function componentToRouteParams(query, params) {
-//   let routes = []
-//   for (let i = 0; i <= params.length - 1; i++) {
-//     routes.push({ [query]: params[i] })
-//   }
-//   return routes
-// }
