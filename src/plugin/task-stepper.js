@@ -6,8 +6,6 @@ import { isPromise } from '../util/assert'
 *  As long as the ti is not `Canceled` or `Rejected`, it continues to iterate
 *  until the ti is `Resolved`.
 *
-*  @param {Generator} gen - task operation
-*  @param {TaskInstance} ti
 *  @returns {TaskInstance} after operation has finished running
 *  @constructs Task Stepper
 */

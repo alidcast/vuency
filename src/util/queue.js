@@ -6,7 +6,7 @@
 export function createQueue(queue = []) {
   return {
     forEach: queue.forEach,
-    
+  
     /**
      * Adds a list of items to to the queue
      * @example

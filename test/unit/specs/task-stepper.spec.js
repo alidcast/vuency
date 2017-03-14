@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-/* global describe, it, expect, beforeEach, sinon */
+/* global describe, it, expect, sinon */
 
 import createTaskStepper from 'src/plugin/task-stepper'
 import createTaskInstance from 'src/plugin/task-instance'
@@ -34,7 +34,6 @@ describe('Task Stepper', function() {
     expect(ti.value).to.equal('success')
   })
 
-
   it('resolves yields from async function ', async () => {
     async function asyncFn() {
       return await sinon.stub().returns('success')()
@@ -62,7 +61,7 @@ describe('Task Stepper', function() {
   })
 
   it('rejects the task instance', () => {
-    let ti = createTaskInstance(function* () {
+    let ti = createTaskInstance(function * () {
           return yield sinon.stub().returns('failed').throws()()
         }),
         stepper = createTaskStepper(ti)
@@ -105,10 +104,10 @@ describe('Task Stepper', function() {
   it('resolves yields server request', () => {
     function * taskReq() {
       let server = sinon.fakeServer.create()
-      server.respondWith("GET",
-        "/fake/req",
+      server.respondWith('GET',
+        '/fake/req',
         [200,
-          { "Content-Type": "application/json" },
+          { 'Content-Type': 'application/json' },
           'Success'
         ])
 
@@ -116,8 +115,8 @@ describe('Task Stepper', function() {
         let req
         var xhr = new XMLHttpRequest()
         xhr.onreadystatechange = function() {
-          if(xhr.readyState == 4 && xhr.status == 200) {
-             req = xhr.responseText
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            req = xhr.responseText
           }
         }
         xhr.open('GET', '/fake/req')
