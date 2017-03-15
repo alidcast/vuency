@@ -13,7 +13,8 @@ module.exports = {
     ]
   },
   css: [
-    ''
+    'normalize.css',
+    'highlight.js/styles/hybrid.css'
   ],
   loading: {
     color: '#3B8070'
