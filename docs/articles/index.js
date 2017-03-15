@@ -18,15 +18,3 @@ export {
   guide,
   examples
 }
-
-// Getting Started
-  //  Installation
-  //  Introduction
-  //  Your First Task
-// Core Concepts
-  // The Task Property
-  // The Task Instance
-  // Managing Flow
-  // Managing Concurrency
-  // Async Helpers
-// Examples - different url or same?
