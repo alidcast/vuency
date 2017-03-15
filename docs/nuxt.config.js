@@ -1,5 +1,4 @@
 const resolve = require('path').resolve
-var compsToRouteParams = require('./utilities/routeParams')
 
 module.exports = {
   head: {
@@ -22,8 +21,7 @@ module.exports = {
   build: {
     extend (config, ctx) {
       // aliases
-      config.resolve.alias['~documentation'] = resolve(__dirname, 'documentation')
-      config.resolve.alias['~examples'] = resolve(__dirname, 'examples')
+      config.resolve.alias['~articles'] = resolve(__dirname, 'articles')
       config.resolve.alias['~utilities'] = resolve(__dirname, 'utilities')
       // loaders
       config.module.rules.push(
@@ -49,15 +47,26 @@ module.exports = {
   ],
   generate: {
     routeParams: {
-      '/guide/:lesson': function() {
-        return compsToRouteParams('lesson', [
-          'introduction',
-          'managing-concurrency',
-          'function-throttling',
-          'controlling-state',
-          'loading-ui'
-        ])
-      }
+      '/guide/:slug': toRouteParams([
+        'introduction',
+        'managing-concurrency',
+      ]),
+      '/examples/:slug': toRouteParams([
+        'controlling-state',
+        // 'function-throttling',
+        // 'loading-ui'
+      ]),
     }
   }
+}
+
+/**
+ * Convert an array of url slugs to an array of dynamic route params.
+ */
+function toRouteParams(params, query = 'slug') {
+  let routes = []
+  params.forEach(param => {
+    routes.push({ [query]: param })
+  })
+  return routes
 }
