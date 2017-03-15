@@ -17,6 +17,7 @@
     "highlight.js": "^9.10.0",
     "normalize.css": "^5.0.0",
     "nuxt": "latest",
+    "sass-chunks": "file:///Users/acastano/Sites/vue/sass-chunks",
     "vuency": "file:///Users/acastano/Sites/vue/vuency"
   },
   "devDependencies": {
