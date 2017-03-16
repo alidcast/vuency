@@ -14,7 +14,8 @@ module.exports = {
   },
   css: [
     'normalize.css',
-    'highlight.js/styles/hybrid.css'
+    'highlight.js/styles/hybrid.css',
+    { src: '~assets/sass/global.sass', lang: 'sass' }
   ],
   loading: {
     color: '#3B8070'
@@ -53,9 +54,7 @@ module.exports = {
         'managing-concurrency',
       ]),
       '/examples/:slug': toRouteParams([
-        'controlling-state',
-        // 'function-throttling',
-        // 'loading-ui'
+        'controlling-state'
       ]),
     }
   }

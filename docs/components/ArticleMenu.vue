@@ -1,13 +1,8 @@
-<template>
-  <div>
-    <ul>
-      <li v-for="article in menu">
-        <nuxt-link :to="`/guide/${article.slug}`">
-            {{ article.heading }}
-        </nuxt-link>
-      </li>
-    </ul>
-  </div>
+<template lang="pug">
+  div
+    ul
+      li(v-for="article in menu")
+        <nuxt-link :to="`/guide/${article.slug}`"> {{ article.heading }} </nuxt-link>
 </template>
 
 <script>

@@ -1,11 +1,7 @@
-<template>
-  <div class="container">
-    <h1> Vuency </h1>
-    <nav class="home-nav">
-      <nuxt-link to="/guide/introduction"> Guide </nuxt-link>
-      <nuxt-link to="/examples/controlling-state"> Examples </nuxt-link>
-    </nav>
-  </div>
+<template lang="pug">
+  div.hero
+    h2.hero-slogan Concurrency management <span> for Vuejs. </span>
+    a.hero-action(href="guide/introduction") Get Started
 </template>
 
 <script>
@@ -14,9 +10,28 @@ export default {
 }
 </script>
 
-<style lang="sass">
-@import "../plugins/sass-chunks.sass"
+<style lang="sass" scoped>
+@import "../assets/sass/global.sass"
 
-.home-nav
-  +grid-contain('row', 'nowrap')
+.header
+  +flex-contain(row)
+  +flex-place('children', start, start)
+  padding: 0 100px
+  .header-title
+    +flex-span(50%, fluid)
+  .header-nav
+    +flex-span(50%, fluid)
+    +flex-contain(row)
+    .header-nav-item
+      +flex-place('self', end, null)
+      margin-top: 1.25rem
+.hero
+  +flex-contain(column)
+  +flex-place('children', start, center)
+  .hero-slogan
+    font-size: 2.75rem
+
+#github-icon
+  display: block
+  width: 32px
 </style>

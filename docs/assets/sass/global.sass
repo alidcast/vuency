@@ -1,0 +1,58 @@
+// --------------------
+// sass-chunks
+// --------------------
+// $background:
+// linear-gradient(to left bottom, rgb(255, 255, 179) 0%, rgb(220, 255, 179) 100%)
+// linear-gradient(to left bottom, rgb(179, 213, 255) 0%, rgb(179, 255, 222) 100%)
+// linear-gradient(to left bottom, rgb(241, 255, 179) 0%, rgb(194, 255, 179) 100%)
+// linear-gradient(to left bottom, rgb(255, 255, 179) 0%, rgb(220, 255, 179) 100%)
+$primary: 'green'
+$default-hue: '100'
+@import "node_modules/sass-chunks/dist/main.sass"
+
+// --------------------
+// main
+// --------------------
+
+html
+  box-sizing: border-box
+  font-size: 16px
+
+*, *:before, *:after
+  box-sizing: inherit
+
+// removed bullet point styles
+ul
+  list-style: none
+  padding-left: 0
+
+// removed hyperlink styles
+a
+  color: inherit
+  text-decoration: inherit
+
+
+// Code
+// Inline and block-level code snippets.
+
+$code-color: #35495e
+$code-background-color: #f9f9f9
+
+code
+  padding: .25em .5em
+  font-size: 90%
+  color: $code-color
+  background-color: $code-background-color
+  border-radius: 3px
+
+pre
+  margin: 0 .5rem 1rem .5rem
+  padding: 1rem
+  background-color: $code-background-color
+
+pre code
+  padding: 0
+  font-size: 100%
+  color: inherit
+  background-color: transparent
+  overflow: scroll

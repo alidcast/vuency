@@ -1,18 +1,14 @@
-<template>
-  <div>
-    <ArticleMenu :articles="articles"/>
-    <comonent :is="currentArticle" />
-  </div>
+<template lang="pug">
+  div
+    comonent(:is="currentArticle")
 </template>
 
 <script>
-import ArticleMenu from '~components/ArticleMenu.vue'
 import { examples } from '~articles/index'
 import { toHeading } from '~utilities/to-transforms'
 
 export default {
   data: ({ params }) => ({
-    articles: Object.keys(examples),
     currentArticle: params.slug || 'introduction'
   }),
 
@@ -23,8 +19,7 @@ export default {
   },
 
   components: {
-    ...examples,
-    ArticleMenu
+    ...examples
   }
 }
 </script>
