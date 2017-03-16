@@ -30,8 +30,4 @@ export default {
   +flex-place('children', start, center)
   .hero-slogan
     font-size: 2.75rem
-
-#github-icon
-  display: block
-  width: 32px
 </style>
