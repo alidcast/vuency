@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    comonent(:is="currentArticle")
+    comonent.content(:is="currentArticle")
 </template>
 
 <script>
@@ -23,3 +23,17 @@ export default {
   }
 }
 </script>
+
+<style lang="sass">
+.content
+  margin: 2.5rem 0 0 2rem
+  max-width: 40rem
+  // content styles
+  h1
+    margin-bottom: 1rem
+  h2
+    border-bottom: 1px solid #ddd
+    padding-bottom: .5rem
+    margin-bottom: 1rem
+    margin-top: 2rem
+</style>

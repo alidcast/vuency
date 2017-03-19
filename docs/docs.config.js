@@ -10,6 +10,13 @@ module.exports = {
         'managing-concurrency'
       ]
     ],
+    ['API',
+      [
+        'task-property',
+        'taskInstance',
+        'task-modifiers'
+      ]
+    ],
     ['examples',
       [
         'controlling-state'
