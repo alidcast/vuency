@@ -6,7 +6,11 @@
     <p>
       answer: {{ answer }} <br>
       result: {{ askQuestion.value }} <br>
-      state: {{ askQuestion.isActive }}
+      state: {{ askQuestion.isActive }} <br>
+      last: {{
+        askQuestion.last.called
+        ? askQuestion.last.called.state : askQuestion.default.state
+      }}
     </p>
   </div>
 </template>
@@ -19,14 +23,12 @@ export default {
   }),
 
   tasks: function(t, { pause }) {
-    return {
-      askQuestion: t(function* () {
-        yield pause(1000)
-        this.answer = this.num
-        this.num++
-        return 'me too!'
-      }).concurrency(3)
-    }
+    return t(function* askQuestion() {
+      yield pause(3000)
+      this.answer = this.num
+      this.num++
+      return 'me too!'
+    }).flow('drop').concurrency(3)
   }
 }
 </script>
