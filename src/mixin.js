@@ -4,7 +4,7 @@ import assert, { isFn } from './util/assert'
 
 export default function(Vue) {
   Vue.mixin({
-    beforeCreate: initTasks
+    created: initTasks
     // TODO
     // beforeDestory {}
   })
@@ -23,7 +23,7 @@ function initTasks() {
     assert(isFn(opts.tasks), 'The Tasks property must be a function')
 
     let createTask = initTaskFactory(host),
-        tasks = opts.tasks(createTask, asyncHelpers)
+        tasks = opts.tasks.call(host, createTask, asyncHelpers)
 
     // if tasks is task object then only one registered task was returned
     // otherwise it was a set registered tasks
