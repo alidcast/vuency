@@ -18,6 +18,7 @@ export default function createTaskProperty(host, operation, policy) {
   function setReactiveProps(tp) {
     tp.isActive = scheduler.running.isActive
     tp.isIdle = !scheduler.running.isActive
+    tp.state = tp.isActive ? 'active' : 'idle'
     host.$forceUpdate()
   }
 
@@ -40,15 +41,15 @@ export default function createTaskProperty(host, operation, policy) {
   return {
     isActive: false,
     isIdle: true,
+    state: 'idle',
 
     // TODO
-    // state
     // last
 
     /**
      * Creates a new task instance and schedules it to run.
      */
-    async run(...args) {
+    run(...args) {
       if (!scheduler) {
         scheduler = createTaskScheduler(policy)
         createTaskWatcher(this)
@@ -58,7 +59,8 @@ export default function createTaskProperty(host, operation, policy) {
           ti = createTaskInstance(hostOperation)
 
       scheduler.schedule(ti)
-      return await waitForRunning(ti._runningInstance)
+      // waitForRunning(ti._runningInstance)
+      return ti
     },
 
     /**
@@ -75,7 +77,7 @@ export default function createTaskProperty(host, operation, policy) {
 /**
  * Waits for running task instance to be set.
  */
-function waitForRunning(running) {
-  if (running) return running
-  else setTimeout(waitForRunning, 30)
-}
+// function waitForRunning(running) {
+//   if (running) return running
+//   else setTimeout(waitForRunning, 50)
+// }

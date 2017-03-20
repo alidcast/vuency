@@ -55,7 +55,7 @@ export default function createTaskScheduler(policy, autorun = true) {
         let ti = waiting.remove().pop()
         if (ti) {
           this.lastStarted = ti
-          ti._runningInstance = runAndFinalize(this, ti, running)
+          ti._runningInstance = runThenFinalize(this, ti, running)
           running.add(ti)
         }
       }
@@ -112,7 +112,7 @@ export default function createTaskScheduler(policy, autorun = true) {
  * Start the task instance and sets up callbacks to finalize the scheduling of
  * task when it has finished running.
  */
-function runAndFinalize(scheduler, ti, running) {
+function runThenFinalize(scheduler, ti, running) {
   return Promise.resolve(
     ti.start()
   ).then(finishedInstance => {
