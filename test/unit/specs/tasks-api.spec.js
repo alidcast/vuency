@@ -17,15 +17,23 @@ describe('Tasks API', function() {
       throw new Error(err)
     }
 
-    let tasksFn = () => new Vue({
-          tasks: (t) => ({
-            test: t(test)
-          })
+    let tasksObjSet = () => new Vue({
+          tasks: (t) => {
+            return {
+              test: t(test)
+            }
+          }
+        }),
+        tasksSingleFn = () => new Vue({
+          tasks: (t) => {
+            return t(test)
+          }
         }),
         tasksArr = () => new Vue({
           tasks: [test]
         })
-    expect(tasksFn).to.not.throw(Error)
+    expect(tasksObjSet).to.not.throw(Error)
+    expect(tasksSingleFn).to.not.throw(Error)
     expect(tasksArr).to.throw(Error)
   })
 
