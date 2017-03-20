@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-/* global describe, it, expect */
+/* global describe, it, expect, sinon */
 
 import Vue from 'vue'
 import Vuency from 'index'
@@ -18,16 +18,14 @@ describe('Tasks API', function() {
     }
 
     let tasksObjSet = () => new Vue({
-          tasks: (t) => {
+          tasks(t) {
             return {
               test: t(test)
             }
           }
         }),
         tasksSingleFn = () => new Vue({
-          tasks: (t) => {
-            return t(test)
-          }
+          tasks: (t) => t(test)
         }),
         tasksArr = () => new Vue({
           tasks: [test]
@@ -46,5 +44,20 @@ describe('Tasks API', function() {
     })
     expect(isObj(vm.ex1)).to.be.true
     expect(isObj(vm.ex2)).to.be.true
+  })
+
+  it('listens to component instance events', () => {
+    let callback = sinon.spy(),
+        vm = new Vue({
+          tasks(t) {
+            return t(function * spy() {
+              callback()
+            }).runOn('runTask')
+          }
+        })
+
+    vm.$emit('runTask')
+    expect(vm.spy).to.not.be.undefined
+    expect(callback.called).to.be.true
   })
 })

@@ -4,7 +4,7 @@ import assert from '../util/assert'
 *  Creates default task policy with modifier options.
 *  @constructs Task Modifiers
 */
-export default function createTaskModifiers(_type, _num) {
+export default function createTaskPolicy(_type, _num) {
   let flowTypes = ['enqueue', 'restart', 'drop']
 
   return {

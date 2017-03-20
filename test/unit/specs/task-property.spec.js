@@ -3,7 +3,7 @@
 
 import Vue from 'vue'
 import createTaskProperty from 'src/plugin/task-property'
-import createTaskModifier from 'src/plugin/task-modifiers'
+import createTaskPolicy from 'src/plugin/task-policy'
 
 function * exTask() {
   return 'passed'
@@ -12,7 +12,7 @@ function * exTask() {
 describe('Task Property', function() {
   let tp,
       host = new Vue(),
-      policy = createTaskModifier('enqueue', 2).policy
+      policy = createTaskPolicy('enqueue', 2).policy
 
   beforeEach(() => {
     tp = createTaskProperty(host, exTask, policy)

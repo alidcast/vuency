@@ -3,7 +3,7 @@
 
 import createTaskScheduler from 'src/plugin/task-scheduler'
 import createTaskInstance from 'src/plugin/task-instance'
-import createTaskModifier from 'src/plugin/task-modifiers'
+import createTaskPolicy from 'src/plugin/task-policy'
 import { pause } from 'src/util/async'
 
 function * exTask() {
@@ -21,7 +21,7 @@ describe('Task Scheduler', function() {
       ti2,
       ti3,
       ti4,
-      policy = createTaskModifier('enqueue', 2).policy
+      policy = createTaskPolicy('enqueue', 2).policy
 
   beforeEach(() => {
     scheduler = createTaskScheduler(policy, false)
@@ -166,7 +166,7 @@ describe('Task Scheduler', function() {
   })
 
   it('(drop) drops second call if first one is still running', async () => {
-    let dropPolicy = createTaskModifier('drop', 1).policy,
+    let dropPolicy = createTaskPolicy('drop', 1).policy,
         dropScheduler = createTaskScheduler(dropPolicy, true)
     dropScheduler.schedule(ti1).schedule(ti2)
     expect(dropScheduler.waiting.size).to.equal(0)
@@ -177,7 +177,7 @@ describe('Task Scheduler', function() {
   })
 
   it('(restart) cancels first call if called again while running', async () => {
-    let restartPolicy = createTaskModifier('restart', 1).policy,
+    let restartPolicy = createTaskPolicy('restart', 1).policy,
         restartScheduler = createTaskScheduler(restartPolicy, true),
         slowTi = createTaskInstance(function * () {
           return yield pause(1000)

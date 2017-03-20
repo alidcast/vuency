@@ -81,8 +81,5 @@ export default function createTaskProperty(host, operation, policy) {
     abort() {
       if (scheduler.isActive) scheduler.emptyOut()
     }
-    // TODO
-    // add events
-    // abort
   }
 }

@@ -6,7 +6,7 @@ export default function(Vue) {
   Vue.mixin({
     created: initTasks
     // TODO
-    // beforeDestory {}
+    // beforeDestory {} // cancel tasks, remove listeners, etc
   })
 }
 

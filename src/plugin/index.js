@@ -1,5 +1,6 @@
 import createTaskProperty from './task-property'
-import createTaskModifiers from './task-modifiers'
+import createTaskPolicy from './task-policy'
+import createTaskListeners from './task-listeners'
 import assert, { isFn } from '../util/assert'
 
 /**
@@ -17,11 +18,14 @@ export default function initTaskFactory(host) {
   return function createTask(operation) {
     assert(isFn(operation), 'All task actions must be functions')
 
-    let { policy, modifiers } = createTaskModifiers('enqueue', 1)
+    let { policy, modifiers } = createTaskPolicy('enqueue', 1),
+        taskProp = createTaskProperty(host, operation, policy),
+        listeners = createTaskListeners(host, taskProp)
 
     return {
       operation,
-      ...createTaskProperty(host, operation, policy),
+      ...taskProp,
+      ...listeners,
       policy,
       ...modifiers
     }
