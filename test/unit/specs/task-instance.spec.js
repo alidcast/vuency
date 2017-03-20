@@ -31,32 +31,39 @@ describe('Task Instance', function() {
   })
 
   it('has correct stepper methods for scheduler to use', () => {
-    expect(ti.start).to.not.be.undefined
+    expect(ti._start).to.not.be.undefined
     expect(ti.cancel).to.not.be.undefined
   })
 
-  it('updates computed isRunning correctly', async () => {
+  it('updates computed isRunning correctly', () => {
     ti.hasStarted = true
+    ti._setComputedProps()
     expect(ti.isRunning).to.be.true
     ti.isResolved = true
+    ti._setComputedProps()
     expect(ti.isRunning).to.be.false
   })
 
-  it('updates computed isDropped correctly', async () => {
+  it('updates computed isDropped correctly', () => {
     ti.isCanceled = true
+    ti._setComputedProps()
     expect(ti.isDropped).to.be.true
     ti.hasStarted = true
+    ti._setComputedProps()
     expect(ti.isDropped).to.be.false
   })
 
-  it('updates computed isFinished correctly', async () => {
+  it('updates computed isFinished correctly', () => {
     ti.isResolved = true
+    ti._setComputedProps()
     expect(ti.isFinished).to.be.true
     ti.isResolved = false
     ti.isCanceled = true
+    ti._setComputedProps()
     expect(ti.isFinished).to.be.true
     ti.isCanceled = false
     ti.isRejected = true
+    ti._setComputedProps()
     expect(ti.isFinished).to.be.true
   })
 })

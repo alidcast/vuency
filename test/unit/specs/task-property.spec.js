@@ -21,6 +21,8 @@ describe('Task Property', function() {
   it('has correct states', () => {
     expect(tp.isActive).to.be.false
     expect(tp.isIdle).to.be.true
+    expect(tp.last).to.not.be.undefined
+    expect(tp.default).to.not.be.undefined
   })
 
   it('has correct actions', () => {
