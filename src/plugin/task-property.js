@@ -13,17 +13,7 @@ export default function createTaskProperty(host, operation, policy) {
   let scheduler
 
   /**
-   * Updates reactive task properties and force component instance to update.
-   */
-  function setReactiveProps(tp) {
-    tp.isActive = scheduler.running.isActive
-    tp.isIdle = !scheduler.running.isActive
-    tp.state = tp.isActive ? 'active' : 'idle'
-    host.$forceUpdate()
-  }
-
-  /**
-   * Create a Vue watcher to update task properties when the
+   *  Create a Vue watcher that will update task properties when the
    *  scheduler's running queue changes.
    */
   function createTaskWatcher(tp) {
@@ -32,19 +22,42 @@ export default function createTaskProperty(host, operation, policy) {
         running: scheduler.running.alias()
       }),
       watch: {
-        running: setReactiveProps.bind(null, tp)
+        running() {
+          tp._setReactiveProps()
+          host.$forceUpdate()
+        }
       }
     })
     return new Watcher()
+  }
+
+  /**
+   * Gets all last instance values.
+   */
+  function getLastProps() {
+    return {
+      called: scheduler.lastCalled,
+      started: scheduler.lastStarted,
+      resolved: scheduler.lastResolved,
+      rejected: scheduler.lastRejected,
+      canceled: scheduler.lastCanceled
+    }
   }
 
   return {
     isActive: false,
     isIdle: true,
     state: 'idle',
+    last: {},
+    // default helper instance to be used for when `last` is undefined
+    default: createTaskInstance(function * () {}),
 
-    // TODO
-    // last
+    _setReactiveProps() {
+      this.isActive = scheduler.running.isActive
+      this.isIdle = !scheduler.running.isActive
+      this.state = this.isActive ? 'active' : 'idle'
+      this.last = getLastProps()
+    },
 
     /**
      * Creates a new task instance and schedules it to run.
@@ -59,7 +72,6 @@ export default function createTaskProperty(host, operation, policy) {
           ti = createTaskInstance(hostOperation)
 
       scheduler.schedule(ti)
-      // waitForRunning(ti._runningInstance)
       return ti
     },
 
@@ -71,13 +83,6 @@ export default function createTaskProperty(host, operation, policy) {
     }
     // TODO
     // add events
+    // abort
   }
 }
-
-/**
- * Waits for running task instance to be set.
- */
-// function waitForRunning(running) {
-//   if (running) return running
-//   else setTimeout(waitForRunning, 50)
-// }

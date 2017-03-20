@@ -13,21 +13,29 @@ export default function createTaskStepper(ti) {
   let iter = ti.operation() // start generator
 
   return {
+    handleStart() {
+      ti.hasStarted = true
+      ti._setComputedProps()
+      return ti
+    },
+
     handleCancel() {
-      if (ti.isOver) return this
       ti.isCanceled = true
+      ti._setComputedProps()
       return ti
     },
 
     handleError(err) {
       ti.isRejected = true
       ti.error = err
+      ti._setComputedProps()
       return ti
     },
 
     handleSuccess(val) {
       ti.isResolved = true
       ti.value = val
+      ti._setComputedProps()
       return ti
     },
 
@@ -40,7 +48,7 @@ export default function createTaskStepper(ti) {
         let output, value
 
         if (ti.isCanceled) return ti                   // CANCELED / DROPPED
-        if (!ti.hasStarted) ti.hasStarted = true
+        if (!ti.hasStarted) stepper.handleStart()
 
         try { // iterate through another yield
           output = iter.next(prev)

@@ -38,7 +38,10 @@ export default function createTaskScheduler(policy, autorun = true) {
      */
     schedule(ti) { //
       this.lastCalled = ti
-      if (shouldDrop()) ti.cancel()
+      if (shouldDrop()) {
+        ti.cancel()
+        console.log('is dropped ' + ti.isDropped)
+      }
       else {
         if (shouldRestart()) running.forEach(instance => instance.cancel())
         waiting.add(ti)
@@ -114,7 +117,7 @@ export default function createTaskScheduler(policy, autorun = true) {
  */
 function runThenFinalize(scheduler, ti, running) {
   return Promise.resolve(
-    ti.start()
+    ti._start()
   ).then(finishedInstance => {
     running.extract(item => item === ti) // remove itself
     updateLastFinished(scheduler, ti)

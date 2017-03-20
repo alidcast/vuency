@@ -11,36 +11,37 @@ export default function createTaskInstance(operation) {
   return {
     operation,
     _runningInstance: null,
-
-    value: null, // set by succesfully completed task
-    error: null, // set by unsuccesfully completed task
+    // results
+    value: null,
+    error: null,
+    // states
     hasStarted: false,
     isCanceled: false,
     isRejected: false,
     isResolved: false,
+    // computed states
+    isDropped: false,
+    isFinished: false,
+    isRunning: false,
+    state: 'waiting',
 
-    get isDropped() {
-      return !this.hasStarted && this.isCanceled
+    _setComputedProps() {
+      this.isDropped = !this.hasStarted && this.isCanceled
+      this.isRunning = this.hasStarted && !this.isFinished
+      this.isFinished = this.isCanceled || this.isRejected || this.isResolved
+      this.state = this._getState()
     },
 
-    get isFinished() {
-      return this.isCanceled || this.isRejected || this.isResolved
-    },
-
-    get isRunning() {
-      return this.hasStarted && !this.isFinished
-    },
-
-    get state() {
+    _getState() {
       if (this.isDropped) return 'dropped'
       else if (this.isCanceled) return 'canceled'
       else if (this.isRejected) return 'rejected'
       else if (this.isResolved) return 'resolved'
-      else if (this.hasStarted) return 'running'
+      else if (this.isRunning) return 'running'
       else return 'waiting'
     },
 
-    start() {
+    _start() {
       if (!stepper) stepper = createTaskStepper(this)
       return stepper.stepThrough.apply(stepper)
     },
