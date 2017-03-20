@@ -38,12 +38,9 @@ export default function createTaskScheduler(policy, autorun = true) {
      */
     schedule(ti) { //
       this.lastCalled = ti
-      if (shouldDrop()) {
-        ti.cancel()
-        console.log('is dropped ' + ti.isDropped)
-      }
+      if (shouldDrop()) ti.cancel()
       else {
-        if (shouldRestart()) running.forEach(instance => instance.cancel())
+        if (shouldRestart()) running.forEach(runningTi => runningTi.cancel())
         waiting.add(ti)
         if (autorun) this.advance()
       }

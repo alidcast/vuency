@@ -27,8 +27,8 @@ export default function createTaskInstance(operation) {
 
     _setComputedProps() {
       this.isDropped = !this.hasStarted && this.isCanceled
-      this.isRunning = this.hasStarted && !this.isFinished
       this.isFinished = this.isCanceled || this.isRejected || this.isResolved
+      this.isRunning = this.hasStarted && !this.isFinished
       this.state = this._getState()
     },
 
