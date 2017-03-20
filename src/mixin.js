@@ -25,8 +25,15 @@ function initTasks() {
     let createTask = initTaskFactory(host),
         tasks = opts.tasks(createTask, asyncHelpers)
 
-    Object.keys(tasks).forEach(key => {
-      host[key] = tasks[key]
-    })
+    // if tasks is task object then only one registered task was returned
+    // otherwise it was a set registered tasks
+    if (tasks.policy) {
+      host[tasks.operation.name] = tasks
+    }
+    else {
+      Object.keys(tasks).forEach(key => {
+        host[key] = tasks[key]
+      })
+    }
   }
 }

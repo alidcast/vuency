@@ -20,6 +20,7 @@ export default function initTaskFactory(host) {
     let { policy, modifiers } = createTaskModifiers('enqueue', 1)
 
     return {
+      operation,
       ...createTaskProperty(host, operation, policy),
       policy,
       ...modifiers
