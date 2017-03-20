@@ -76,10 +76,10 @@ export default function createTaskProperty(host, operation, policy) {
     },
 
     /**
-     * Cancels all active task instances.
+     * Cancels all scheduled task instances.
      */
     abort() {
-
+      if (scheduler.isActive) scheduler.emptyOut()
     }
     // TODO
     // add events

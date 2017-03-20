@@ -126,10 +126,19 @@ describe('Task Scheduler', function() {
       .advance().advance()
     await ti4._runningInstance
     await ti1._runningInstance
-    expect(autoScheduler.waiting.size).to.equal(0)
-    expect(autoScheduler.running.size).to.equal(0)
+    expect(scheduler.waiting.size).to.equal(0)
+    expect(scheduler.running.size).to.equal(0)
     expect(scheduler.lastRejected).to.be.equal(ti4)
     expect(scheduler.lastResolved).to.be.equal(ti1)
+  })
+
+  it('manually empties out queues and cancels instances', async () => {
+    scheduler.schedule(ti1).schedule(ti2).schedule(ti3).advance().emptyOut()
+    expect(scheduler.waiting.size).to.equal(0)
+    expect(scheduler.running.size).to.equal(0)
+    expect(ti1.isCanceled).to.be.true
+    expect(ti2.isCanceled).to.be.true
+    expect(ti3.isCanceled).to.be.true
   })
 
   it('automatically runs one function', async () => {

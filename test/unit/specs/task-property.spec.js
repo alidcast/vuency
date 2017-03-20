@@ -30,8 +30,17 @@ describe('Task Property', function() {
     expect(tp.abort).to.not.be.undefined
   })
 
-  it('returns task instance when operation is run', async () => {
-    let runningTi = await tp.run()
-    expect(runningTi.state).to.not.be.undefined
+  it('returns task instance when operation is run', () => {
+    let scheduledTi = tp.run()
+    expect(scheduledTi.state).to.not.be.undefined
+  })
+
+  it('aborts all task instances', () => {
+    let scheduledTi1 = tp.run(),
+        scheduledTi2 = tp.run()
+    tp.abort()
+    expect(scheduledTi1.isCanceled).to.be.true
+    expect(scheduledTi2.isCanceled).to.be.true
+    expect(tp.isActive).to.be.false
   })
 })

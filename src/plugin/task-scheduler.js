@@ -40,7 +40,7 @@ export default function createTaskScheduler(policy, autorun = true) {
       this.lastCalled = ti
       if (shouldDrop()) ti.cancel()
       else {
-        if (shouldRestart()) running.forEach(runningTi => runningTi.cancel())
+        if (shouldRestart()) cancelQueued(running)
         waiting.add(ti)
         if (autorun) this.advance()
       }
@@ -60,6 +60,16 @@ export default function createTaskScheduler(policy, autorun = true) {
         }
       }
       return this
+    },
+
+    /**
+     * Cancels all scheduled task instances and clears queues.
+     */
+    emptyOut() {
+      cancelQueued(waiting)
+      cancelQueued(running)
+      waiting.clear()
+      running.clear()
     },
 
     get isActive() {
@@ -130,4 +140,8 @@ function updateLastFinished(scheduler, ti) {
   if (ti.isCanceled) scheduler.lastCanceled = ti
   else if (ti.isRejected) scheduler.lastRejected = ti
   else if (ti.isResolved) scheduler.lastResolved = ti
+}
+
+function cancelQueued(queue) {
+  queue.forEach(item => item.cancel())
 }
