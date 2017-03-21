@@ -45,6 +45,7 @@ export default function createTaskProperty(host, operation, policy) {
   }
 
   return {
+    // reactive states
     isActive: false,
     isIdle: true,
     state: 'idle',
@@ -67,10 +68,8 @@ export default function createTaskProperty(host, operation, policy) {
         scheduler = createTaskScheduler(policy)
         createTaskWatcher(this)
       }
-
       let hostOperation = operation.bind(host, ...args),
           ti = createTaskInstance(hostOperation)
-
       scheduler.schedule(ti)
       return ti
     },

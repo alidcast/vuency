@@ -66,8 +66,10 @@ export default function createTaskScheduler(policy, autorun = true) {
      * Cancels all scheduled task instances and clears queues.
      */
     emptyOut() {
-      emptyQueued(waiting)
-      emptyQueued(running)
+      cancelQueued(waiting)
+      cancelQueued(running)
+      waiting.clear()
+      running.clear()
     },
 
     get isActive() {
@@ -149,9 +151,4 @@ function updateLastFinished(scheduler, ti) {
 function cancelQueued(queue) {
   if (queue.size === 1) queue.pop().cancel()
   else queue.forEach(item => item.cancel())
-}
-
-function emptyQueued(queue) {
-  cancelQueued(queue)
-  queue.clear()
 }
