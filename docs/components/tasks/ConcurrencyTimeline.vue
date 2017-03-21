@@ -1,13 +1,24 @@
 <template>
   <div>
     <button @click="runTrackerInstance"> task.run() </button>
+    <button @click="clearTimeline">Clear Timeline</button>
+    <button
+      v-if="canCancelLast && trackerTask.last.called && !trackerTask.last.called.isFinished"
+      @click="trackerTask.last.started.cancel()">
+      Cancel Last
+    </button>
+    <button
+      v-if="trackerTask.isActive"
+      @click="trackerTask.abort()">
+      Cancel All
+    </button>
 
-    <svg class="trackerGragh">
-      <g  class="taskTimeLine">
+    <svg class="concurrencyTimeline">
+      <g>
         <line
-          :x1="xTimeLine + '%'"
+          :x1="xTimeline + '%'"
           y1="0"
-          :x2="xTimeLine + '%'"
+          :x2="xTimeline + '%'"
           y2="100"
           stroke="black" />
       </g>
@@ -38,19 +49,18 @@
 </template>
 
 <script>
-import Vue from 'vue'
-
-//
 // TODO
-// - DRopped not showing up - getting dropped but still being executed?
-// - restart is taking long
+// enqueue waiting is being shown! :( can't win this!!
+// - clear task tracker
+//      - automatic clear if it reaches certain length
+// - scheduler isn't getting advnace fully in enqueue and drop?
 
 /** TODO consider making timers part of tp
  * Enhance task property so that I can be used for tracker graph.
  */
 function createTrackerInstance(host) {
-  let colors = [ 'red', 'green', 'blue' ],
-      labelHeights = [0, 20, 40, 60, 80, 100 ]
+  let colors = ['red', 'green', 'blue'],
+      labelHeights = [0, 20, 40, 60, 80, 100]
 
   return {
     id: host.nextId++,
@@ -62,27 +72,27 @@ function createTrackerInstance(host) {
 
     g: {
       height: 20,
-      width: 0,
+      width: 0.01,
       x: 0,
       y: pickFrom(labelHeights, host.nextId),
       color: pickFrom(colors, host.nextId)
     },
 
-    startTracking() {
-      this.hasStarted = true
-      this.startTime = host.timeElapsed || 1
-    },
-
-    endTracking() {
-      this.endTime = host.timeElapsed
-    },
-
     update(currTime, upper, lower) {
       let ti = this.taskInstance,
           start = this.startTime
-      this.endTime = currTime
-      if (!ti.isFinished) this.g.width = scale(width(this, upper), upper, lower)
+
+      if (!this.hasStarted) {
+        this.startTime = currTime
+        this.hasStarted = true
+      }
+
       this.g.x = scale(start - lower, upper, lower)
+
+      if (!ti.isFinished) {
+        this.g.width = scale(width(this, upper), upper, lower)
+        this.endTime = currTime
+      }
     }
   }
 }
@@ -91,29 +101,28 @@ export default {
   props: {
     flow: {
       type: String, required: true
+    },
+    canCancelLast: {
+      type: Boolean, default: false
+    },
+    canCancelAll: {
+      type: Boolean, default: true
     }
   },
 
   data() {
     return {
       trackedInstances: [],
+      nextId: 0,
       startTime: false,
       timeElapsed: 0,
-      nextId: 0,
-      xTimeLine: 0
+      xTimeline: 0
     }
   },
-
   tasks(t, { pause }) {
     return {
       trackerTask: t(function * (trackerInstance) {
-        trackerInstance.startTracking()
-        try {
-          yield pause(2000)
-        }
-        finally {
-          trackerInstance.endTracking()
-        }
+        yield pause(2000)
       }).flow(this.flow),
 
       ticker: t(function * () {
@@ -137,7 +146,7 @@ export default {
     },
 
     upperLimit() {
-      return Math.max(10000, this.timeElapsed);
+      return Math.max(10000, this.timeElapsed)
     }
   },
 
@@ -156,11 +165,21 @@ export default {
           upper = this.upperLimit, lower = this.lowerLimit
 
       window.requestAnimationFrame(() => {
-        tracker.xTimeLine = scale(currTime, upper, lower)
+        tracker.xTimeline = scale(currTime, upper, lower)
         tracker.trackedInstances.forEach(instance => {
           instance.update(currTime, upper, lower)
         })
       })
+    },
+
+    clearTimeline() {
+      this.trackedInstances = []
+      this.trackerTask.abort()
+      this.ticker.abort()
+      this.nextId = 0
+      this.startTime = 0
+      this.timeElapsed = 0
+      this.xTimeline = 0
     }
   }
 }
@@ -181,13 +200,11 @@ function pickFrom(list, index) {
 </script>
 
 
-<style>
-.trackerGragh {
-  width: 100%;
-  padding: 5px;
-}
+<style lang="sass">
+.concurrencyTimeline
+  width: 100%
+  padding: 5px
 
-.taskTrackerInstance {
-  height: 20px;
-}
+.taskTrackerInstance
+  height: 20px
 </style>

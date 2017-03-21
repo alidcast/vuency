@@ -1,5 +1,5 @@
 <script>
-import AjaxThrolling from '~components/examples/AjaxThrottling.vue'
+import AjaxThrolling from '~components/tasks/AjaxThrottling.vue'
 
 export default {
   components: {

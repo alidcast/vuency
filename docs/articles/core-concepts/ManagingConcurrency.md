@@ -1,3 +1,13 @@
+<script>
+import ConcurrencyTimeline from '~components/tasks/ConcurrencyTimeline.vue'
+
+export default {
+  components: {
+    ConcurrencyTimeline
+  }
+}
+</script>
+
 ## Managing Task Concurrency
 
 Concurrency means multiple tasks which run in overlapping time periods
@@ -20,14 +30,23 @@ introduce them with examples
 Once the max number of tasks are running, the `enqueue` modifier enqueues any other repeat calls and only runs them when the allowed amount of concurrency frees up. Thus, there is not task overlap and all tasks are eventually performed, as each task waits for previous calls to finish before being dequeued itself and run to completion.
 
 
-A useful example...(ajax req)
+<div>
+  <ConcurrencyTimeline flow="enqueue"> </ConcurrencyTimeline>
+</div>
 
 #### drop
 
 Once the max number of tasks are running, the `drop` modifier drops any other repeat calls. Thus, like the `enqueue` modifier, there is also no task overlap, but instead of enqueing the task to run later, any extra calls are ignored and the functions are never actually called.
 
-A useful example...(keyboard typing)
+
+<div>
+  <ConcurrencyTimeline flow="drop"> </ConcurrencyTimeline>
+</div>
 
 #### restart
 
 Upon repeat requests, if the max number of tasks are running, the `restart` modifier cancels any currently running tasks and runs the new task instance immediately. Thus, rather than enqueing or dropping repeat calls, the `restart` modifier cancels currently running tasks if a new one tasks before a prior one completes.
+
+<div>
+  <ConcurrencyTimeline flow="restart"> </ConcurrencyTimeline>
+</div>
