@@ -66,10 +66,8 @@ export default function createTaskScheduler(policy, autorun = true) {
      * Cancels all scheduled task instances and clears queues.
      */
     emptyOut() {
-      cancelQueued(waiting)
-      cancelQueued(running)
-      waiting.clear()
-      running.clear()
+      emptyQueued(waiting)
+      emptyQueued(running)
     },
 
     get isActive() {
@@ -142,6 +140,18 @@ function updateLastFinished(scheduler, ti) {
   else if (ti.isResolved) scheduler.lastResolved = ti
 }
 
+/**
+ * Cancels the queued task instances.
+ *
+ * If concurrency is 1, then we just cancel first item directly.
+ * This made the task-graph demo work better, so it's noticably faster. :)
+ */
 function cancelQueued(queue) {
-  queue.forEach(item => item.cancel())
+  if (queue.size === 1) queue.pop().cancel()
+  else queue.forEach(item => item.cancel())
+}
+
+function emptyQueued(queue) {
+  cancelQueued(queue)
+  queue.clear()
 }

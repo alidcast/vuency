@@ -183,8 +183,6 @@ describe('Task Scheduler', function() {
           return yield pause(1000)
         })
     restartScheduler.schedule(slowTi).schedule(ti1)
-    expect(restartScheduler.waiting.size).to.equal(1)
-    expect(restartScheduler.running.size).to.equal(1)
     await slowTi._runningInstance
     await ti1._runningInstance
     expect(restartScheduler.waiting.size).to.equal(0)
