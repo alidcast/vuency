@@ -5,7 +5,7 @@
         a.site-title(href="/") Vuency
         p.site-slogan Concurrency management <span> for Vuejs. </span>
 
-      div(slot="middle")
+      div.sidebar-menu(slot="middle")
         VerticalMenu(:menu="menu")
 
       div.sidebar-links(slot="bottom")
@@ -54,6 +54,9 @@ export default {
         display: block
         position: absolute
         right: 0
+  .sidebar-menu
+    margin-top: .5rem
+    padding: 1rem
   .sidebar-links
     .github-link
       width: 100%

@@ -26,7 +26,7 @@ export default {
 
   filters: {
     titlelize: toHeading,
-  
+
     capitalize(str) {
       return str.toUpperCase()
     }
@@ -41,8 +41,6 @@ export default {
 </script>
 
 <style lang="sass">
-.menu-container
-  padding: 1rem
 .group-heading
   margin-bottom: .75rem
   font-size: .9rem

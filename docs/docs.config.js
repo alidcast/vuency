@@ -1,20 +1,22 @@
 module.exports = {
   menu: [
-    ['getting-started',
-      [
-        'introduction'
-      ]
+    [
+      'installation',
+      'introduction', // What is Vuency?
+      'getting-started'
     ],
     ['core-concepts',
       [
         'using-tasks',
-        'managing-concurrency'
+        // task state
+        // task cancellation
+        'managing-concurrency' // task flow and concurrency
       ]
     ],
     ['API',
       [
         'task-property',
-        'taskInstance',
+        'task-instance',
         'task-modifiers'
       ]
     ],

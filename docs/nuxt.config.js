@@ -1,4 +1,5 @@
 const resolve = require('path').resolve
+const config = require('./docs.config')
 
 module.exports = {
   head: {
@@ -49,24 +50,24 @@ module.exports = {
   ],
   generate: {
     routeParams: {
-      '/guide/:slug': toRouteParams([
-        'introduction',
-        'managing-concurrency',
-      ]),
-      '/examples/:slug': toRouteParams([
-        'controlling-state'
-      ]),
+      '/guide/:slug': menuToRouteParams(config.menu)
     }
   }
 }
 
 /**
- * Convert an array of url slugs to an array of dynamic route params.
+ * Convert a list of menu items to an array of dynamic route params.
+ *
+ * For simplicity, we ignore group headings and just create a top level route
+ * for each subsection.
  */
-function toRouteParams(params, query = 'slug') {
+function menuToRouteParams(menu, query = 'slug') {
   let routes = []
-  params.forEach(param => {
-    routes.push({ [query]: param })
+  menu.forEach(group => {
+    if (group[1] instanceof Array)
+      group[1].forEach(subsection => routes.push({ [query]: subsection }))
+    else
+      group.forEach(section => routes.push({ [query]: section }))
   })
   return routes
 }
