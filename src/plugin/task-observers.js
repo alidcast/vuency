@@ -1,31 +1,31 @@
 /**
 *  Configures component instance observers for main task actions.
-*
+*  @this for each function is the task property
 *  @constructs Task Events
 */
-export default function createTaskObservers(host, task) {
+export default function createTaskObservers(host) {
   return {
     /**
      * Event listeners.
      * (All events are triggered by `host.$emit`.)
      */
-    runOn(vmEvent) {
-      host.$on(vmEvent, task.run.bind(task))
+    runOn(vmEvent, ...args) {
+      host.$on(vmEvent, this.run.bind(this, ...args))
       return this
     },
     abortOn(vmEvent) {
-      host.$on(vmEvent, task.abort.bind(task))
+      host.$on(vmEvent, this.abort.bind(this))
       return this
     },
     /**
      * Watchers.
      */
-    runIf(vmData, opts = {}) {
-      host.$watch(vmData, task.run.bind(task), opts)
+    runWhen(vmData, ...args) {
+      host.$watch(vmData, this.run.bind(this, ...args))
       return this
     },
-    abortIf(vmData, opts = {}) {
-      host.$watch(vmData, task.abort.bind(task), opts)
+    abortWhen(vmData) {
+      host.$watch(vmData, this.abort.bind(this))
       return this
     }
   }

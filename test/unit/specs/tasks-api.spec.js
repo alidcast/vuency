@@ -46,37 +46,41 @@ describe('Tasks API', function() {
     expect(isObj(vm.ex2)).to.be.true
   })
 
-  it('listens to component instance events', () => {
+
+  it('even listener runs task and updates data', (done) => {
     let callback = sinon.spy(),
         vm = new Vue({
           tasks(t) {
-            return t(function * spy() {
+            return t(function * myTask() {
               callback()
             }).runOn('runTask')
           }
         })
 
     vm.$emit('runTask')
-    expect(vm.spy).to.not.be.undefined
-    expect(callback.called).to.be.true
+    Vue.nextTick(() => {
+      expect(callback.called).to.be.true
+      expect(vm.myTask.last.called).to.not.be.undefined
+      done()
+    })
   })
 
-  it('watches component instance data', (done) => {
+  it('watcher runs instance and updates task data', (done) => {
     let callback = sinon.spy(),
         vm = new Vue({
           data: ({
             changed: false
           }),
           tasks(t) {
-            return t(function * spy() {
+            return t(function * myTask() {
               callback()
-            }).runIf('changed')
+            }).runWhen('changed')
           }
         })
     vm.changed = true
-    expect(vm.spy).to.not.be.undefined
     Vue.nextTick(() => {
       expect(callback.called).to.be.true
+      expect(vm.myTask.last).to.not.be.undefined
       done()
     })
   })

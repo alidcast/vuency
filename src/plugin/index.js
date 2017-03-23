@@ -19,15 +19,14 @@ export default function initTaskFactory(host) {
     assert(isFn(operation), 'All task actions must be functions')
 
     let { policy, modifiers } = createTaskPolicy('enqueue', 1),
-        taskProp = createTaskProperty(host, operation, policy),
-        observers = createTaskObservers(host, taskProp)
+        observers = createTaskObservers(host)
 
     return {
       operation,
-      ...taskProp,
-      ...observers,
+      ...createTaskProperty(host, operation, policy),
       policy,
-      ...modifiers
+      ...modifiers,
+      ...observers
     }
   }
 }
