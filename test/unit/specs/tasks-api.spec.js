@@ -60,4 +60,24 @@ describe('Tasks API', function() {
     expect(vm.spy).to.not.be.undefined
     expect(callback.called).to.be.true
   })
+
+  it('watches component instance data', (done) => {
+    let callback = sinon.spy(),
+        vm = new Vue({
+          data: ({
+            changed: false
+          }),
+          tasks(t) {
+            return t(function * spy() {
+              callback()
+            }).runIf('changed')
+          }
+        })
+    vm.changed = true
+    expect(vm.spy).to.not.be.undefined
+    Vue.nextTick(() => {
+      expect(callback.called).to.be.true
+      done()
+    })
+  })
 })
