@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import createTaskInstance from './task-instance'
 import createTaskScheduler from './task-scheduler'
+import createTaskPolicy from './modifiers/task-policy'
+import createTaskSubscriber from './modifiers/task-subscriber'
+import createTaskListeners from './modifiers/task-listeners'
 
 /**
  * A {TaskProperty}
@@ -9,8 +12,11 @@ import createTaskScheduler from './task-scheduler'
  * @param {Object} policy - the task scheduling policy
  * @constructor Task Property
  */
-export default function createTaskProperty(host, operation, policy) {
-  let scheduler
+export default function createTaskProperty(host, operation) {
+  let scheduler,
+      { policy, changePolicy } = createTaskPolicy('enqueue', 1),
+      { events, watchers } = createTaskListeners(host),
+      { subscriptions, ...subscriber } = createTaskSubscriber(host)
 
   /**
    *  Create a Vue watcher that will update task properties when the
@@ -50,6 +56,7 @@ export default function createTaskProperty(host, operation, policy) {
     isIdle: true,
     state: 'idle',
     last: {},
+
     // default helper instance to be used for when `last` is undefined
     default: createTaskInstance(function * () {}),
 
@@ -58,6 +65,11 @@ export default function createTaskProperty(host, operation, policy) {
       this.isIdle = !scheduler.running.isActive
       this.state = this.isActive ? 'active' : 'idle'
       this.last = getLastProps()
+      // lastCalled
+      // lastStarted
+      // lastResolved
+      // lastRejected
+      // lastCanceled
     },
 
     /**
@@ -69,7 +81,7 @@ export default function createTaskProperty(host, operation, policy) {
         createTaskWatcher(this)
       }
       let hostOperation = operation.bind(host, ...args),
-          ti = createTaskInstance(hostOperation)
+          ti = createTaskInstance(hostOperation, subscriber)
       scheduler.schedule(ti)
       return ti
     },
@@ -78,7 +90,15 @@ export default function createTaskProperty(host, operation, policy) {
      * Cancels all scheduled task instances.
      */
     abort() {
-      if (scheduler.isActive) scheduler.emptyOut()
-    }
+      if (scheduler && scheduler.isActive) scheduler.emptyOut()
+    },
+
+    /**
+     * Task modifiers.
+     */
+    policy: changePolicy,
+    ...events,
+    ...watchers,
+    ...subscriptions
   }
 }

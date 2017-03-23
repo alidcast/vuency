@@ -1,6 +1,4 @@
 import createTaskProperty from './task-property'
-import createTaskPolicy from './task-policy'
-import createTaskObservers from './task-observers'
 import assert, { isFn } from '../util/assert'
 
 /**
@@ -12,21 +10,12 @@ import assert, { isFn } from '../util/assert'
  * @constructs Task
  */
 export default function initTaskFactory(host) {
-  /**
-   * Converts a operation into a task object with scheduler modifier options
-   */
   return function createTask(operation) {
     assert(isFn(operation), 'All task actions must be functions')
 
-    let { policy, modifiers } = createTaskPolicy('enqueue', 1),
-        observers = createTaskObservers(host)
-
     return {
       operation,
-      ...createTaskProperty(host, operation, policy),
-      policy,
-      ...modifiers,
-      ...observers
+      ...createTaskProperty(host, operation)
     }
   }
 }

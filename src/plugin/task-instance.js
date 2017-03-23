@@ -5,7 +5,7 @@ import createTaskStepper from './task-stepper'
  * @param {Function} operation - the registered task operation
  * @constructor Task Instance
  */
-export default function createTaskInstance(operation) {
+export default function createTaskInstance(operation, subscriber) {
   let stepper
 
   return {
@@ -21,14 +21,16 @@ export default function createTaskInstance(operation) {
     isResolved: false,
     // computed states
     isDropped: false,
-    isFinished: false,
+    isRestarted: false, // TODO
     isRunning: false,
+    isOver: false,
     state: 'waiting',
 
     _setComputedProps() {
       this.isDropped = !this.hasStarted && this.isCanceled
-      this.isFinished = this.isCanceled || this.isRejected || this.isResolved
-      this.isRunning = this.hasStarted && !this.isFinished
+      this.isRestarted = this.hasStarted && this.isCanceled
+      this.isOver = this.isCanceled || this.isRejected || this.isResolved
+      this.isRunning = this.hasStarted && !this.isOver
       this.state = this._getState()
     },
 
@@ -42,12 +44,12 @@ export default function createTaskInstance(operation) {
     },
 
     _start() {
-      if (!stepper) stepper = createTaskStepper(this)
+      if (!stepper) stepper = createTaskStepper(this, subscriber)
       return stepper.stepThrough.apply(stepper)
     },
 
     cancel() {
-      if (!stepper) stepper = createTaskStepper(this)
+      if (!stepper) stepper = createTaskStepper(this, subscriber)
       return stepper.handleCancel.apply(stepper)
     }
   }

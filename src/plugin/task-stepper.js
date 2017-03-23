@@ -9,7 +9,7 @@ import { isPromise } from '../util/assert'
 *  @returns {TaskInstance} after operation has finished running
 *  @constructs Task Stepper
 */
-export default function createTaskStepper(ti) {
+export default function createTaskStepper(ti, subscriber) {
   let iter = ti.operation() // start generator
 
   return {
@@ -22,6 +22,10 @@ export default function createTaskStepper(ti) {
     handleCancel() {
       ti.isCanceled = true
       ti._setComputedProps()
+      if (ti.isDropped) subscriber.emitDrop()
+      if (ti.isRestarted) subscriber.emitRestart()
+      subscriber.emitCancel()
+      subscriber.emitFinalize()
       return ti
     },
 
@@ -29,6 +33,8 @@ export default function createTaskStepper(ti) {
       ti.isRejected = true
       ti.error = err
       ti._setComputedProps()
+      subscriber.emitError()
+      subscriber.emitFinalize()
       return ti
     },
 
@@ -36,6 +42,8 @@ export default function createTaskStepper(ti) {
       ti.isResolved = true
       ti.value = val
       ti._setComputedProps()
+      subscriber.emitSuccess()
+      subscriber.emitFinalize()
       return ti
     },
 

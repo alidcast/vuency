@@ -6,7 +6,7 @@ export default function(Vue) {
   Vue.mixin({
     created: initTasks
     // TODO
-    // beforeDestory {} // cancel tasks, remove listeners, etc
+    // beforeDestory {} // cancel tasks, remove listeners, take down task watcher etc
   })
 }
 
@@ -25,12 +25,10 @@ function initTasks() {
     let createTask = initTaskFactory(host),
         tasks = opts.tasks.call(host, createTask, asyncHelpers)
 
-    // if tasks is task object then only one registered task was returned
-    // otherwise it was a set registered tasks
-    if (tasks.policy) {
+    if (tasks.policy) { // it is a task object, so register as named function
       host[tasks.operation.name] = tasks
     }
-    else {
+    else { // it is a list of task objects, so register as named objects
       Object.keys(tasks).forEach(key => {
         host[key] = tasks[key]
       })
