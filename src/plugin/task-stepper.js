@@ -27,10 +27,10 @@ export default function createTaskStepper(ti, subscriber) {
     handleCancel() {
       ti.isCanceled = true
       ti._setComputedProps()
-      if (ti.isDropped) subscriber.emitDrop()
-      if (ti.isRestarted) subscriber.emitRestart()
-      subscriber.emitCancel()
-      subscriber.emitFinalize()
+      if (ti.isDropped) subscriber.onDrop()
+      if (ti.isRestarted) subscriber.onRestart()
+      subscriber.onCancel()
+      subscriber.afterEnd()
       return ti
     },
 
@@ -38,17 +38,17 @@ export default function createTaskStepper(ti, subscriber) {
       ti.isRejected = true
       ti.error = err
       ti._setComputedProps()
-      subscriber.emitError()
-      subscriber.emitFinalize()
+      subscriber.onError()
+      subscriber.afterEnd()
       return ti
     },
 
-    async handleSuccess(val) {
+    handleSuccess(val) {
       ti.isResolved = true
       ti.value = val
       ti._setComputedProps()
-      subscriber.emitSuccess()
-      subscriber.emitFinalize()
+      subscriber.onSuccess()
+      subscriber.afterEnd()
       return ti
     },
 

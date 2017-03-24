@@ -14,11 +14,11 @@ export default function createTaskSubscriber() {
       restartFn,
       errorFn,
       successFn,
-      finalizeFn
+      endFn
 
   return {
     /**
-     * `Before` Subscriptions.
+     * `Before` actions.
      *
      * These operations are async so that they can be use to timeout logic
      *  (e.g. the `pause` helper) to better update UI state.
@@ -30,30 +30,31 @@ export default function createTaskSubscriber() {
       if (nextFn) await nextFn()
     },
     /**
-     * `On` Subscriptions.
-     *
+     * `On` actions.
      */
-    emitCancel() {
+    onCancel() {
       if (cancelFn) cancelFn()
     },
-    emitDrop() {
+    onDrop() {
       if (dropFn) dropFn()
     },
-    emitRestart() {
+    onRestart() {
       if (restartFn) restartFn()
     },
-    emitError() {
+    onError() {
       if (errorFn) errorFn()
     },
-    emitSuccess() {
+    onSuccess() {
       if (successFn) successFn()
     },
-    emitFinalize() {
-      if (finalizeFn) finalizeFn()
+    /**
+     * `After` actions.
+     */
+    afterEnd() {
+      if (endFn) endFn()
     },
-
     subscriptions: {
-      beforeStart(fn) { // onStart
+      beforeStart(fn) {
         startFn = fn.bind(this)
         return this
       },
@@ -81,8 +82,8 @@ export default function createTaskSubscriber() {
         successFn = fn.bind(this)
         return this
       },
-      onFinalize(fn) { // afterEnd // TODO
-        finalizeFn = fn.bind(this)
+      afterEnd(fn) {
+        endFn = fn.bind(this)
         return this
       }
     }
