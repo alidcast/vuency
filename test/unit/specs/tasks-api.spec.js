@@ -46,7 +46,6 @@ describe('Tasks API', function() {
     expect(isObj(vm.ex2)).to.be.true
   })
 
-
   it('even listener runs task and updates data', (done) => {
     let callback = sinon.spy(),
         vm = new Vue({
@@ -78,10 +77,14 @@ describe('Tasks API', function() {
           }
         })
     vm.changed = true
+    // watcher takes longer to run for some reason so we wait for
+    // two ticks to finish before checking assertions
     Vue.nextTick(() => {
-      expect(callback.called).to.be.true
-      expect(vm.myTask.last).to.not.be.undefined
-      done()
+      Vue.nextTick(() => {
+        expect(callback.called).to.be.true
+        expect(vm.myTask.last.called).to.not.be.undefined
+        done()
+      })
     })
   })
 })

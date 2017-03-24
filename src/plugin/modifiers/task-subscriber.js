@@ -17,12 +17,22 @@ export default function createTaskSubscriber() {
       finalizeFn
 
   return {
-    emitBeforeStart() {
-      if (startFn) startFn()
+    /**
+     * `Before` Subscriptions.
+     *
+     * These operations are async so that they can be use to timeout logic
+     *  (e.g. the `pause` helper) to better update UI state.
+     */
+    async asyncBeforeStart() {
+      if (startFn) await startFn()
     },
-    emitBeforeNext() {
-      if (nextFn) nextFn()
+    async asyncBeforeNext() {
+      if (nextFn) await nextFn()
     },
+    /**
+     * `On` Subscriptions.
+     *
+     */
     emitCancel() {
       if (cancelFn) cancelFn()
     },

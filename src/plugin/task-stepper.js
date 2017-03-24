@@ -1,5 +1,3 @@
-import { isPromise } from '../util/assert'
-
 /**
   A {Stepper} is responsible for iterating through the generator function.
 *  It iterates through each yield, while being mindful of the tis state.
@@ -13,15 +11,15 @@ export default function createTaskStepper(ti, subscriber) {
   let iter = ti.operation() // start generator
 
   return {
-    handleStart() {
-      subscriber.emitBeforeStart()
+    async handleStart() {
+      await subscriber.asyncBeforeStart()
       ti.hasStarted = true
       ti._setComputedProps()
       return ti
     },
 
-    handleStep(prev) {
-      subscriber.emitBeforeNext()
+    async handleNext(prev) {
+      await subscriber.asyncBeforeNext()
       let output = iter.next(prev)
       return output
     },
@@ -45,7 +43,7 @@ export default function createTaskStepper(ti, subscriber) {
       return ti
     },
 
-    handleSuccess(val) {
+    async handleSuccess(val) {
       ti.isResolved = true
       ti.value = val
       ti._setComputedProps()
@@ -55,40 +53,33 @@ export default function createTaskStepper(ti, subscriber) {
     },
 
     // checks the state of the ti to take appropriate actions
-    // recursively iterates through generator function until ti is finished
-    stepThrough(gen) {
+    // recursively iterates through generator function until operation is finished
+    async stepThrough(gen) {
       let stepper = this
 
-      function takeAStep(prev = undefined) {
+      async function takeAStep(prev = undefined) {
         let value, done
 
-        if (ti.isCanceled) return ti                 // CANCELED Pre Start
-        if (!ti.hasStarted) stepper.handleStart()
-        if (ti.isCanceled) return ti                 // CANCELED Post Start
+        if (ti.isCanceled) return ti                         // CANCELED / DROPPED
+        if (!ti.hasStarted) await stepper.handleStart()
+        if (ti.isCanceled) return ti                         // CANCELED
 
         try {
-          ({ value, done } = stepper.handleStep(prev))
+          ({ value, done } = await stepper.handleNext(prev))
         }
-        catch (err) {                                // REJECTED
+        catch (err) {                                        // REJECTED
           // TODO better error handling
           return stepper.handleError(err)
         }
 
-        if (ti.isCanceled) return ti                 // CANCELED Post Iteration
+        if (ti.isCanceled) return ti                         // CANCELED (post iteration)
 
-        if (done) {                                  // RESOLVED
-          return stepper.handleSuccess(value)
-        }
-
-        if (isPromise(value)) {
-          return value.then(resolved => takeAStep(resolved))
-        }
-        else {
-          return takeAStep(value)
-        }
+        value = await value
+        if (done) return stepper.handleSuccess(value)        // RESOLVED
+        else return await takeAStep(value)
       }
 
-      return takeAStep()
+      return await takeAStep()
     }
   }
 }
