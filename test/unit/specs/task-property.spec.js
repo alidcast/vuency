@@ -21,7 +21,14 @@ describe('Task Property', function() {
   it('has correct states', () => {
     expect(tp.isActive).to.be.false
     expect(tp.isIdle).to.be.true
-    expect(tp.last).to.not.be.undefined
+  })
+
+  it('has correct last data', () => {
+    expect(tp.lastCalled).to.not.be.undefined
+    expect(tp.lastStarted).to.not.be.undefined
+    expect(tp.lastResolved).to.not.be.undefined
+    expect(tp.lastRejected).to.not.be.undefined
+    expect(tp.lastCanceled).to.not.be.undefined
     expect(tp.default).to.not.be.undefined
   })
 

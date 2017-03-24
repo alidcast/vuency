@@ -29,7 +29,8 @@ export default function createTaskProperty(host, operation) {
       }),
       watch: {
         running() {
-          tp._setReactiveProps()
+          tp._setStates()
+          tp._setLast()
           host.$forceUpdate()
         }
       }
@@ -37,39 +38,32 @@ export default function createTaskProperty(host, operation) {
     return new Watcher()
   }
 
-  /**
-   * Gets all last instance values.
-   */
-  function getLastProps() {
-    return {
-      called: scheduler.lastCalled,
-      started: scheduler.lastStarted,
-      resolved: scheduler.lastResolved,
-      rejected: scheduler.lastRejected,
-      canceled: scheduler.lastCanceled
-    }
-  }
-
   return {
     // reactive states
     isActive: false,
     isIdle: true,
     state: 'idle',
-    last: {},
-
-    // default helper instance to be used for when `last` is undefined
+    // last instances
+    lastCalled: null,
+    lastStarted: null,
+    lastResolved: null,
+    lastRejected: null,
+    lastCanceled: null,
+    // default helper instance to be used for when `last-` is undefined
     default: createTaskInstance(function * () {}),
 
-    _setReactiveProps() {
+    _setStates() {
       this.isActive = scheduler.running.isActive
       this.isIdle = !scheduler.running.isActive
       this.state = this.isActive ? 'active' : 'idle'
-      this.last = getLastProps()
-      // lastCalled
-      // lastStarted
-      // lastResolved
-      // lastRejected
-      // lastCanceled
+    },
+
+    _setLast() {
+      this.lastCalled = scheduler.lastCalled
+      this.lastStarted = scheduler.lastStarted
+      this.lastResolved = scheduler.lastResolved
+      this.lastRejected = scheduler.lastRejected
+      this.lastCanceled = scheduler.lastCanceled
     },
 
     /**
