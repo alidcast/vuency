@@ -16,7 +16,7 @@ export default function createTaskProperty(host, operation) {
   let scheduler,
       { policy, changePolicy } = createTaskPolicy('enqueue', 1),
       { events, watchers } = createTaskListeners(host),
-      { subscriptions, ...subscriber } = createTaskSubscriber(host)
+      { subscriptions, ...subscriber } = createTaskSubscriber()
 
   /**
    *  Create a Vue watcher that will update task properties when the

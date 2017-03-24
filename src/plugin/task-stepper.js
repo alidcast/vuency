@@ -14,9 +14,16 @@ export default function createTaskStepper(ti, subscriber) {
 
   return {
     handleStart() {
+      subscriber.emitBeforeStart()
       ti.hasStarted = true
       ti._setComputedProps()
       return ti
+    },
+
+    handleStep(prev) {
+      subscriber.emitBeforeNext()
+      let output = iter.next(prev)
+      return output
     },
 
     handleCancel() {
@@ -53,21 +60,23 @@ export default function createTaskStepper(ti, subscriber) {
       let stepper = this
 
       function takeAStep(prev = undefined) {
-        let output, value
+        let value, done
 
-        if (ti.isCanceled) return ti                   // CANCELED / DROPPED
+        if (ti.isCanceled) return ti                 // CANCELED Pre Start
         if (!ti.hasStarted) stepper.handleStart()
+        if (ti.isCanceled) return ti                 // CANCELED Post Start
 
-        try { // iterate through another yield
-          output = iter.next(prev)
-          value = output.value
+        try {
+          ({ value, done } = stepper.handleStep(prev))
         }
-        catch (err) {                                  // REJECTED
+        catch (err) {                                // REJECTED
           // TODO better error handling
           return stepper.handleError(err)
         }
 
-        if (output.done) {                             // RESOLVED
+        if (ti.isCanceled) return ti                 // CANCELED Post Iteration
+
+        if (done) {                                  // RESOLVED
           return stepper.handleSuccess(value)
         }
 

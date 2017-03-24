@@ -2,16 +2,18 @@
 /* global describe, it, expect, beforeEach */
 
 import createTaskInstance from 'src/plugin/task-instance'
+import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
 
 function * exTask() {
   return 'passed'
 }
 
 describe('Task Instance', function() {
-  let ti
+  let ti,
+      { ...subscriber } = createTaskSubscriber()
 
   beforeEach(() => {
-    ti = createTaskInstance(exTask)
+    ti = createTaskInstance(exTask, subscriber)
   })
 
   it('has correct props', () => {
@@ -25,8 +27,9 @@ describe('Task Instance', function() {
     expect(ti.isResolved).to.be.false
     // computed states
     expect(ti.isDropped).to.not.be.undefined
+    expect(ti.isRestarted).to.not.be.undefined
     expect(ti.isRunning).to.not.be.undefined
-    expect(ti.isFinished).to.not.be.undefined
+    expect(ti.isOver).to.not.be.undefined
     expect(ti.state).to.not.be.undefined
   })
 
@@ -53,17 +56,26 @@ describe('Task Instance', function() {
     expect(ti.isDropped).to.be.false
   })
 
-  it('updates computed isFinished correctly', () => {
+  it('updates computed isRestarted correctly', () => {
+    ti.isCanceled = true
+    ti._setComputedProps()
+    expect(ti.isRestarted).to.be.false
+    ti.hasStarted = true
+    ti._setComputedProps()
+    expect(ti.isRestarted).to.be.true
+  })
+
+  it('updates computed isOver correctly', () => {
     ti.isResolved = true
     ti._setComputedProps()
-    expect(ti.isFinished).to.be.true
+    expect(ti.isOver).to.be.true
     ti.isResolved = false
     ti.isCanceled = true
     ti._setComputedProps()
-    expect(ti.isFinished).to.be.true
+    expect(ti.isOver).to.be.true
     ti.isCanceled = false
     ti.isRejected = true
     ti._setComputedProps()
-    expect(ti.isFinished).to.be.true
+    expect(ti.isOver).to.be.true
   })
 })

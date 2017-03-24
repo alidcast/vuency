@@ -6,8 +6,10 @@
 *  @this the {TaskProperty} where the subscriber is destructured
 *  @constructs TaskSubscriber
 */
-export default function createTaskSubscriber(host) {
-  let cancelFn,
+export default function createTaskSubscriber() {
+  let startFn,
+      nextFn,
+      cancelFn,
       dropFn,
       restartFn,
       errorFn,
@@ -15,6 +17,12 @@ export default function createTaskSubscriber(host) {
       finalizeFn
 
   return {
+    emitBeforeStart() {
+      if (startFn) startFn()
+    },
+    emitBeforeNext() {
+      if (nextFn) nextFn()
+    },
     emitCancel() {
       if (cancelFn) cancelFn()
     },
@@ -35,28 +43,36 @@ export default function createTaskSubscriber(host) {
     },
 
     subscriptions: {
+      beforeStart(fn) { // onStart
+        startFn = fn.bind(this)
+        return this
+      },
+      beforeNext(fn) {
+        nextFn = fn.bind(this)
+        return this
+      },
       onCancel(fn) {
-        cancelFn = fn.bind(host)
+        cancelFn = fn.bind(this)
         return this
       },
       onDrop(fn) {
-        dropFn = fn.bind(host)
+        dropFn = fn.bind(this)
         return this
       },
       onRestart(fn) {
-        restartFn = fn.bind(host)
+        restartFn = fn.bind(this)
         return this
       },
       onError(fn) {
-        errorFn = fn.bind(host)
+        errorFn = fn.bind(this)
         return this
       },
       onSuccess(fn) {
-        successFn = fn.bind(host)
+        successFn = fn.bind(this)
         return this
       },
-      onFinalize(fn) {
-        finalizeFn = fn.bind(host)
+      onFinalize(fn) { // afterEnd // TODO
+        finalizeFn = fn.bind(this)
         return this
       }
     }

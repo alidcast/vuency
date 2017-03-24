@@ -3,7 +3,8 @@
 
 import createTaskScheduler from 'src/plugin/task-scheduler'
 import createTaskInstance from 'src/plugin/task-instance'
-import createTaskPolicy from 'src/plugin/task-policy'
+import createTaskPolicy from 'src/plugin/modifiers/task-policy'
+import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
 import { pause } from 'src/util/async'
 
 function * exTask() {
@@ -21,15 +22,16 @@ describe('Task Scheduler', function() {
       ti2,
       ti3,
       ti4,
-      policy = createTaskPolicy('enqueue', 2).policy
+      policy = createTaskPolicy('enqueue', 2).policy,
+      { ...subscriber } = createTaskSubscriber()
 
   beforeEach(() => {
     scheduler = createTaskScheduler(policy, false)
     autoScheduler = createTaskScheduler(policy, true)
-    ti1 = createTaskInstance(exTask)
-    ti2 = createTaskInstance(exTask)
-    ti3 = createTaskInstance(exTask)
-    ti4 = createTaskInstance(rejectedTask)
+    ti1 = createTaskInstance(exTask, subscriber)
+    ti2 = createTaskInstance(exTask, subscriber)
+    ti3 = createTaskInstance(exTask, subscriber)
+    ti4 = createTaskInstance(rejectedTask, subscriber)
   })
 
   it('schedules the task', () => {
@@ -181,7 +183,7 @@ describe('Task Scheduler', function() {
         restartScheduler = createTaskScheduler(restartPolicy, true),
         slowTi = createTaskInstance(function * () {
           return yield pause(1000)
-        })
+        }, subscriber)
     restartScheduler.schedule(slowTi).schedule(ti1)
     await slowTi._runningInstance
     await ti1._runningInstance

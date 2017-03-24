@@ -74,7 +74,7 @@ describe('Tasks API', function() {
           tasks(t) {
             return t(function * myTask() {
               callback()
-            }).runWhen('changed')
+            }).runWith('changed')
           }
         })
     vm.changed = true

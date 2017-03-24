@@ -3,7 +3,10 @@
 
 import createTaskStepper from 'src/plugin/task-stepper'
 import createTaskInstance from 'src/plugin/task-instance'
+import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
 import { pause } from 'src/util/async'
+
+let { ...subscriber } = createTaskSubscriber()
 
 function * exTask() {
   return 'success'
@@ -12,7 +15,7 @@ function * exTask() {
 describe('Task Stepper', function() {
   it('solves empty function', () => {
     let ti = createTaskInstance(function * () {}),
-        stepper = createTaskStepper(ti)
+        stepper = createTaskStepper(ti, subscriber)
     stepper.stepThrough()
     expect(ti.value).to.be.undefined
     expect(ti.error).to.be.null
@@ -20,7 +23,7 @@ describe('Task Stepper', function() {
 
   it('resolves yields from primitives', () => {
     let ti = createTaskInstance(exTask),
-        stepper = createTaskStepper(ti)
+        stepper = createTaskStepper(ti, subscriber)
     stepper.stepThrough()
     expect(ti.value).to.equal('success')
   })
@@ -29,7 +32,7 @@ describe('Task Stepper', function() {
     let ti = createTaskInstance(function * () {
           return yield sinon.stub().returns('success')()
         }),
-        stepper = createTaskStepper(ti)
+        stepper = createTaskStepper(ti, subscriber)
     stepper.stepThrough()
     expect(ti.value).to.equal('success')
   })
@@ -41,7 +44,7 @@ describe('Task Stepper', function() {
     let ti = createTaskInstance(function * () {
           return yield asyncFn()
         }),
-        stepper = createTaskStepper(ti)
+        stepper = createTaskStepper(ti, subscriber)
     await stepper.stepThrough()
     expect(ti.isResolved).to.true
     expect(ti.value).to.equal('success')
@@ -51,7 +54,7 @@ describe('Task Stepper', function() {
     let ti = createTaskInstance(function * () {
           return 'success'
         }),
-        stepper = createTaskStepper(ti)
+        stepper = createTaskStepper(ti, subscriber)
     stepper.stepThrough()
     expect(ti.hasStarted).to.be.true
     expect(ti.isResolved).to.be.true
@@ -64,7 +67,7 @@ describe('Task Stepper', function() {
     let ti = createTaskInstance(function * () {
           return yield sinon.stub().returns('failed').throws()()
         }),
-        stepper = createTaskStepper(ti)
+        stepper = createTaskStepper(ti, subscriber)
     stepper.stepThrough()
     expect(ti.isRejected).to.be.true
     expect(ti.isResolved).to.be.false
@@ -76,7 +79,7 @@ describe('Task Stepper', function() {
 
   it('drops the task', () => {
     let ti = createTaskInstance(exTask),
-        stepper = createTaskStepper(ti)
+        stepper = createTaskStepper(ti, subscriber)
     stepper.handleCancel()
     stepper.stepThrough()
     expect(ti.hasStarted).to.be.false
@@ -90,7 +93,7 @@ describe('Task Stepper', function() {
     let ti = createTaskInstance(function * () {
           return yield pause(1000)
         }),
-        stepper = createTaskStepper(ti)
+        stepper = createTaskStepper(ti, subscriber)
     stepper.stepThrough()
     stepper.handleCancel()
     expect(ti.hasStarted).to.be.true
@@ -128,7 +131,7 @@ describe('Task Stepper', function() {
     }
 
     let ti = createTaskInstance(taskReq),
-        stepper = createTaskStepper(ti)
+        stepper = createTaskStepper(ti, subscriber)
 
     stepper.stepThrough()
     expect(ti.isResolved).to.be.true

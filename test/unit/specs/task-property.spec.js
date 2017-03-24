@@ -3,7 +3,7 @@
 
 import Vue from 'vue'
 import createTaskProperty from 'src/plugin/task-property'
-import createTaskPolicy from 'src/plugin/task-policy'
+import createTaskPolicy from 'src/plugin/modifiers/task-policy'
 
 function * exTask() {
   return 'passed'
