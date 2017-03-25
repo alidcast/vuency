@@ -7,10 +7,14 @@
 
 <script>
 import CountdownTimer from 'examples/CountdownTimer'
+import RandomQuestion from 'examples/RandomQuestion'
+import AjaxThrottling from 'examples/AjaxThrottling'
 
 const routes = {
   '/': { template: `<h1>Vuency</h1>` },
-  '/countdown-timer': CountdownTimer
+  '/countdown-timer': CountdownTimer,
+  '/random-question': RandomQuestion,
+  '/ajax-throttling': AjaxThrottling
 }
 
 export default {

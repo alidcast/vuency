@@ -19,7 +19,7 @@ export default function createTaskPolicy(_type, _num = 1, _time = 0) {
     // default scheduler policy
     get policy() {
       return policy
-    } 
+    },
 
     /**
      *  Sets the scheduling rule for repeat calls and optionally the amount
