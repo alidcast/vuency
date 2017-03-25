@@ -3,4 +3,5 @@
 node_modules/
 dist/
 npm-debug.log
+selenium-debug.log
 nuxt/

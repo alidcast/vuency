@@ -6,7 +6,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 var projectRoot = resolve(__dirname, './')
 var srcRoot = resolve(__dirname, './src')
 var testRoot = resolve(__dirname, './test')
-var devRoot = resolve(__dirname, './demo')
+var devRoot = resolve(__dirname, './examples')
 var prodRoot = resolve(__dirname, './dist')
 
 const baseConfig = {
@@ -16,8 +16,7 @@ const baseConfig = {
     ],
     alias: { // create an alias for commonly used modules
       'vue$': 'vue/dist/vue.common.js', // vue standalone build
-      'src': srcRoot,
-      'demo': devRoot
+      'src': srcRoot
     },
     modules: [ // directory to search when resolving modules
       srcRoot, "node_modules"
@@ -70,11 +69,6 @@ const devConfig = {
       publicPath: '/'
     },
     devtool: '#eval-source-map',
-    devServer: {
-      // contentBase: __dirname + "/src",
-      historyApiFallback: true,
-      noInfo: true
-    },
     performance: { hints: false },
     plugins: [
       new webpack.DefinePlugin({
@@ -121,16 +115,6 @@ const prodConfig = {
       minimize: true
     })
   ])
-}
-
-const testConfig = {
-  devtool: '#inline-source-map',
-  performance: { hints: false },
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env': '"testing"'
-    })
-  ]
 }
 
 var finalConfig

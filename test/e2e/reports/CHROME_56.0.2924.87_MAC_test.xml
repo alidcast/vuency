@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites errors="0"
+            failures="1"
+            tests="1">
+
+  <testsuite name="test"
+    errors="0" failures="1" hostname="" id="" package="test" skipped="0"
+    tests="1" time="8.451" timestamp="Sat, 25 Mar 2017 18:31:53 GMT">
+  
+    <testcase name="default e2e tests" time="8.451" assertions="1">  <failure message="Timed out while waiting for element &lt;#app&gt; to be present for 5000 milliseconds.">    at Object.default e2e tests (/Users/acastano/Sites/vue/vuency/test/e2e/specs/test.js:13:8)
+    at _combinedTickCallback (internal/process/next_tick.js:67:7)</failure>
+
+    
+    </testcase>
+  
+  
+  </testsuite>
+</testsuites>
