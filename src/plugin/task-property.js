@@ -14,7 +14,7 @@ import createTaskListeners from './modifiers/task-listeners'
  */
 export default function createTaskProperty(host, operation) {
   let scheduler,
-      { policy, changePolicy } = createTaskPolicy('enqueue', 1),
+      { policy, ...policyModifiers } = createTaskPolicy('enqueue', 1),
       { events, watchers } = createTaskListeners(host),
       { subscriptions, ...subscriber } = createTaskSubscriber()
 
@@ -29,8 +29,8 @@ export default function createTaskProperty(host, operation) {
       }),
       watch: {
         running() {
-          tp._setStates()
-          tp._setLast()
+          setStates(tp, scheduler)
+          setLast(tp, scheduler)
           host.$forceUpdate()
         }
       }
@@ -39,7 +39,7 @@ export default function createTaskProperty(host, operation) {
   }
 
   return {
-    // reactive states
+    // states
     isActive: false,
     isIdle: true,
     state: 'idle',
@@ -51,20 +51,8 @@ export default function createTaskProperty(host, operation) {
     lastCanceled: null,
     // default helper instance to be used for when `last-` is undefined
     default: createTaskInstance(function * () {}),
-
-    _setStates() {
-      this.isActive = scheduler.running.isActive
-      this.isIdle = !scheduler.running.isActive
-      this.state = this.isActive ? 'active' : 'idle'
-    },
-
-    _setLast() {
-      this.lastCalled = scheduler.lastCalled
-      this.lastStarted = scheduler.lastStarted
-      this.lastResolved = scheduler.lastResolved
-      this.lastRejected = scheduler.lastRejected
-      this.lastCanceled = scheduler.lastCanceled
-    },
+    // to differentiate between scheduler cancelation
+    selfCanceled: false,
 
     /**
      * Creates a new task instance and schedules it to run.
@@ -77,6 +65,7 @@ export default function createTaskProperty(host, operation) {
       let hostOperation = operation.bind(host, ...args),
           ti = createTaskInstance(hostOperation, subscriber)
       scheduler.schedule(ti)
+      resetData(this, scheduler)
       return ti
     },
 
@@ -85,14 +74,33 @@ export default function createTaskProperty(host, operation) {
      */
     abort() {
       if (scheduler && scheduler.isActive) scheduler.emptyOut()
+      this.selfCanceled = true
     },
 
     /**
      * Task modifiers.
      */
-    policy: changePolicy,
+    ...policyModifiers,
     ...events,
     ...watchers,
     ...subscriptions
   }
+}
+
+function setStates(tp, scheduler) {
+  tp.isActive = scheduler.running.isActive
+  tp.isIdle = !scheduler.running.isActive
+  tp.state = tp.isActive ? 'active' : 'idle'
+}
+
+function setLast(tp, scheduler) {
+  tp.lastCalled = scheduler.lastCalled
+  tp.lastStarted = scheduler.lastStarted
+  tp.lastResolved = scheduler.lastResolved
+  tp.lastRejected = scheduler.lastRejected
+  tp.lastCanceled = scheduler.lastCanceled
+}
+
+function resetData(tp, scheduler) {
+  tp.selfCanceled = scheduler.lastCalled.isCanceled || false
 }

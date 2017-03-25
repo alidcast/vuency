@@ -50,4 +50,12 @@ describe('Task Property', function() {
     expect(scheduledTi2.isCanceled).to.be.true
     expect(tp.isActive).to.be.false
   })
+
+  it('differentiates between self cancelation', () => {
+    tp.run()
+    tp.abort()
+    expect(tp.selfCanceled).to.be.true
+    tp.run()
+    expect(tp.selfCanceled).to.be.false
+  })
 })

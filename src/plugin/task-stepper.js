@@ -1,3 +1,5 @@
+import { pause } from '../util/async'
+
 /**
   A {Stepper} is responsible for iterating through the generator function.
 *  It iterates through each yield, while being mindful of the tis state.
@@ -12,6 +14,7 @@ export default function createTaskStepper(ti, subscriber) {
 
   return {
     async handleStart() {
+      if (ti._delayNext > 0) await pause(ti._delayNext)
       await subscriber.asyncBeforeStart()
       ti.hasStarted = true
       ti._setComputedProps()

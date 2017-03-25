@@ -10,7 +10,8 @@ export default function createTaskInstance(operation, subscriber) {
 
   return {
     operation,
-    _runningInstance: null,
+    _runningOperation: null,
+    _delayNext: 0,
     // results
     value: null,
     error: null,
@@ -21,7 +22,7 @@ export default function createTaskInstance(operation, subscriber) {
     isResolved: false,
     // computed states
     isDropped: false,
-    isRestarted: false, // TODO
+    isRestarted: false,
     isRunning: false,
     isOver: false,
     state: 'waiting',
@@ -31,16 +32,7 @@ export default function createTaskInstance(operation, subscriber) {
       this.isRestarted = this.hasStarted && this.isCanceled
       this.isOver = this.isCanceled || this.isRejected || this.isResolved
       this.isRunning = this.hasStarted && !this.isOver
-      this.state = this._getState()
-    },
-
-    _getState() {
-      if (this.isDropped) return 'dropped'
-      else if (this.isCanceled) return 'canceled'
-      else if (this.isRejected) return 'rejected'
-      else if (this.isResolved) return 'resolved'
-      else if (this.isRunning) return 'running'
-      else return 'waiting'
+      this.state = getState(this)
     },
 
     _start() {
@@ -53,4 +45,13 @@ export default function createTaskInstance(operation, subscriber) {
       return stepper.handleCancel.apply(stepper)
     }
   }
+}
+
+function getState(tp) {
+  if (tp.isDropped) return 'dropped'
+  else if (tp.isCanceled) return 'canceled'
+  else if (tp.isRejected) return 'rejected'
+  else if (tp.isResolved) return 'resolved'
+  else if (tp.isRunning) return 'running'
+  else return 'waiting'
 }

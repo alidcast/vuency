@@ -1,6 +1,6 @@
 /**
 *  The {TaskSubscriber} is responsbile for delegating each
-*  callback, or subscriptions, so that it can be called in the
+*  "subscriptions", or callbacks, so that they can be called in the
 *  appropriate context.
 *
 *  @this the {TaskProperty} where the subscriber is destructured

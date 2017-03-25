@@ -12,18 +12,18 @@ import createQueue from '../util/queue'
 export default function createTaskScheduler(policy, autorun = true) {
   let waiting = createQueue(),
       running = createQueue(),
-      { flow, concurrency } = policy
+      { flow, delay, maxRunning } = policy
 
   function shouldRun() {
-    return waiting.isActive && running.size < concurrency
+    return waiting.isActive && running.size < maxRunning
   }
 
   function shouldDrop() {
-    return flow === 'drop' && (waiting.size + running.size === concurrency)
+    return flow === 'drop' && (waiting.size + running.size === maxRunning)
   }
 
   function shouldRestart() {
-    return flow === 'restart' && running.size === concurrency
+    return flow === 'restart' && running.size === maxRunning
   }
 
   return {
@@ -55,7 +55,8 @@ export default function createTaskScheduler(policy, autorun = true) {
         let ti = waiting.remove().pop()
         if (ti) {
           this.lastStarted = ti
-          ti._runningInstance = runThenFinalize(this, ti, running)
+          ti._delayNext = delay
+          ti._runningOperation = runThenFinalize(this, ti, running)
           running.add(ti)
         }
       }
@@ -145,7 +146,7 @@ function updateLastFinished(scheduler, ti) {
 /**
  * Cancels the queued task instances.
  *
- * If concurrency is 1, then we just cancel first item directly.
+ * If maxRunning is 1, then we just cancel first item directly.
  * This made the task-graph demo work better, so it's noticably faster. :)
  */
 function cancelQueued(queue) {

@@ -3,7 +3,6 @@
 
 import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
 
-
 describe('Task Subscribions', function() {
   let subs
   beforeEach(() => {

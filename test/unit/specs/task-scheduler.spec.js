@@ -64,15 +64,15 @@ describe('Task Scheduler', function() {
 
   it('removes one finished task from running', async () => {
     scheduler.schedule(ti1).advance()
-    await ti1._runningInstance
+    await ti1._runningOperation
     expect(scheduler.running.size).to.equal(0)
   })
 
   it('removes multiple finished tasks from running', async () => {
     scheduler.schedule(ti1).schedule(ti2)
       .advance().advance()
-    await ti1._runningInstance
-    await ti2._runningInstance
+    await ti1._runningOperation
+    await ti2._runningOperation
     expect(scheduler.running.size).to.equal(0)
   })
 
@@ -87,27 +87,27 @@ describe('Task Scheduler', function() {
     expect(scheduler.isActive).to.be.true
     scheduler.advance()
     expect(scheduler.isActive).to.be.true
-    await ti1._runningInstance
+    await ti1._runningOperation
     expect(scheduler.isActive).to.be.false
   })
 
   it('manually updates last', async () => {
     scheduler.schedule(ti1).advance()
-    await ti1._runningInstance
+    await ti1._runningOperation
     expect(scheduler.lastResolved).to.equal(ti1)
   })
 
   it('manually updates multiple last', async () => {
     scheduler.schedule(ti1).schedule(ti2)
       .advance().advance()
-    await ti1._runningInstance
-    await ti2._runningInstance
+    await ti1._runningOperation
+    await ti2._runningOperation
     expect(scheduler.lastResolved).to.equal(ti2)
   })
 
   it('manually updates last rejected', async () => {
     scheduler.schedule(ti4).advance()
-    await ti4._runningInstance
+    await ti4._runningOperation
     expect(scheduler.lastRejected).to.equal(ti4)
     expect(scheduler.lastResolved).to.be.null
     expect(scheduler.lastCanceled).to.be.null
@@ -117,7 +117,7 @@ describe('Task Scheduler', function() {
     scheduler.schedule(ti1)
     ti1.cancel()
     scheduler.advance()
-    await ti1._runningInstance
+    await ti1._runningOperation
     expect(scheduler.lastCanceled).to.equal(ti1)
     expect(scheduler.lastResolved).to.be.null
     expect(scheduler.lastRejected).to.be.null
@@ -126,8 +126,8 @@ describe('Task Scheduler', function() {
   it('manually runs differently finished functions', async () => {
     scheduler.schedule(ti4).schedule(ti1)
       .advance().advance()
-    await ti4._runningInstance
-    await ti1._runningInstance
+    await ti4._runningOperation
+    await ti1._runningOperation
     expect(scheduler.waiting.size).to.equal(0)
     expect(scheduler.running.size).to.equal(0)
     expect(scheduler.lastRejected).to.be.equal(ti4)
@@ -145,7 +145,7 @@ describe('Task Scheduler', function() {
 
   it('automatically runs one function', async () => {
     autoScheduler.schedule(ti1)
-    await ti1._runningInstance
+    await ti1._runningOperation
     expect(autoScheduler.waiting.size).to.equal(0)
     expect(autoScheduler.running.size).to.equal(0)
     expect(autoScheduler.lastResolved).to.equal(ti1)
@@ -153,8 +153,8 @@ describe('Task Scheduler', function() {
 
   it('automatically runs differently finished functions', async () => {
     autoScheduler.schedule(ti1).schedule(ti4)
-    await ti4._runningInstance
-    await ti1._runningInstance
+    await ti4._runningOperation
+    await ti1._runningOperation
     expect(autoScheduler.waiting.size).to.equal(0)
     expect(autoScheduler.running.size).to.equal(0)
     expect(autoScheduler.lastRejected).to.be.equal(ti4)
@@ -174,7 +174,7 @@ describe('Task Scheduler', function() {
     expect(dropScheduler.waiting.size).to.equal(0)
     expect(dropScheduler.running.size).to.equal(1)
     expect(ti2.isDropped).to.be.true
-    await ti1._runningInstance
+    await ti1._runningOperation
     expect(dropScheduler.lastResolved).to.equal(ti1)
   })
 
@@ -185,8 +185,8 @@ describe('Task Scheduler', function() {
           return yield pause(1000)
         }, subscriber)
     restartScheduler.schedule(slowTi).schedule(ti1)
-    await slowTi._runningInstance
-    await ti1._runningInstance
+    await slowTi._runningOperation
+    await ti1._runningOperation
     expect(restartScheduler.waiting.size).to.equal(0)
     expect(restartScheduler.running.size).to.equal(0)
     expect(ti1.isResolved).to.be.true
