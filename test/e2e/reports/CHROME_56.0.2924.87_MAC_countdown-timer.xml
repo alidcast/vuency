@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites errors="0"
+            failures="0"
+            tests="1">
+
+  <testsuite name="countdown-timer"
+    errors="0" failures="0" hostname="" id="" package="countdown-timer" skipped="0"
+    tests="1" time="7.502" timestamp="Sat, 25 Mar 2017 20:44:43 GMT">
+  
+    <testcase name="countdown=timer" time="7.502" assertions="5">
+
+    
+
+    
+
+    
+
+    
+
+    
+    </testcase>
+  
+  
+  </testsuite>
+</testsuites>

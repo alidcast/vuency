@@ -6,7 +6,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 var projectRoot = resolve(__dirname, './')
 var srcRoot = resolve(__dirname, './src')
 var testRoot = resolve(__dirname, './test')
-var devRoot = resolve(__dirname, './examples')
+var devRoot = resolve(__dirname, './demo')
 var prodRoot = resolve(__dirname, './dist')
 
 const baseConfig = {
@@ -16,7 +16,8 @@ const baseConfig = {
     ],
     alias: { // create an alias for commonly used modules
       'vue$': 'vue/dist/vue.common.js', // vue standalone build
-      'src': srcRoot
+      'src': srcRoot,
+      'examples': resolve(__dirname, './examples')
     },
     modules: [ // directory to search when resolving modules
       srcRoot, "node_modules"

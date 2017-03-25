@@ -7,28 +7,28 @@ import assert from '../../util/assert'
 *  @this the {TaskProperty} where the task policy is destructured
 *  @constructs TaskPolicy
 */
-export default function createTaskPolicy(_type, _num = 1) {
+export default function createTaskPolicy(_type, _num = 1, _time = 0) {
   let flowTypes = ['enqueue', 'restart', 'drop'],
-      flow = _type,
-      maxRunning = _num,
-      delay = 0
+      policy = {
+        flow: _type,
+        maxRunning: _num,
+        delay: _time
+      }
 
   return {
+    // default scheduler policy
     get policy() {
-      return {
-        flow,
-        delay,
-        maxRunning
-      }
-    },
+      return policy
+    } 
+
     /**
      *  Sets the scheduling rule for repeat calls and optionally the amount
      *  of time to delay the scheduling of the task.
      */
     flow(type, time = 0) {
       assert(flowTypes.includes(type), `${type} is not a flow control option`)
-      flow = type
-      delay = time
+      policy.flow = type
+      policy.delay = time
       return this
     },
 
@@ -36,7 +36,7 @@ export default function createTaskPolicy(_type, _num = 1) {
      * Sets the number of instances allowed to run concurrently.
      */
     maxRunning(num) {
-      maxRunning = num
+      policy.maxRunning = num
       return this
     }
   }

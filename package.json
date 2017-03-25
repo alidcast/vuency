@@ -6,7 +6,7 @@
   "module": "dist/build.js",
   "main": "dist/build.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development node examples/server.js",
+    "dev": "cross-env NODE_ENV=development node demo/server.js",
     "e2e": "cross-env NODE_ENV=development node test/e2e/runner.js",
     "unit": "cross-env NODE_ENV=development karma start test/unit/karma.conf.js",
     "test": "npm run unit && npm run e2e",
@@ -55,6 +55,7 @@
     "karma-webpack": "^2.0.2",
     "mocha": "^3.2.0",
     "nightwatch": "^0.9.12",
+    "nightwatch-helpers": "^1.2.0",
     "selenium-server": "^3.0.1",
     "sinon": "^1.17.3",
     "sinon-chai": "^2.8.0",

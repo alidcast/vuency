@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites errors="1"
+            failures="0"
+            tests="1">
+
+  <testsuite name="countdown-timer"
+    errors="1" failures="0" hostname="" id="" package="countdown-timer" skipped="0"
+    tests="1" time="0.01400" timestamp="Sat, 25 Mar 2017 20:25:55 GMT">
+  
+    <testcase name="countdown=timer" time="0.01400" assertions="0">
+    </testcase>
+      <system-err>
+          Error while running [Countdown Timer / countdown=timer]:
+
+  TypeError: browser.url(...).waitForElementVisible(...).assert.containsText(...).click(...).waitFor(...).assert.waitForText is not a function
+    at Object.countdown=timer (/Users/acastano/Sites/vue/vuency/test/e2e/specs/countdown-timer.js:10:15)
+    at Module.call (/Users/acastano/Sites/vue/vuency/node_modules/nightwatch/lib/runner/module.js:62:34)
+    at /Users/acastano/Sites/vue/vuency/node_modules/nightwatch/lib/runner/testcase.js:70:29
+    at _fulfilled (/Users/acastano/Sites/vue/vuency/node_modules/q/q.js:834:54)
+    at self.promiseDispatch.done (/Users/acastano/Sites/vue/vuency/node_modules/q/q.js:863:30)
+    at Promise.promise.promiseDispatch (/Users/acastano/Sites/vue/vuency/node_modules/q/q.js:796:13)
+    at /Users/acastano/Sites/vue/vuency/node_modules/q/q.js:556:49
+    at runSingle (/Users/acastano/Sites/vue/vuency/node_modules/q/q.js:137:13)
+    at flush (/Users/acastano/Sites/vue/vuency/node_modules/q/q.js:125:13)
+    at _combinedTickCallback (internal/process/next_tick.js:67:7)
+      </system-err>
+  
+  
+  </testsuite>
+</testsuites>
