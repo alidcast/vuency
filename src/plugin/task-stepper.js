@@ -14,7 +14,6 @@ export default function createTaskStepper(ti, subscriber) {
 
   return {
     async handleStart() {
-      if (ti._delayNext > 0) await pause(ti._delayNext)
       await subscriber.asyncBeforeStart()
       ti.hasStarted = true
       ti._setComputedProps()
@@ -55,17 +54,25 @@ export default function createTaskStepper(ti, subscriber) {
       return ti
     },
 
-    // checks the state of the ti to take appropriate actions
-    // recursively iterates through generator function until operation is finished
+    /**
+     * At each step, checks the state of the task instance to know appropriate
+     * action and recursively iterates through generator function until
+     * operation is either canceled, rejected, or resolved.
+     */
     async stepThrough(gen) {
       let stepper = this
 
+      // when the task is canceled that means the steppers' `handelCancel`
+      // method was already called from the outside, so all we have to do
+      // is return the task instance
       async function takeAStep(prev = undefined) {
         let value, done
 
-        if (ti.isCanceled) return ti                         // CANCELED / DROPPED
+        if (ti._delayStart > 0) await pause(ti._delayStart)
+
+        if (ti.isCanceled) return ti                         // CANCELED (pre start)
         if (!ti.hasStarted) await stepper.handleStart()
-        if (ti.isCanceled) return ti                         // CANCELED
+        if (ti.isCanceled) return ti                         // CANCELED (post start)
 
         try {
           ({ value, done } = await stepper.handleNext(prev))

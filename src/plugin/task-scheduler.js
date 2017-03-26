@@ -42,7 +42,7 @@ export default function createTaskScheduler(policy, autorun = true) {
      */
     schedule(ti) {
       this.lastCalled = ti
-      if (shouldDrop()) ti.cancel()
+      if (shouldDrop()) ti._cancel()
       else if (shouldWait()) {
         if (shouldRestart()) cancelQueued(running)
         waiting.add(ti)
@@ -60,7 +60,7 @@ export default function createTaskScheduler(policy, autorun = true) {
         let ti = waiting.remove().pop()
         if (ti) {
           this.lastStarted = ti
-          ti._delayNext = delay
+          ti._delayStart = delay
           ti._runningOperation = runThenFinalize(this, ti, running)
           running.add(ti)
         }
@@ -74,6 +74,7 @@ export default function createTaskScheduler(policy, autorun = true) {
     emptyOut() {
       cancelQueued(waiting)
       cancelQueued(running)
+      // TODO don't task instances clear themselves?
       waiting.clear()
       running.clear()
     },
@@ -155,6 +156,6 @@ function updateLastFinished(scheduler, ti) {
  * This made the task-graph demo work better, so it's noticably faster. :)
  */
 function cancelQueued(queue) {
-  if (queue.size === 1) queue.pop().cancel()
-  else queue.forEach(item => item.cancel())
+  if (queue.size === 1) queue.pop()._cancel()
+  else queue.forEach(item => item._cancel())
 }

@@ -78,4 +78,11 @@ describe('Task Instance', function() {
     ti._setComputedProps()
     expect(ti.isOver).to.be.true
   })
+
+  it('differentiates between self cancelation', () => {
+    ti._cancel()
+    expect(ti.selfCanceled).to.be.false
+    ti.cancel()
+    expect(ti.selfCanceled).to.be.true
+  })
 })

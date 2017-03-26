@@ -115,7 +115,7 @@ describe('Task Scheduler', function() {
 
   it('manually updates last canceled', async () => {
     scheduler.schedule(ti1)
-    ti1.cancel()
+    ti1._cancel()
     scheduler.advance()
     await ti1._runningOperation
     expect(scheduler.lastCanceled).to.equal(ti1)

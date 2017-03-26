@@ -10,8 +10,8 @@ export default function createTaskInstance(operation, subscriber) {
 
   return {
     operation,
+    _delayStart: 0,
     _runningOperation: null,
-    _delayNext: 0,
     // results
     value: null,
     error: null,
@@ -40,8 +40,18 @@ export default function createTaskInstance(operation, subscriber) {
       return stepper.stepThrough.apply(stepper)
     },
 
+    /**
+     * To differentiate between self cancelation versus scheduler cancelation,
+     * the task instance has both a private and public `cancel` method.
+     */
+    selfCanceled: false,
+    _cancel() {
+      if (!stepper) stepper = createTaskStepper(this, subscriber)
+      return stepper.handleCancel.apply(stepper)
+    },
     cancel() {
       if (!stepper) stepper = createTaskStepper(this, subscriber)
+      this.selfCanceled = true
       return stepper.handleCancel.apply(stepper)
     }
   }

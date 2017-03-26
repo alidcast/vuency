@@ -3,7 +3,6 @@
 *  "subscriptions", or callbacks, so that they can be called in the
 *  appropriate context.
 *
-*  @this the {TaskProperty} where the subscriber is destructured
 *  @constructs TaskSubscriber
 */
 export default function createTaskSubscriber() {
@@ -53,37 +52,41 @@ export default function createTaskSubscriber() {
     afterEnd() {
       if (endFn) endFn()
     },
+
+    /**
+     * @this the {TaskProperty} where the subscriptions are destructured
+     */
     subscriptions: {
       beforeStart(fn) {
-        startFn = fn.bind(this)
+        startFn = fn.bind(this, this)
         return this
       },
       beforeNext(fn) {
-        nextFn = fn.bind(this)
+        nextFn = fn.bind(this, this)
         return this
       },
       onCancel(fn) {
-        cancelFn = fn.bind(this)
+        cancelFn = fn.bind(this, this)
         return this
       },
       onDrop(fn) {
-        dropFn = fn.bind(this)
+        dropFn = fn.bind(this, this)
         return this
       },
       onRestart(fn) {
-        restartFn = fn.bind(this)
+        restartFn = fn.bind(this, this)
         return this
       },
       onError(fn) {
-        errorFn = fn.bind(this)
+        errorFn = fn.bind(this, this)
         return this
       },
       onSuccess(fn) {
-        successFn = fn.bind(this)
+        successFn = fn.bind(this, this)
         return this
       },
       afterEnd(fn) {
-        endFn = fn.bind(this)
+        endFn = fn.bind(this, this)
         return this
       }
     }

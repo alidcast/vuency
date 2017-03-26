@@ -51,8 +51,6 @@ export default function createTaskProperty(host, operation) {
     lastCanceled: null,
     // default helper instance to be used for when `last-` is undefined
     default: createTaskInstance(function * () {}),
-    // to differentiate between scheduler cancelation
-    selfCanceled: false,
 
     /**
      * Creates a new task instance and schedules it to run.
@@ -65,7 +63,7 @@ export default function createTaskProperty(host, operation) {
       let hostOperation = operation.bind(host, ...args),
           ti = createTaskInstance(hostOperation, subscriber)
       scheduler.schedule(ti)
-      resetData(this, scheduler)
+      // resetData(this, scheduler)
       return ti
     },
 
@@ -74,7 +72,6 @@ export default function createTaskProperty(host, operation) {
      */
     abort() {
       if (scheduler && scheduler.isActive) scheduler.emptyOut()
-      this.selfCanceled = true
     },
 
     /**
@@ -99,8 +96,4 @@ function setLast(tp, scheduler) {
   tp.lastResolved = scheduler.lastResolved
   tp.lastRejected = scheduler.lastRejected
   tp.lastCanceled = scheduler.lastCanceled
-}
-
-function resetData(tp, scheduler) {
-  tp.selfCanceled = scheduler.lastCalled.isCanceled || false
 }
