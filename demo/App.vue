@@ -7,14 +7,16 @@
 
 <script>
 import CountdownTimer from 'examples/CountdownTimer'
-import RandomQuestion from 'examples/RandomQuestion'
-import AjaxThrottling from 'examples/AjaxThrottling'
+import CoinFlip from 'examples/CoinFlip'
+import QuestionGenie from 'examples/QuestionGenie'
+import InfiniteAjax from 'examples/InfiniteAjax'
 
 const routes = {
   '/': { template: `<h1>Vuency</h1>` },
   '/countdown-timer': CountdownTimer,
-  '/random-question': RandomQuestion,
-  '/ajax-throttling': AjaxThrottling
+  '/coin-flip': CoinFlip,
+  '/question-genie': QuestionGenie,
+  '/infinite-ajax': InfiniteAjax
 }
 
 export default {

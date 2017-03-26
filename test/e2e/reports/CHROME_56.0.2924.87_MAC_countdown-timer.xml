@@ -5,9 +5,9 @@
 
   <testsuite name="countdown-timer"
     errors="0" failures="0" hostname="" id="" package="countdown-timer" skipped="0"
-    tests="1" time="6.862" timestamp="Sat, 25 Mar 2017 21:38:01 GMT">
+    tests="1" time="5.828" timestamp="Sun, 26 Mar 2017 19:37:12 GMT">
   
-    <testcase name="countdown-timer" time="6.862" assertions="5">
+    <testcase name="countdown-timer" time="5.828" assertions="5">
 
     
 

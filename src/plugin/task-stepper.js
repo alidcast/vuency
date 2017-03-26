@@ -21,7 +21,7 @@ export default function createTaskStepper(ti, subscriber) {
     },
 
     async handleNext(prev) {
-      await subscriber.asyncBeforeNext(ti)
+      await subscriber.asyncBeforeYield(ti)
       let output = iter.next(prev)
       return output
     },

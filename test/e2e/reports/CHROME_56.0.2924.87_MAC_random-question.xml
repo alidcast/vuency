@@ -5,9 +5,9 @@
 
   <testsuite name="random-question"
     errors="0" failures="0" hostname="" id="" package="random-question" skipped="0"
-    tests="1" time="5.823" timestamp="Sat, 25 Mar 2017 21:38:08 GMT">
+    tests="1" time="5.283" timestamp="Sun, 26 Mar 2017 18:25:35 GMT">
   
-    <testcase name="random-question" time="5.823" assertions="6">
+    <testcase name="random-question" time="5.283" assertions="6">
 
     
 

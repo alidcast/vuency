@@ -7,7 +7,7 @@
 */
 export default function createTaskSubscriber() {
   let startFn,
-      nextFn,
+      yieldFn,
       cancelFn,
       dropFn,
       restartFn,
@@ -25,8 +25,8 @@ export default function createTaskSubscriber() {
     async asyncBeforeStart(taskInstance) {
       if (startFn) await startFn(taskInstance)
     },
-    async asyncBeforeNext(taskInstance) {
-      if (nextFn) await nextFn(taskInstance)
+    async asyncBeforeYield(taskInstance) {
+      if (yieldFn) await yieldFn(taskInstance)
     },
     /**
      * `On` actions.
@@ -61,8 +61,8 @@ export default function createTaskSubscriber() {
         startFn = fn.bind(this)
         return this
       },
-      beforeNext(fn) {
-        nextFn = fn.bind(this)
+      beforeYield(fn) {
+        yieldFn = fn.bind(this)
         return this
       },
       onCancel(fn) {

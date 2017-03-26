@@ -2,7 +2,9 @@ import initTaskFactory from './plugin/index'
 import asyncHelpers from './util/async'
 import assert, { isFn } from './util/assert'
 
-export default function(Vue) {
+let Vue
+export default function(_Vue) {
+  Vue = _Vue
   Vue.mixin({
     created: initTasks
     // TODO
@@ -26,11 +28,11 @@ function initTasks() {
         tasks = opts.tasks.call(host, createTask, asyncHelpers)
 
     if (tasks.flow) { // it is a task object, so register as named function
-      host[tasks.operation.name] = tasks
+      Vue.util.defineReactive(host, tasks.operation.name, tasks)
     }
     else { // it is a list of task objects, so register as named objects
       Object.keys(tasks).forEach(key => {
-        host[key] = tasks[key]
+        Vue.util.defineReactive(host, key, tasks[key])
       })
     }
   }
