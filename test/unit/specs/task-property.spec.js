@@ -3,19 +3,17 @@
 
 import Vue from 'vue'
 import createTaskProperty from 'src/plugin/task-property'
-import createTaskPolicy from 'src/plugin/modifiers/task-policy'
 
 function * exTask() {
   return 'passed'
 }
 
 describe('Task Property', function() {
-  let tp,
-      host = new Vue(),
-      policy = createTaskPolicy('enqueue', 2).policy
+  let tp
 
   beforeEach(() => {
-    tp = createTaskProperty(host, exTask, policy)
+    tp = createTaskProperty(new Vue(), exTask)
+    tp.flow('enqueue')
   })
 
   it('has correct states', () => {
@@ -42,7 +40,7 @@ describe('Task Property', function() {
     expect(scheduledTi.state).to.not.be.undefined
   })
 
-  it('aborts all task instances', () => {
+  it('aborts all task instances', async () => {
     let scheduledTi1 = tp.run(),
         scheduledTi2 = tp.run()
     tp.abort()

@@ -14,16 +14,20 @@ export default function createTaskScheduler(policy, autorun = true) {
       running = createQueue(),
       { flow, delay, maxRunning } = policy
 
-  function shouldRun() {
-    return waiting.isActive && running.size < maxRunning
-  }
-
   function shouldDrop() {
     return flow === 'drop' && (waiting.size + running.size === maxRunning)
   }
 
   function shouldRestart() {
     return flow === 'restart' && running.size === maxRunning
+  }
+
+  function shouldWait() {
+    return flow === 'enqueue' || flow === 'restart' || flow === 'drop'
+  }
+
+  function shouldRun() {
+    return waiting.isActive && running.size < maxRunning
   }
 
   return {
@@ -36,14 +40,15 @@ export default function createTaskScheduler(policy, autorun = true) {
     /**
      * Add task instance to waiting queue.
      */
-    schedule(ti) { //
+    schedule(ti) {
       this.lastCalled = ti
       if (shouldDrop()) ti.cancel()
-      else {
+      else if (shouldWait()) {
         if (shouldRestart()) cancelQueued(running)
         waiting.add(ti)
         if (autorun) this.advance()
       }
+      else ti._start()
       return this
     },
 

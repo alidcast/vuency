@@ -171,8 +171,6 @@ describe('Task Scheduler', function() {
     let dropPolicy = createTaskPolicy('drop', 1).policy,
         dropScheduler = createTaskScheduler(dropPolicy, true)
     dropScheduler.schedule(ti1).schedule(ti2)
-    expect(dropScheduler.waiting.size).to.equal(0)
-    expect(dropScheduler.running.size).to.equal(1)
     expect(ti2.isDropped).to.be.true
     await ti1._runningOperation
     expect(dropScheduler.lastResolved).to.equal(ti1)

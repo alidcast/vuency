@@ -7,7 +7,7 @@ import assert from '../../util/assert'
 *  @this the {TaskProperty} where the task policy is destructured
 *  @constructs TaskPolicy
 */
-export default function createTaskPolicy(_type, _num = 1, _time = 0) {
+export default function createTaskPolicy(_type = 'normal', _num = 1, _time = 0) {
   let flowTypes = ['enqueue', 'restart', 'drop'],
       policy = {
         flow: _type,
@@ -26,7 +26,7 @@ export default function createTaskPolicy(_type, _num = 1, _time = 0) {
      *  of time to delay the scheduling of the task.
      */
     flow(type, time = 0) {
-      assert(flowTypes.includes(type), `${type} is not a flow control option`)
+      assert(flowTypes.indexOf(type) > -1, `${type} is not a flow control option`)
       policy.flow = type
       policy.delay = time
       return this

@@ -14,7 +14,7 @@ import createTaskListeners from './modifiers/task-listeners'
  */
 export default function createTaskProperty(host, operation) {
   let scheduler,
-      { policy, ...policyModifiers } = createTaskPolicy('enqueue', 1),
+      { policy, ...policyModifiers } = createTaskPolicy(),
       { events, watchers } = createTaskListeners(host),
       { subscriptions, ...subscriber } = createTaskSubscriber()
 
