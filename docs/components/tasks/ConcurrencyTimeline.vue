@@ -3,8 +3,8 @@
     <button @click="runTrackerInstance"> task.run() </button>
     <button @click="clearTimeline">Clear Timeline</button>
     <button
-      v-if="canCancelLast && trackerTask.last.called && !trackerTask.last.called.isFinished"
-      @click="trackerTask.last.started.cancel()">
+      v-if="canCancelLast && trackerTask.lastCalled && !trackerTask.lastCalled.isOver"
+      @click="trackerTask.lastStarted.cancel()">
       Cancel Last
     </button>
     <button
@@ -31,7 +31,8 @@
             :y="instance.g.y"
             :width="instance.g.width + '%'"
             :height="instance.g.height"
-            :fill="instance.g.color" fill-opacity=0.3
+            :fill="instance.g.color"
+            :fill-opacity="instance.g.opacity"
             stroke="black" />
           <text
             :x="instance.g.x + 0.5 + '%'"
@@ -49,12 +50,6 @@
 </template>
 
 <script>
-// TODO
-// enqueue waiting is being shown! :( can't win this!!
-// - clear task tracker
-//      - automatic clear if it reaches certain length
-// - scheduler isn't getting advnace fully in enqueue and drop?
-
 /** TODO consider making timers part of tp
  * Enhance task property so that I can be used for tracker graph.
  */
@@ -75,21 +70,21 @@ function createTrackerInstance(host) {
       width: 0.01,
       x: 0,
       y: pickFrom(labelHeights, host.nextId),
-      color: pickFrom(colors, host.nextId)
+      color: pickFrom(colors, host.nextId),
+      opacity: 0.3
     },
 
     update(currTime, upper, lower) {
-      let ti = this.taskInstance,
-          start = this.startTime
+      let ti = this.taskInstance
 
       if (!this.hasStarted) {
         this.startTime = currTime
         this.hasStarted = true
       }
 
-      this.g.x = scale(start - lower, upper, lower)
+      this.g.x = scale(this.startTime - lower, upper, lower)
 
-      if (!ti.isFinished) {
+      if (ti.isRunning) {
         this.g.width = scale(width(this, upper), upper, lower)
         this.endTime = currTime
       }
@@ -121,7 +116,7 @@ export default {
   },
   tasks(t, { pause }) {
     return {
-      trackerTask: t(function * (trackerInstance) {
+      trackerTask: t(function * () {
         yield pause(2000)
       }).flow(this.flow),
 

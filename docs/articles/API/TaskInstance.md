@@ -27,7 +27,7 @@ Each task instance has the following properties:
 
 Example usage:
 
-``` javascript
+```js
 
 export default {
   created() {

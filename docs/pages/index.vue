@@ -1,7 +1,7 @@
 <template lang="pug">
   div.landing-container
     div.intro-container
-      h1.intro-title Introducing Vuency
+      h1.intro-title Vue + Concurrency = Vuency
       h3.intro-description
         | Gain complete control and transparency over the execution of concurrent
         |  and asyncronous operations, with almost no code.

@@ -1,7 +1,7 @@
 {
   "name": "vuency",
   "description": "a vuejs concurrency management plugin",
-  "version": "0.0.14",
+  "version": "0.0.16",
   "author": "Alid Castano <alidcastano@gmail.com>",
   "module": "dist/build.js",
   "main": "dist/build.js",

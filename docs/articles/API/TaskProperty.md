@@ -21,8 +21,7 @@ Each task has the following properties:
 
 An example basic usage:
 
-``` html
-
+```html
 <div>
   <button @click="myTask.run()"></button>  
   <p>{{ this.myTask.isActive 'I'm active' : 'I'm idle' }}</p>

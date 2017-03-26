@@ -42,6 +42,7 @@ module.exports = {
       }
     },
     vendor: [
+      'axios',
       'vuency'
     ]
   },

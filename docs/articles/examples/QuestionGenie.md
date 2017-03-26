@@ -1,13 +1,30 @@
-<template>
-  <div>
-    <p>
-      Ask a yes/no question: <input v-model="question">
-    </p>
-    <p>{{ answer }}</p>
-  </div>
-</template>
-
 <script>
+import QuestionGenie from '~components/tasks/QuestionGenie.vue'
+
+export default {
+  components: {
+    QuestionGenie
+  }
+}
+</script>
+
+<div>
+    <QuestionGenie> </QuestionGenie>
+</div>
+
+The example we'll be working on below is basically an input form that takes in question and, using the `yesno.wtf` API, returns an answer. This example was actually taken from the [Vuejs documentation about watchers](https://vuejs.org/v2/guide/computed.html#Watchers). In the second snippet below, you'll see the refactored version that uses Vuency.
+
+
+```js
+// template
+<div>
+  <p>
+    Ask a yes/no question: <input v-model="question">
+  </p>
+  <p>{{ answer }}</p>
+</div>
+
+// javascript
 export default {
   data() {
     return {
@@ -37,4 +54,4 @@ export default {
     })
   }
 }
-</script>
+```

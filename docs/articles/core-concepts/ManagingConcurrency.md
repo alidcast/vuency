@@ -17,13 +17,8 @@ Often you want to control the flow and frequency of concurrent tasks. For exampl
 
 ### Task Modifiers
 
-introduce them with examples
 
 #### Default Behavior: Tasks Run Concurrently
-
-// TODO
-// infinite tasks run concurrently
-// but w/ any modifier, default is 1
 
 #### enqueue
 

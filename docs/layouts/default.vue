@@ -40,6 +40,10 @@ export default {
 
 .sidebar-content
   padding-left: 1rem
+  // removed hyperlink styles
+  a
+    color: inherit
+    text-decoration: inherit
   .sidebar-header
     text-align: center
     .site-title

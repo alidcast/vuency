@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import { guide } from '~articles/index'
+import docs from '~articles/index'
 import { toHeading } from '~utilities/to-transforms'
 
 export default {
@@ -18,9 +18,7 @@ export default {
     }
   },
 
-  components: {
-    ...guide
-  }
+  components: docs
 }
 </script>
 

@@ -1,26 +1,23 @@
-import Installation from './getting-started/Installation.md'
-import Introduction from './getting-started/Introduction.md'
+// essential
+import Introduction from './Introduction.md'
+import GettingStarted from './GettingStarted.md'
+// advanced
 import ManagingConcurrency from './core-concepts/ManagingConcurrency.md'
-import TaskProperty from './API/TaskProperty.md'
-import TaskInstance from './API/TaskInstance.md'
-import ControllingState from './examples/ControllingState.md'
-// import QuestionGenie from './examples/LoadingUi.md'
-// import FunctionThrottling from './examples/FunctionThrottling.md'
+// api
+import TaskProperty from './api/TaskProperty.md'
+import TaskInstance from './api/TaskInstance.md'
+// examples
+import QuestionGenie from './examples/QuestionGenie.md'
 
-let guide = {
-      Installation,
-      Introduction,
-      ManagingConcurrency,
-      TaskProperty,
-      TaskInstance
-    },
-    examples = {
-      ControllingState
-      // QuestionGenie,
-      // FunctionThrottling
-    }
-
-export {
-  guide,
-  examples
+export default {
+  // essential
+  Introduction,
+  GettingStarted,
+  // advanced
+  ManagingConcurrency,
+  // examples
+  QuestionGenie,
+  // api
+  TaskProperty,
+  TaskInstance
 }

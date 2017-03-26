@@ -1,18 +1,4 @@
 /**
- * Converts array of article names to array of menu option objects.
- */
-export function compsToMenu(comps) {
-  let menu = []
-  comps.forEach(key => {
-    menu.push({
-      heading: toHeading(key),
-      slug: toSlug(key)
-    })
-  })
-  return menu
-}
-
-/**
  * Convert a camelized or hyphenated string to a heading.
  * @example
  *  'getting-started' => 'Getting Started'
