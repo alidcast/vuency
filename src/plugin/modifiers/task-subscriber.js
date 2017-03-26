@@ -22,35 +22,35 @@ export default function createTaskSubscriber() {
      * These operations are async so that they can be use to timeout logic
      *  (e.g. the `pause` helper) to better update UI state.
      */
-    async asyncBeforeStart() {
-      if (startFn) await startFn()
+    async asyncBeforeStart(taskInstance) {
+      if (startFn) await startFn(taskInstance)
     },
-    async asyncBeforeNext() {
-      if (nextFn) await nextFn()
+    async asyncBeforeNext(taskInstance) {
+      if (nextFn) await nextFn(taskInstance)
     },
     /**
      * `On` actions.
      */
-    onCancel() {
-      if (cancelFn) cancelFn()
+    onCancel(taskInstance) {
+      if (cancelFn) cancelFn(taskInstance)
     },
-    onDrop() {
-      if (dropFn) dropFn()
+    onDrop(taskInstance) {
+      if (dropFn) dropFn(taskInstance)
     },
-    onRestart() {
-      if (restartFn) restartFn()
+    onRestart(taskInstance) {
+      if (restartFn) restartFn(taskInstance)
     },
-    onError() {
-      if (errorFn) errorFn()
+    onError(taskInstance) {
+      if (errorFn) errorFn(taskInstance)
     },
-    onSuccess() {
-      if (successFn) successFn()
+    onSuccess(taskInstance) {
+      if (successFn) successFn(taskInstance)
     },
     /**
      * `After` actions.
      */
-    afterEnd() {
-      if (endFn) endFn()
+    afterEnd(taskInstance) {
+      if (endFn) endFn(taskInstance)
     },
 
     /**
@@ -58,35 +58,35 @@ export default function createTaskSubscriber() {
      */
     subscriptions: {
       beforeStart(fn) {
-        startFn = fn.bind(this, this)
+        startFn = fn.bind(this)
         return this
       },
       beforeNext(fn) {
-        nextFn = fn.bind(this, this)
+        nextFn = fn.bind(this)
         return this
       },
       onCancel(fn) {
-        cancelFn = fn.bind(this, this)
+        cancelFn = fn.bind(this)
         return this
       },
       onDrop(fn) {
-        dropFn = fn.bind(this, this)
+        dropFn = fn.bind(this)
         return this
       },
       onRestart(fn) {
-        restartFn = fn.bind(this, this)
+        restartFn = fn.bind(this)
         return this
       },
       onError(fn) {
-        errorFn = fn.bind(this, this)
+        errorFn = fn.bind(this)
         return this
       },
       onSuccess(fn) {
-        successFn = fn.bind(this, this)
+        successFn = fn.bind(this)
         return this
       },
       afterEnd(fn) {
-        endFn = fn.bind(this, this)
+        endFn = fn.bind(this)
         return this
       }
     }

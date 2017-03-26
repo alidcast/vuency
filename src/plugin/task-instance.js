@@ -27,7 +27,7 @@ export default function createTaskInstance(operation, subscriber) {
     isOver: false,
     state: 'waiting',
 
-    _setComputedProps() {
+    _updateComputed() {
       this.isDropped = !this.hasStarted && this.isCanceled
       this.isRestarted = this.hasStarted && this.isCanceled
       this.isOver = this.isCanceled || this.isRejected || this.isResolved

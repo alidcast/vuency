@@ -14,43 +14,43 @@ export default function createTaskStepper(ti, subscriber) {
 
   return {
     async handleStart() {
-      await subscriber.asyncBeforeStart()
+      await subscriber.asyncBeforeStart(ti)
       ti.hasStarted = true
-      ti._setComputedProps()
+      ti._updateComputed()
       return ti
     },
 
     async handleNext(prev) {
-      await subscriber.asyncBeforeNext()
+      await subscriber.asyncBeforeNext(ti)
       let output = iter.next(prev)
       return output
     },
 
     handleCancel() {
       ti.isCanceled = true
-      ti._setComputedProps()
-      if (ti.isDropped) subscriber.onDrop()
-      if (ti.isRestarted) subscriber.onRestart()
-      subscriber.onCancel()
-      subscriber.afterEnd()
+      ti._updateComputed()
+      if (ti.isDropped) subscriber.onDrop(ti)
+      if (ti.isRestarted) subscriber.onRestart(ti)
+      subscriber.onCancel(ti)
+      subscriber.afterEnd(ti)
       return ti
     },
 
     handleError(err) {
       ti.isRejected = true
       ti.error = err
-      ti._setComputedProps()
-      subscriber.onError()
-      subscriber.afterEnd()
+      ti._updateComputed()
+      subscriber.onError(ti)
+      subscriber.afterEnd(ti)
       return ti
     },
 
     handleSuccess(val) {
       ti.isResolved = true
       ti.value = val
-      ti._setComputedProps()
-      subscriber.onSuccess()
-      subscriber.afterEnd()
+      ti._updateComputed()
+      subscriber.onSuccess(ti)
+      subscriber.afterEnd(ti)
       return ti
     },
 

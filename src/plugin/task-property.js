@@ -29,8 +29,7 @@ export default function createTaskProperty(host, operation) {
       }),
       watch: {
         running() {
-          setStates(tp, scheduler)
-          setLast(tp, scheduler)
+          tp._update()
           host.$forceUpdate()
         }
       }
@@ -49,8 +48,13 @@ export default function createTaskProperty(host, operation) {
     lastResolved: null,
     lastRejected: null,
     lastCanceled: null,
-    // default helper instance to be used for when `last-` is undefined
+    // default helper instance (can be used for when `last-` is undefined)
     default: createTaskInstance(function * () {}),
+
+    _update() {
+      setStates(this, scheduler)
+      setLast(this, scheduler)
+    },
 
     /**
      * Creates a new task instance and schedules it to run.

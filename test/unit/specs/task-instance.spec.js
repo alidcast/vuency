@@ -40,42 +40,42 @@ describe('Task Instance', function() {
 
   it('updates computed isRunning correctly', () => {
     ti.hasStarted = true
-    ti._setComputedProps()
+    ti._updateComputed()
     expect(ti.isRunning).to.be.true
     ti.isResolved = true
-    ti._setComputedProps()
+    ti._updateComputed()
     expect(ti.isRunning).to.be.false
   })
 
   it('updates computed isDropped correctly', () => {
     ti.isCanceled = true
-    ti._setComputedProps()
+    ti._updateComputed()
     expect(ti.isDropped).to.be.true
     ti.hasStarted = true
-    ti._setComputedProps()
+    ti._updateComputed()
     expect(ti.isDropped).to.be.false
   })
 
   it('updates computed isRestarted correctly', () => {
     ti.isCanceled = true
-    ti._setComputedProps()
+    ti._updateComputed()
     expect(ti.isRestarted).to.be.false
     ti.hasStarted = true
-    ti._setComputedProps()
+    ti._updateComputed()
     expect(ti.isRestarted).to.be.true
   })
 
   it('updates computed isOver correctly', () => {
     ti.isResolved = true
-    ti._setComputedProps()
+    ti._updateComputed()
     expect(ti.isOver).to.be.true
     ti.isResolved = false
     ti.isCanceled = true
-    ti._setComputedProps()
+    ti._updateComputed()
     expect(ti.isOver).to.be.true
     ti.isCanceled = false
     ti.isRejected = true
-    ti._setComputedProps()
+    ti._updateComputed()
     expect(ti.isOver).to.be.true
   })
 

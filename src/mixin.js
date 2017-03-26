@@ -25,7 +25,7 @@ function initTasks() {
     let createTask = initTaskFactory(host),
         tasks = opts.tasks.call(host, createTask, asyncHelpers)
 
-    if (tasks.policy) { // it is a task object, so register as named function
+    if (tasks.flow) { // it is a task object, so register as named function
       host[tasks.operation.name] = tasks
     }
     else { // it is a list of task objects, so register as named objects
