@@ -60,10 +60,9 @@ export function createQueue(queue = []) {
 
     /**
      * Empties out entire array.
-     * @param {Boolean} Keep - whether to keep reference to original array
      */
-    clear(keep = false) {
-      keep ? queue = [] : queue.length = 0
+    clear() {
+      queue.length = 0
     },
 
     /**

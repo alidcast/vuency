@@ -27,7 +27,7 @@ export default function createTaskStepper(ti, subscriber) {
     },
 
     handleCancel() {
-      if (ti.isOver) return ti 
+      if (ti.isOver) return ti
       iter.return() // terminate early and run finally clause
       ti.isCanceled = true
       ti._updateComputed()
