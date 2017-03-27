@@ -7,8 +7,8 @@ import assert from '../../util/assert'
 *  @this the {TaskProperty} where the task policy is destructured
 *  @constructs TaskPolicy
 */
-export default function createTaskPolicy(_type = 'normal', _num = 1, _time = 0) {
-  let flowTypes = ['normal', 'enqueue', 'restart', 'drop'],
+export default function createTaskPolicy(_type = 'default', _num = 1, _time = 0) {
+  let flowTypes = ['default', 'enqueue', 'restart', 'drop'],
       policy = {
         flow: _type,
         maxRunning: _num,

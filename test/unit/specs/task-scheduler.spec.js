@@ -167,16 +167,28 @@ describe('Task Scheduler', function() {
     expect(autoScheduler.running.size).to.equal(2)
   })
 
-  it('(drop) drops second call if first one is still running', async () => {
+  it('(default) runs all instances and updates scheduler last', async () => {
+    let defaultPolicy = createTaskPolicy('default', 1).policy,
+        defaultScheduler = createTaskScheduler(defaultPolicy, true)
+    defaultScheduler.schedule(ti1).schedule(ti2)
+    expect(defaultScheduler.lastStarted).to.equal(ti2)
+    await ti2._runningOperation
+    expect(ti1.hasStarted).to.be.true
+    expect(ti2.hasStarted).to.be.true
+    expect(defaultScheduler.lastResolved).to.equal(ti2)
+  })
+
+  it('(drop) drops repeat calls and updates last', async () => {
     let dropPolicy = createTaskPolicy('drop', 1).policy,
         dropScheduler = createTaskScheduler(dropPolicy, true)
     dropScheduler.schedule(ti1).schedule(ti2)
     expect(ti2.isDropped).to.be.true
+    expect(dropScheduler.lastCanceled).to.equal(ti2)
     await ti1._runningOperation
     expect(dropScheduler.lastResolved).to.equal(ti1)
   })
 
-  it('(restart) cancels first call if called again while running', async () => {
+  it('(restart) restarts previous calls and updates last', async () => {
     let restartPolicy = createTaskPolicy('restart', 1).policy,
         restartScheduler = createTaskScheduler(restartPolicy, true),
         slowTi = createTaskInstance(function * () {
@@ -185,8 +197,8 @@ describe('Task Scheduler', function() {
     restartScheduler.schedule(slowTi).schedule(ti1)
     await slowTi._runningOperation
     await ti1._runningOperation
-    expect(restartScheduler.waiting.size).to.equal(0)
-    expect(restartScheduler.running.size).to.equal(0)
+    expect(restartScheduler.lastStarted).to.equal(ti1)
+    expect(restartScheduler.lastCanceled).to.equal(slowTi)
     expect(ti1.isResolved).to.be.true
     expect(slowTi.isCanceled).to.be.true
   })

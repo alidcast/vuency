@@ -8,7 +8,6 @@ import createQueue from '../util/queue'
  * @param {Boolean} autorun - whether schedule is updated automatically (primarily for testing)
  * @constructs Task Scheduler
  */
-
 export default function createTaskScheduler(policy, autorun = true) {
   let waiting = createQueue(),
       running = createQueue(),
@@ -42,13 +41,19 @@ export default function createTaskScheduler(policy, autorun = true) {
      */
     schedule(ti) {
       this.lastCalled = ti
-      if (shouldDrop()) ti._cancel()
+      if (shouldDrop()) {
+        ti._cancel()
+        updateLastFinished(this, ti)
+      }
       else if (shouldWait()) {
         if (shouldRestart()) cancelQueued(running)
         waiting.add(ti)
         if (autorun) this.advance()
       }
-      else ti._start()
+      else {
+        runTask(this, ti)
+          .then(() => updateLastFinished(this, ti))
+      }
       return this
     },
 
@@ -59,12 +64,21 @@ export default function createTaskScheduler(policy, autorun = true) {
       if (shouldRun()) {
         let ti = waiting.remove().pop()
         if (ti) {
-          this.lastStarted = ti
-          ti._delayStart = delay
-          ti._runningOperation = runThenFinalize(this, ti, running)
+          runTask(this, ti, delay)
+            .then(() => this.finalize(ti))
           running.add(ti)
         }
       }
+      return this
+    },
+
+    /**
+     * Removes the task instance from running and updates last instance data.
+     */
+    finalize(ti) {
+      running.extract(item => item === ti)
+      updateLastFinished(this, ti)
+      if (autorun) this.advance()
       return this
     },
 
@@ -124,39 +138,24 @@ export default function createTaskScheduler(policy, autorun = true) {
   }
 }
 
-/**
- * Start the task instance and sets up callbacks to finalize the scheduling of
- * task when it has finished running.
- */
-function runThenFinalize(scheduler, ti, running) {
-  return Promise.resolve(
-    ti._start()
-  ).then(finishedInstance => {
-    running.extract(item => item === ti) // remove itself
-    updateLastFinished(scheduler, ti)
-    scheduler.advance()
-    return finishedInstance
-  })
+function runTask(schedule, ti, delay) {
+  schedule.lastStarted = ti
+  ti._delayStart = delay
+  ti._runningOperation = ti._start()
+  return ti._runningOperation
 }
 
-/**
- * Updates the scheduler's state based on the finished task instance's state.
- */
 function updateLastFinished(scheduler, ti) {
   if (ti.isCanceled) scheduler.lastCanceled = ti
   else if (ti.isRejected) scheduler.lastRejected = ti
   else if (ti.isResolved) scheduler.lastResolved = ti
 }
 
-/**
- * Cancels the queued task instances.
- *
- * If maxRunning is 1, then we just cancel first item directly.
- * This made the task-graph demo work better, so it's noticably faster. :)
- */
 function cancelQueued(queue, canceler = 'scheduler') {
   let cancelMethod
   canceler === 'self' ? cancelMethod = 'cancel' : cancelMethod = '_cancel'
+  // if one item in queue, then we just cancel it directly; this made
+  // the task-graph demo work better, so it's "noticably" faster. :)
   if (queue.size === 1) queue.pop()[cancelMethod]()
   else queue.forEach(item => item[cancelMethod]())
 }
