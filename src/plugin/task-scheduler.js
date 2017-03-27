@@ -50,9 +50,9 @@ export default function createTaskScheduler(policy, autorun = true) {
         waiting.add(ti)
         if (autorun) this.advance()
       }
-      else {
-        runTask(this, ti)
-          .then(() => updateLastFinished(this, ti))
+      else { // default behavior, task runs automatically
+        runTask(this, ti, delay).then(() => this.finalize(ti))
+        running.add(ti)
       }
       return this
     },
@@ -64,8 +64,7 @@ export default function createTaskScheduler(policy, autorun = true) {
       if (shouldRun()) {
         let ti = waiting.remove().pop()
         if (ti) {
-          runTask(this, ti, delay)
-            .then(() => this.finalize(ti))
+          runTask(this, ti, delay).then(() => this.finalize(ti))
           running.add(ti)
         }
       }
