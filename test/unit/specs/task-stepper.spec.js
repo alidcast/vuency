@@ -91,18 +91,53 @@ describe('Task Stepper', function() {
 
   it('cancels the task', async () => {
     let ti = createTaskInstance(function * () {
-          return yield pause(1000)
+          return yield pause(500)
         }),
         stepper = createTaskStepper(ti, subscriber),
         ongoing = stepper.stepThrough()
     stepper.handleCancel()
     await ongoing
-    expect(ti.hasStarted).to.be.true
     expect(ti.isCanceled).to.be.true
     expect(ti.isResolved).to.be.false
     expect(ti.isRejected).to.be.false
     expect(ti.value).to.be.null
     expect(ti.error).to.be.null
+  })
+
+  it('runs finally block upon completion', async () => {
+    let result,
+        ti = createTaskInstance(function * () {
+          try {
+            result = 'try'
+            yield pause(500)
+          }
+          finally {
+            result = 'finally'
+          }
+        }),
+        stepper = createTaskStepper(ti, subscriber),
+        ongoing = stepper.stepThrough()
+    await ongoing
+    expect(result).to.equal('finally')
+  })
+
+  it('runs finally block upon cancelation', async () => {
+    let result,
+        ti = createTaskInstance(function * () {
+          try {
+            result = 'try'
+            yield pause(500)
+          }
+          finally {
+            result = 'finally'
+          }
+        }),
+        stepper = createTaskStepper(ti, subscriber),
+        ongoing = stepper.stepThrough()
+    stepper.handleCancel()
+    await ongoing
+    expect(ti.isCanceled).to.be.true
+    expect(result).to.equal('finally')
   })
 
   it('resolves yields server request', async () => {
