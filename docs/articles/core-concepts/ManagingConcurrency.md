@@ -20,6 +20,11 @@ Often you want to control the flow and frequency of concurrent tasks. For exampl
 
 #### Default Behavior: Tasks Run Concurrently
 
+<!-- <div>
+  <ConcurrencyTimeline flow="normal"> </ConcurrencyTimeline>
+</div> -->
+
+
 #### enqueue
 
 Once the max number of tasks are running, the `enqueue` modifier enqueues any other repeat calls and only runs them when the allowed amount of concurrency frees up. Thus, there is not task overlap and all tasks are eventually performed, as each task waits for previous calls to finish before being dequeued itself and run to completion.
