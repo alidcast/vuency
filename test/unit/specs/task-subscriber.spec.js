@@ -12,7 +12,7 @@ describe('Task Subscribions', function() {
 
   it('has correct `before` subscriptions', async () => {
     expect(subs.beforeStart).to.not.be.undefined
-    expect(subs.beforeNext).to.not.be.undefined
+    expect(subs.beforeYield).to.not.be.undefined
   })
 
   it('has correct `on` subscriptions', async () => {

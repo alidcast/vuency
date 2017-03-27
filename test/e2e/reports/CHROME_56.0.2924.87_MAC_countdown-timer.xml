@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuites errors="0"
-            failures="0"
+            failures="1"
             tests="1">
 
   <testsuite name="countdown-timer"
-    errors="0" failures="0" hostname="" id="" package="countdown-timer" skipped="0"
-    tests="1" time="5.828" timestamp="Sun, 26 Mar 2017 19:37:12 GMT">
+    errors="0" failures="1" hostname="" id="" package="countdown-timer" skipped="0"
+    tests="1" time="5.869" timestamp="Mon, 27 Mar 2017 06:20:46 GMT">
   
-    <testcase name="countdown-timer" time="5.828" assertions="5">
+    <testcase name="countdown-timer" time="5.869" assertions="5">
 
     
 
@@ -15,7 +15,8 @@
 
     
 
-    
+      <failure message="Testing if element &lt;.countdown-timer p&gt; contains text: &quot;Count: DONE&quot;.">    at Object.countdown-timer (/Users/acastano/Sites/vue/vuency/test/e2e/specs/countdown-timer.js:17:15)
+    at _combinedTickCallback (internal/process/next_tick.js:67:7)</failure>
 
     
     </testcase>

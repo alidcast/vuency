@@ -13,8 +13,8 @@ export default function(_Vue) {
 }
 
 /**
- * Calls tasks property with the task factory and helper functions so that
- * each task operation can be converted into a task objects before being
+ * Calls the `tasks` property with the task factory and async helper functions
+ * so that each task operation can be converted into a task object before being
  * injected into the component instance.
  */
 function initTasks() {

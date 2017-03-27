@@ -5,9 +5,9 @@
 
   <testsuite name="coin-flip"
     errors="0" failures="0" hostname="" id="" package="coin-flip" skipped="0"
-    tests="1" time="6.640" timestamp="Sun, 26 Mar 2017 19:37:05 GMT">
+    tests="1" time="9.803" timestamp="Mon, 27 Mar 2017 06:20:36 GMT">
   
-    <testcase name="coin-flip" time="6.640" assertions="6">
+    <testcase name="coin-flip" time="9.803" assertions="6">
 
     
 

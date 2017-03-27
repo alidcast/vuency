@@ -16,7 +16,7 @@ export default function createTaskProperty(host, operation) {
   let scheduler,
       { policy, ...policyModifiers } = createTaskPolicy(),
       { events, watchers } = createTaskListeners(host),
-      { subscriptions, ...subscriber } = createTaskSubscriber()
+      { subscriptions, ...subscriber } = createTaskSubscriber(host)
 
   /**
    *  Create a Vue watcher that will update task properties when the
@@ -67,7 +67,6 @@ export default function createTaskProperty(host, operation) {
       let hostOperation = operation.bind(host, ...args),
           ti = createTaskInstance(hostOperation, subscriber)
       scheduler.schedule(ti)
-      // resetData(this, scheduler)
       return ti
     },
 
