@@ -88,8 +88,9 @@ export default function createTaskScheduler(policy, autorun = true) {
     emptyOut() {
       cancelQueued(waiting, 'self')
       cancelQueued(running, 'self')
+      // only need to clear waiting queue since running instances
+      // extract themselves upon termination
       waiting.clear()
-      running.clear()
     },
 
     get isActive() {
