@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import createTaskInstance from './task-instance'
 import createTaskScheduler from './task-scheduler'
 import createTaskPolicy from './modifiers/task-policy'
@@ -12,37 +11,18 @@ import createTaskListeners from './modifiers/task-listeners'
  * @param {Object} policy - the task scheduling policy
  * @constructor Task Property
  */
-export default function createTaskProperty(host, operation) {
+export default function createTaskProperty(host, operation, autorun = true) {
   let scheduler,
       { policy, ...policyModifiers } = createTaskPolicy(),
       { events, watchers } = createTaskListeners(host),
       { subscriptions, ...subscriber } = createTaskSubscriber(host)
 
-  /**
-   *  Create a Vue watcher that will update task properties when the
-   *  scheduler's running queue changes.
-   */
-  function createTaskWatcher(tp) {
-    const Watcher = Vue.extend({
-      data: () => ({
-        running: scheduler.running.alias()
-      }),
-      watch: {
-        running() {
-          tp._update()
-          host.$forceUpdate()
-        }
-      }
-    })
-    return new Watcher()
-  }
-
   return {
-    // states
+    // reactive data
     isActive: false,
     isIdle: true,
     state: 'idle',
-    // last instances
+    // last instance data (set by scheduler)
     lastCalled: null,
     lastStarted: null,
     lastResolved: null,
@@ -51,22 +31,24 @@ export default function createTaskProperty(host, operation) {
     // default helper instance (can be used for when `last-` is undefined)
     default: createTaskInstance(function * () {}),
 
-    _update() {
-      setStates(this, scheduler)
-      setLast(this, scheduler)
+    /*
+     * Data that needs to be updated when instances
+     * are added to the scheduler's running queue.
+     */
+    _updateReactive() {
+      this.isActive = scheduler.running.isActive
+      this.isIdle = !scheduler.running.isActive
+      this.state = this.isActive ? 'active' : 'idle'
     },
 
     /**
      * Creates a new task instance and schedules it to run.
      */
     run(...args) {
-      if (!scheduler) {
-        scheduler = createTaskScheduler(policy)
-        createTaskWatcher(this)
-      }
+      if (!scheduler) scheduler = createTaskScheduler(this, policy)
       let hostOperation = operation.bind(host, ...args),
           ti = createTaskInstance(hostOperation, subscriber)
-      scheduler.schedule(ti)
+      if (autorun) scheduler.schedule(ti)
       return ti
     },
 
@@ -74,7 +56,7 @@ export default function createTaskProperty(host, operation) {
      * Cancels all scheduled task instances.
      */
     abort() {
-      if (scheduler && scheduler.isActive) scheduler.emptyOut()
+      if (scheduler && scheduler.isActive) scheduler.clear()
     },
 
     /**
@@ -85,18 +67,4 @@ export default function createTaskProperty(host, operation) {
     ...watchers,
     ...subscriptions
   }
-}
-
-function setStates(tp, scheduler) {
-  tp.isActive = scheduler.running.isActive
-  tp.isIdle = !scheduler.running.isActive
-  tp.state = tp.isActive ? 'active' : 'idle'
-}
-
-function setLast(tp, scheduler) {
-  tp.lastCalled = scheduler.lastCalled
-  tp.lastStarted = scheduler.lastStarted
-  tp.lastResolved = scheduler.lastResolved
-  tp.lastRejected = scheduler.lastRejected
-  tp.lastCanceled = scheduler.lastCanceled
 }

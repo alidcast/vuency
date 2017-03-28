@@ -43,19 +43,18 @@ describe('Task Property', function() {
   it('aborts all instances and clears queue', async () => {
     let scheduledTi1 = tp.run(),
         scheduledTi2 = tp.run()
-    tp.abort()
+    await tp.abort()
     expect(scheduledTi1.isCanceled).to.be.true
     expect(scheduledTi2.isCanceled).to.be.true
     expect(tp.isActive).to.be.false
   })
 
   it('cancels instance and clears queue', async () => {
-    let scheduledTi1 = tp.run(),
-        scheduledTi2 = tp.run()
-    scheduledTi1._cancel()
-    scheduledTi2._cancel()
-    expect(scheduledTi1.isCanceled).to.be.true
-    expect(scheduledTi2.isCanceled).to.be.true
+    let ti1 = tp.run()
+    ti1._cancel()
+    await ti1._runningOperation
+    expect(ti1.isCanceled).to.be.true
+    expect(tp.lastCanceled).to.equal(ti1)
     expect(tp.isActive).to.be.false
   })
 })

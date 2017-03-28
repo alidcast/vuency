@@ -28,9 +28,9 @@ export default function createTaskStepper(ti, subscriber) {
 
     handleCancel() {
       if (ti.isOver) return ti
-      iter.return() // terminate early and run finally clause
       ti.isCanceled = true
       ti._updateComputed()
+      iter.return() // terminate early and run finally clause
       if (ti.isDropped) subscriber.onDrop(ti)
       if (ti.isRestarted) subscriber.onRestart(ti)
       subscriber.onCancel(ti)
@@ -61,7 +61,7 @@ export default function createTaskStepper(ti, subscriber) {
      * action and recursively iterates through generator function until
      * operation is either canceled, rejected, or resolved.
      */
-    async stepThrough(gen) {
+    stepThrough(gen) {
       let stepper = this
 
       // when the task is canceled that means the steppers' `handelCancel`
@@ -87,10 +87,10 @@ export default function createTaskStepper(ti, subscriber) {
 
         value = await value
         if (done) return stepper.handleSuccess(value)        // RESOLVED
-        else return await takeAStep(value)
+        else return takeAStep(value)
       }
 
-      return await takeAStep()
+      return takeAStep()
     }
   }
 }

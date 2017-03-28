@@ -4,11 +4,12 @@ import createQueue from '../util/queue'
  * A {Scheduler} is responsible for scheduling and running task instances,
  * as well as updating all 'last' task states.
  *
+ * @param {Object} tp - task property
  * @param {Object} policy - scheduler run policy
  * @param {Boolean} autorun - whether schedule is updated automatically (primarily for testing)
  * @constructs Task Scheduler
  */
-export default function createTaskScheduler(policy, autorun = true) {
+export default function createTaskScheduler(tp, policy, autorun = true) {
   let waiting = createQueue(),
       running = createQueue(),
       { flow, delay, maxRunning } = policy
@@ -26,47 +27,38 @@ export default function createTaskScheduler(policy, autorun = true) {
   }
 
   function shouldRun() {
-    return waiting.isActive && running.size < maxRunning
+    return (waiting.isActive && running.size < maxRunning) || flow === 'default'
   }
 
   return {
-    lastCalled: null,
-    lastStarted: null,
-    lastResolved: null,
-    lastRejected: null,
-    lastCanceled: null,
-
     /**
      * Add task instance to waiting queue.
      */
     schedule(ti) {
-      this.lastCalled = ti
+      tp.lastCalled = ti
       if (shouldDrop()) {
         ti._cancel()
-        updateLastFinished(this, ti)
+        updateLastFinished(tp, ti)
       }
       else if (shouldWait()) {
         if (shouldRestart()) cancelQueued(running)
         waiting.add(ti)
         if (autorun) this.advance()
       }
-      else { // default behavior, task runs automatically
-        runTask(this, ti, delay).then(() => this.finalize(ti))
-        running.add(ti)
-      }
+      // TODO for some reason this is causing errors, i think it has to do with watchers?
+      else this.advance(ti)
       return this
     },
 
     /**
      * Move task instance from waiting to running queue.
      */
-    advance() {
+    advance(ti = null) {
       if (shouldRun()) {
-        let ti = waiting.remove().pop()
-        if (ti) {
-          runTask(this, ti, delay).then(() => this.finalize(ti))
-          running.add(ti)
-        }
+        if (!ti) ti = waiting.remove().pop()
+        runTask(tp, ti, delay).then(() => this.finalize(ti))
+        running.add(ti)
+        tp._updateReactive()
       }
       return this
     },
@@ -76,20 +68,22 @@ export default function createTaskScheduler(policy, autorun = true) {
      */
     finalize(ti) {
       running.extract(item => item === ti)
-      updateLastFinished(this, ti)
-      if (autorun) this.advance()
+      updateLastFinished(tp, ti)
+      tp._updateReactive()
+      if (autorun && waiting.isActive) this.advance()
       return this
     },
 
     /**
      * Cancels all scheduled task instances and clears queues.
      */
-    emptyOut() {
+    clear() {
       cancelQueued(waiting, 'self')
       cancelQueued(running, 'self')
-      // only need to clear waiting queue since running instances
-      // extract themselves upon termination
       waiting.clear()
+      running.clear()
+      tp._updateReactive()
+      return this
     },
 
     get isActive() {
@@ -138,17 +132,17 @@ export default function createTaskScheduler(policy, autorun = true) {
   }
 }
 
-function runTask(schedule, ti, delay) {
-  schedule.lastStarted = ti
+function runTask(tp, ti, delay) {
+  tp.lastStarted = ti
   ti._delayStart = delay
   ti._runningOperation = ti._start()
   return ti._runningOperation
 }
 
-function updateLastFinished(scheduler, ti) {
-  if (ti.isCanceled) scheduler.lastCanceled = ti
-  else if (ti.isRejected) scheduler.lastRejected = ti
-  else if (ti.isResolved) scheduler.lastResolved = ti
+function updateLastFinished(tp, ti) {
+  if (ti.isCanceled) tp.lastCanceled = ti
+  else if (ti.isRejected) tp.lastRejected = ti
+  else if (ti.isResolved) tp.lastResolved = ti
 }
 
 function cancelQueued(queue, canceler = 'scheduler') {

@@ -59,7 +59,7 @@ describe('Tasks API', function() {
     vm.$emit('runTask')
     Vue.nextTick(() => {
       expect(callback.called).to.be.true
-      // expect(vm.myTask.lastCalled).to.not.be.undefined
+      expect(vm.myTask.lastCalled).to.not.be.undefined
       done()
     })
   })
@@ -82,7 +82,7 @@ describe('Tasks API', function() {
     Vue.nextTick(() => {
       Vue.nextTick(() => {
         expect(callback.called).to.be.true
-        // expect(vm.myTask.lastCalled).to.not.be.undefined
+        expect(vm.myTask.lastCalled).to.not.be.undefined
         done()
       })
     })
