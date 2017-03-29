@@ -3,7 +3,7 @@
 
 import createTaskInstance from 'src/plugin/task-instance'
 import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
-import createTaskInjections from 'src/plugin/modifiers/task-injections'
+import createTaskInjections from 'src/plugin/task-injections'
 
 function * exTask() {
   return 'passed'

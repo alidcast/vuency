@@ -4,7 +4,7 @@
 import createTaskStepper from 'src/plugin/task-stepper'
 import createTaskInstance from 'src/plugin/task-instance'
 import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
-import createTaskInjections from 'src/plugin/modifiers/task-injections'
+import createTaskInjections from 'src/plugin/task-injections'
 import { pause } from 'src/util/async'
 
 let { ...subscriber } = createTaskSubscriber(),

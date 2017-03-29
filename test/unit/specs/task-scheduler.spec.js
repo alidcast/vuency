@@ -5,7 +5,7 @@ import Vue from 'vue'
 import createTaskScheduler from 'src/plugin/task-scheduler'
 import createTaskProperty from 'src/plugin/task-property'
 import createTaskPolicy from 'src/plugin/modifiers/task-policy'
-import createTaskInjections from 'src/plugin/modifiers/task-injections'
+import createTaskInjections from 'src/plugin/task-injections'
 import { pause } from 'src/util/async'
 
 function * exTask(error = false) {

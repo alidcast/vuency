@@ -11,6 +11,7 @@ import assert, { isFn } from '../util/assert'
  * @constructs Task
  */
 export default function initTaskFactory(host) {
+  // TODO cleanup provider if not used
   let { provider, ...injections } = createTaskInjections()
 
   return {

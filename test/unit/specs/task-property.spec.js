@@ -3,7 +3,7 @@
 
 import Vue from 'vue'
 import createTaskProperty from 'src/plugin/task-property'
-import createTaskInjections from 'src/plugin/modifiers/task-injections'
+import createTaskInjections from 'src/plugin/task-injections'
 
 function * exTask() {
   return 'passed'
