@@ -5,7 +5,7 @@ import createTaskStepper from './task-stepper'
  * @param {Function} operation - the registered task operation
  * @constructor Task Instance
  */
-export default function createTaskInstance(operation, subscriber) {
+export default function createTaskInstance(operation, subscriber, provider) {
   let stepper
 
   return {
@@ -36,8 +36,8 @@ export default function createTaskInstance(operation, subscriber) {
     },
 
     _start() {
-      if (!stepper) stepper = createTaskStepper(this, subscriber)
-      return stepper.stepThrough.apply(stepper)
+      if (!stepper) stepper = createTaskStepper(this, subscriber, provider)
+      return stepper.stepThrough()
     },
 
     /**
@@ -46,13 +46,13 @@ export default function createTaskInstance(operation, subscriber) {
      */
     selfCanceled: false,
     _cancel() {
-      if (!stepper) stepper = createTaskStepper(this, subscriber)
-      return stepper.handleCancel.apply(stepper)
+      if (!stepper) stepper = createTaskStepper(this, subscriber, provider)
+      return stepper.handleCancel()
     },
     cancel() {
-      if (!stepper) stepper = createTaskStepper(this, subscriber)
+      if (!stepper) stepper = createTaskStepper(this, subscriber, provider)
       this.selfCanceled = true
-      return stepper.handleCancel.apply(stepper)
+      return stepper.handleCancel()
     }
   }
 }

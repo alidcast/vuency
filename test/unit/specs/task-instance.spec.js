@@ -3,6 +3,7 @@
 
 import createTaskInstance from 'src/plugin/task-instance'
 import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
+import createTaskInjections from 'src/plugin/modifiers/task-injections'
 
 function * exTask() {
   return 'passed'
@@ -10,10 +11,11 @@ function * exTask() {
 
 describe('Task Instance', function() {
   let ti,
-      { ...subscriber } = createTaskSubscriber()
+      { ...subscriber } = createTaskSubscriber(),
+      { provider } = createTaskInjections()
 
   beforeEach(() => {
-    ti = createTaskInstance(exTask, subscriber)
+    ti = createTaskInstance(exTask, subscriber, provider)
   })
 
   it('has correct props', () => {

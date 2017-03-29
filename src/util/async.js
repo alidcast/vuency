@@ -1,7 +1,7 @@
-export default {
-  pause
+export function pause(duration) {
+  return new Promise((resolve) => setTimeout(resolve, duration))
 }
 
-export function pause(time) {
-  return new Promise((resolve) => setTimeout(resolve, time))
+export default {
+  pause
 }

@@ -45,7 +45,6 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
         waiting.add(ti)
         if (autorun) this.advance()
       }
-      // TODO for some reason this is causing errors, i think it has to do with watchers?
       else this.advance(ti)
       return this
     },

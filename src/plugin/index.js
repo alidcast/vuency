@@ -1,4 +1,5 @@
 import createTaskProperty from './task-property'
+import createTaskInjections from './task-injections'
 import assert, { isFn } from '../util/assert'
 
 /**
@@ -10,12 +11,16 @@ import assert, { isFn } from '../util/assert'
  * @constructs Task
  */
 export default function initTaskFactory(host) {
-  return function createTask(operation) {
-    assert(isFn(operation), 'All task actions must be functions')
+  let { provider, ...injections } = createTaskInjections()
 
-    return {
-      operation,
-      ...createTaskProperty(host, operation)
-    }
+  return {
+    createTask(operation) {
+      assert(isFn(operation), 'All task actions must be functions')
+      return {
+        operation,
+        ...createTaskProperty(host, operation, provider)
+      }
+    },
+    taskHelpers: injections
   }
 }

@@ -4,9 +4,11 @@
 import createTaskStepper from 'src/plugin/task-stepper'
 import createTaskInstance from 'src/plugin/task-instance'
 import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
+import createTaskInjections from 'src/plugin/modifiers/task-injections'
 import { pause } from 'src/util/async'
 
-let { ...subscriber } = createTaskSubscriber()
+let { ...subscriber } = createTaskSubscriber(),
+    { provider } = createTaskInjections()
 
 function * exTask() {
   return 'success'
@@ -15,7 +17,7 @@ function * exTask() {
 describe('Task Stepper', function() {
   it('solves empty function', async () => {
     let ti = createTaskInstance(function * () {}),
-        stepper = createTaskStepper(ti, subscriber)
+        stepper = createTaskStepper(ti, subscriber, provider)
     await stepper.stepThrough()
     expect(ti.value).to.be.undefined
     expect(ti.error).to.be.null
@@ -23,7 +25,7 @@ describe('Task Stepper', function() {
 
   it('resolves yields from primitives', async () => {
     let ti = createTaskInstance(exTask),
-        stepper = createTaskStepper(ti, subscriber)
+        stepper = createTaskStepper(ti, subscriber, provider)
     await stepper.stepThrough()
     expect(ti.value).to.equal('success')
   })
@@ -32,7 +34,7 @@ describe('Task Stepper', function() {
     let ti = createTaskInstance(function * () {
           return yield sinon.stub().returns('success')()
         }),
-        stepper = createTaskStepper(ti, subscriber)
+        stepper = createTaskStepper(ti, subscriber, provider)
     await stepper.stepThrough()
     expect(ti.value).to.equal('success')
   })
@@ -44,7 +46,7 @@ describe('Task Stepper', function() {
     let ti = createTaskInstance(function * () {
           return yield asyncFn()
         }),
-        stepper = createTaskStepper(ti, subscriber)
+        stepper = createTaskStepper(ti, subscriber, provider)
     await stepper.stepThrough()
     expect(ti.isResolved).to.true
     expect(ti.value).to.equal('success')
@@ -54,7 +56,7 @@ describe('Task Stepper', function() {
     let ti = createTaskInstance(function * () {
           return 'success'
         }),
-        stepper = createTaskStepper(ti, subscriber)
+        stepper = createTaskStepper(ti, subscriber, provider)
     await stepper.stepThrough()
     expect(ti.hasStarted).to.be.true
     expect(ti.isResolved).to.be.true
@@ -67,7 +69,7 @@ describe('Task Stepper', function() {
     let ti = createTaskInstance(function * () {
           return yield sinon.stub().returns('failed').throws()()
         }),
-        stepper = createTaskStepper(ti, subscriber)
+        stepper = createTaskStepper(ti, subscriber, provider)
     await stepper.stepThrough()
     expect(ti.isRejected).to.be.true
     expect(ti.isResolved).to.be.false
@@ -79,7 +81,7 @@ describe('Task Stepper', function() {
 
   it('drops the task', () => {
     let ti = createTaskInstance(exTask),
-        stepper = createTaskStepper(ti, subscriber)
+        stepper = createTaskStepper(ti, subscriber, provider)
     stepper.handleCancel()
     stepper.stepThrough()
     expect(ti.hasStarted).to.be.false
@@ -93,7 +95,7 @@ describe('Task Stepper', function() {
     let ti = createTaskInstance(function * () {
           return yield pause(500)
         }),
-        stepper = createTaskStepper(ti, subscriber),
+        stepper = createTaskStepper(ti, subscriber, provider),
         ongoing = stepper.stepThrough()
     stepper.handleCancel()
     await ongoing
@@ -115,7 +117,7 @@ describe('Task Stepper', function() {
             result = 'finally'
           }
         }),
-        stepper = createTaskStepper(ti, subscriber),
+        stepper = createTaskStepper(ti, subscriber, provider),
         ongoing = stepper.stepThrough()
     await ongoing
     expect(result).to.equal('finally')
@@ -132,7 +134,7 @@ describe('Task Stepper', function() {
             result = 'finally'
           }
         }),
-        stepper = createTaskStepper(ti, subscriber),
+        stepper = createTaskStepper(ti, subscriber, provider),
         ongoing = stepper.stepThrough()
     stepper.handleCancel()
     await ongoing
@@ -167,8 +169,7 @@ describe('Task Stepper', function() {
     }
 
     let ti = createTaskInstance(taskReq),
-        stepper = createTaskStepper(ti, subscriber)
-
+        stepper = createTaskStepper(ti, subscriber, provider)
     await stepper.stepThrough()
     expect(ti.isResolved).to.be.true
     expect(ti.isRejected).to.be.false

@@ -1,5 +1,4 @@
 import initTaskFactory from './plugin/index'
-import asyncHelpers from './util/async'
 import assert, { isFn } from './util/assert'
 
 let Vue
@@ -24,8 +23,8 @@ function initTasks() {
   if (opts.tasks) {
     assert(isFn(opts.tasks), 'The Tasks property must be a function')
 
-    let createTask = initTaskFactory(host),
-        tasks = opts.tasks.call(host, createTask, asyncHelpers)
+    let { createTask, taskHelpers } = initTaskFactory(host),
+        tasks = Reflect.apply(opts.tasks, host, [createTask, taskHelpers])
 
     if (tasks.flow) { // it is a task object, so register as named function
       Vue.util.defineReactive(host, tasks.operation.name, tasks)

@@ -3,16 +3,18 @@
 
 import Vue from 'vue'
 import createTaskProperty from 'src/plugin/task-property'
+import createTaskInjections from 'src/plugin/modifiers/task-injections'
 
 function * exTask() {
   return 'passed'
 }
 
 describe('Task Property', function() {
-  let tp
+  let tp,
+      { provider } = createTaskInjections()
 
   beforeEach(() => {
-    tp = createTaskProperty(new Vue(), exTask)
+    tp = createTaskProperty(new Vue(), exTask, provider)
     tp.flow('enqueue')
   })
 

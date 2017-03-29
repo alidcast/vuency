@@ -11,13 +11,13 @@ import createTaskListeners from './modifiers/task-listeners'
  * @param {Object} policy - the task scheduling policy
  * @constructor Task Property
  */
-export default function createTaskProperty(host, operation, autorun = true) {
-  let scheduler,
-      { policy, ...policyModifiers } = createTaskPolicy(),
+export default function createTaskProperty(host, operation, provider, autorun = true) {
+  let { policy, ...policyModifiers } = createTaskPolicy(),
       { events, watchers } = createTaskListeners(host),
       { subscriptions, ...subscriber } = createTaskSubscriber(host)
 
   return {
+    scheduler: null,
     // reactive data
     isActive: false,
     isIdle: true,
@@ -36,6 +36,7 @@ export default function createTaskProperty(host, operation, autorun = true) {
      * are added to the scheduler's running queue.
      */
     _updateReactive() {
+      let { scheduler } = this
       this.isActive = scheduler.running.isActive
       this.isIdle = !scheduler.running.isActive
       this.state = this.isActive ? 'active' : 'idle'
@@ -45,10 +46,10 @@ export default function createTaskProperty(host, operation, autorun = true) {
      * Creates a new task instance and schedules it to run.
      */
     run(...args) {
-      if (!scheduler) scheduler = createTaskScheduler(this, policy)
+      if (!this.scheduler) this.scheduler = createTaskScheduler(this, policy)
       let hostOperation = operation.bind(host, ...args),
-          ti = createTaskInstance(hostOperation, subscriber)
-      if (autorun) scheduler.schedule(ti)
+          ti = createTaskInstance(hostOperation, subscriber, provider)
+      if (autorun) this.scheduler.schedule(ti)
       return ti
     },
 
@@ -56,6 +57,7 @@ export default function createTaskProperty(host, operation, autorun = true) {
      * Cancels all scheduled task instances.
      */
     abort() {
+      let { scheduler } = this
       if (scheduler && scheduler.isActive) scheduler.clear()
     },
 

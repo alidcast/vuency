@@ -1,4 +1,4 @@
-/**
+/** // TODO need instance or make via prototype approach?
  * Creates a Queue implementation using array properties.
  * @param  {Array}  queue - starting queue
  * @constructs Queue

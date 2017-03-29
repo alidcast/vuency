@@ -5,6 +5,7 @@ import Vue from 'vue'
 import createTaskScheduler from 'src/plugin/task-scheduler'
 import createTaskProperty from 'src/plugin/task-property'
 import createTaskPolicy from 'src/plugin/modifiers/task-policy'
+import createTaskInjections from 'src/plugin/modifiers/task-injections'
 import { pause } from 'src/util/async'
 
 function * exTask(error = false) {
@@ -17,6 +18,7 @@ function * exTask(error = false) {
 
 describe('Task Scheduler', function() {
   let policy = createTaskPolicy('enqueue', 2).policy,
+      { provider } = createTaskInjections(),
       tp,
       ti1,
       ti2,
@@ -26,7 +28,7 @@ describe('Task Scheduler', function() {
       autoScheduler
 
   beforeEach(() => {
-    tp = createTaskProperty(new Vue(), exTask, false)
+    tp = createTaskProperty(new Vue(), exTask, provider, false)
     ti1 = tp.run()
     ti2 = tp.run()
     ti3 = tp.run()
@@ -75,6 +77,15 @@ describe('Task Scheduler', function() {
     await ti1._runningOperation
     await ti2._runningOperation
     expect(scheduler.running.size).to.equal(0)
+  })
+
+  it('finalizes canceled instances', async () => {
+    scheduler.schedule(ti1).advance()
+    ti1._cancel()
+    await ti1._runningOperation
+    expect(tp.lastCanceled).to.equal(ti1)
+    expect(scheduler.running.size).to.equal(0)
+    expect(scheduler.running.isActive).to.be.false
   })
 
   it('gets concurrency', () => {
