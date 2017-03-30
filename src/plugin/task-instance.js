@@ -2,14 +2,16 @@ import createTaskStepper from './task-stepper'
 
 /**
  * A {TaskInstance}
- * @param {Function} operation - the registered task operation
+ * @param {Function} data - instance data
  * @constructor Task Instance
  */
-export default function createTaskInstance(operation, subscriber, provider) {
-  let stepper
+export default function createTaskInstance(data, subscriber, provider) {
+  let stepper,
+      { operation, params } = data
 
   return {
     operation,
+    params,
     _delayStart: 0,
     _runningOperation: null,
     // results

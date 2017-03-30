@@ -45,10 +45,10 @@ export default function createTaskProperty(host, operation, provider, autorun = 
     /**
      * Creates a new task instance and schedules it to run.
      */
-    run(...args) {
+    run(...params) {
       if (!this.scheduler) this.scheduler = createTaskScheduler(this, policy)
-      let hostOperation = operation.bind(host, ...args),
-          ti = createTaskInstance(hostOperation, subscriber, provider)
+      let instanceData = { params, operation: operation.bind(host, ...params) },
+          ti = createTaskInstance(instanceData, subscriber, provider)
       if (autorun) this.scheduler.schedule(ti)
       return ti
     },
