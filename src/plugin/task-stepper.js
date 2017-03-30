@@ -10,7 +10,7 @@ import { pause } from '../util/async'
 *  @constructs Task Stepper
 */
 export default function createTaskStepper(ti, subscriber, provider) {
-  let iter = ti.operation() // start generator
+  let iter = ti._operation() // start generator
 
   return {
     async handleStart() {
