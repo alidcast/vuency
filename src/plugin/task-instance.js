@@ -47,12 +47,12 @@ export default function createTaskInstance(operation, subscriber, provider) {
     selfCanceled: false,
     _cancel() {
       if (!stepper) stepper = createTaskStepper(this, subscriber, provider)
-      return stepper.handleCancel()
+      return stepper.triggerCancel()
     },
     cancel() {
       if (!stepper) stepper = createTaskStepper(this, subscriber, provider)
       this.selfCanceled = true
-      return stepper.handleCancel()
+      return stepper.triggerCancel()
     }
   }
 }

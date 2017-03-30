@@ -35,34 +35,34 @@ export default function createTaskSubscriber(host) {
      *  (e.g. the `pause` helper) to better update UI state.
      */
     async asyncBeforeStart(taskInstance) {
-      if (startFn) await Reflect.apply(startFn, host, taskInstance)
+      if (startFn) await Reflect.apply(startFn, host, [taskInstance])
     },
     async asyncBeforeYield(taskInstance) {
-      if (yieldFn) await Reflect.apply(yieldFn, host, taskInstance)
+      if (yieldFn) await Reflect.apply(yieldFn, host, [taskInstance])
     },
     /**
      * `On` actions.
      */
     onCancel(taskInstance) {
-      if (cancelFn) Reflect.apply(cancelFn, host, taskInstance)
+      if (cancelFn) Reflect.apply(cancelFn, host, [taskInstance])
     },
     onDrop(taskInstance) {
-      if (dropFn) Reflect.apply(dropFn, host, taskInstance)
+      if (dropFn) Reflect.apply(dropFn, host, [taskInstance])
     },
     onRestart(taskInstance) {
-      if (restartFn) Reflect.apply(restartFn, host, taskInstance)
+      if (restartFn) Reflect.apply(restartFn, host, [taskInstance])
     },
     onError(taskInstance) {
-      if (errorFn) Reflect.apply(errorFn, host, taskInstance)
+      if (errorFn) Reflect.apply(errorFn, host, [taskInstance])
     },
     onSuccess(taskInstance) {
-      if (successFn) Reflect.apply(successFn, host, taskInstance)
+      if (successFn) Reflect.apply(successFn, host, [taskInstance])
     },
     /**
      * `After` actions.
      */
     afterEnd(taskInstance) {
-      if (endFn) Reflect.apply(endFn, taskInstance, taskInstance)
+      if (endFn) Reflect.apply(endFn, host, [taskInstance])
     },
 
     subscriptions: {

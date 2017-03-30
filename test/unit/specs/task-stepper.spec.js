@@ -82,7 +82,7 @@ describe('Task Stepper', function() {
   it('drops the task', () => {
     let ti = createTaskInstance(exTask),
         stepper = createTaskStepper(ti, subscriber, provider)
-    stepper.handleCancel()
+    stepper.triggerCancel()
     stepper.stepThrough()
     expect(ti.hasStarted).to.be.false
     expect(ti.isCanceled).to.be.true
@@ -97,7 +97,7 @@ describe('Task Stepper', function() {
         }),
         stepper = createTaskStepper(ti, subscriber, provider),
         ongoing = stepper.stepThrough()
-    stepper.handleCancel()
+    stepper.triggerCancel()
     await ongoing
     expect(ti.isCanceled).to.be.true
     expect(ti.isResolved).to.be.false
@@ -136,7 +136,7 @@ describe('Task Stepper', function() {
         }),
         stepper = createTaskStepper(ti, subscriber, provider),
         ongoing = stepper.stepThrough()
-    stepper.handleCancel()
+    stepper.triggerCancel()
     await ongoing
     expect(ti.isCanceled).to.be.true
     expect(result).to.equal('finally')

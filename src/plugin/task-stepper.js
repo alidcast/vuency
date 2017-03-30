@@ -26,15 +26,11 @@ export default function createTaskStepper(ti, subscriber, provider) {
       return output
     },
 
-    handleCancel() {
-      if (ti.isOver) return ti
-      ti.isCanceled = true
+    handleSuccess(val) {
+      ti.isResolved = true
+      ti.value = val
       ti._updateComputed()
-      iter.return() // terminate early and run finally clause
-      // provider.off()
-      if (ti.isDropped) subscriber.onDrop(ti)
-      if (ti.isRestarted) subscriber.onRestart(ti)
-      subscriber.onCancel(ti)
+      subscriber.onSuccess(ti)
       subscriber.afterEnd(ti)
       return ti
     },
@@ -48,11 +44,22 @@ export default function createTaskStepper(ti, subscriber, provider) {
       return ti
     },
 
-    handleSuccess(val) {
-      ti.isResolved = true
-      ti.value = val
+    /**
+     * Task Instances are canceled from the outside,
+     * so the cancelation and handeling are done seperately.
+     */
+    triggerCancel() {
+      if (ti.isOver) return ti
+      ti.isCanceled = true
       ti._updateComputed()
-      subscriber.onSuccess(ti)
+      return ti
+    },
+    handleCancel(val) {
+      iter.return() // cause iter to terminate; still runs finally clause
+      provider.cleanup(val)
+      if (ti.isDropped) subscriber.onDrop(ti)
+      else if (ti.isRestarted) subscriber.onRestart(ti)
+      subscriber.onCancel(ti)
       subscriber.afterEnd(ti)
       return ti
     },
@@ -65,34 +72,29 @@ export default function createTaskStepper(ti, subscriber, provider) {
     async stepThrough(gen) {
       let stepper = this
 
-      // when the task is canceled that means the steppers' `handelCancel`
-      // method was already called from the outside, so all we have to do
-      // is return the task instance
       async function takeAStep(prev = undefined) {
         let value, done
-        // TODO
-        if (ti._delayStart > 0) await pause(ti._delayStart)
 
-        if (ti.isCanceled) return ti                         // CANCELED (pre start)
-        if (!ti.hasStarted) await stepper.handleStart()
+        if (ti._delayStart > 0) await pause(ti._delayStart)     // DELAYED TODO
+
+        if (ti.isCanceled) return stepper.handleCancel(value)   // CANCELED / PRE-START
+
+        if (!ti.hasStarted) await stepper.handleStart()         // STARTED
+
+        if (ti.isCanceled) return stepper.handleCancel(value)   // CANCELED / POST-START
 
         try {
           ({ value, done } = await stepper.handleYield(prev))
         }
-        catch (err) {                                        // REJECTED
+        catch (err) {                                           // REJECTED
           // TODO better error handling
           return stepper.handleError(err)
         }
 
-        if (ti.isCanceled) return ti                         // CANCELED (post iteration)
+        if (ti.isCanceled) return stepper.handleCancel(value)   // CANCELED / POST-ITER
 
-        // if (typeof fn !== 'undefined') console.log(value)
-        if (typeof value !== 'undefined' && typeof value.cancel === 'function') {
-          value.cancel()
-          console.log(value)
-        }
         value = await value
-        if (done) return stepper.handleSuccess(value)        // RESOLVED
+        if (done) return stepper.handleSuccess(value)           // RESOLVED
         else return takeAStep(value)
       }
 

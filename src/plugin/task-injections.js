@@ -5,6 +5,15 @@
  */
 export default function createTaskInjections(host) {
   return {
+    provider: {
+      cleanup(val) {
+        console.log(val)
+        return val
+      }
+    },
+    /**
+     * Injections.
+     */
     timeout: (duration) => createCancelableTimeout(duration)
   }
 }
@@ -23,9 +32,10 @@ export default function createTaskInjections(host) {
  *  @constructor Timer
  */
 function createCancelableTimeout(duration) {
+  // let timerData = new WeakMap()
   let timerId, clearPromise
   class Timer extends Promise {
-    constructor(duration) {
+    constructor() {
       // Promise Construction
       super(resolve => {
         clearPromise = resolve
@@ -40,5 +50,5 @@ function createCancelableTimeout(duration) {
       }
     }
   }
-  return new Timer(duration)
+  return new Timer()
 }
