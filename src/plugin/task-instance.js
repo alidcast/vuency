@@ -11,7 +11,6 @@ export default function createTaskInstance(data, subscriber, provider) {
 
   return {
     _operation: operation,
-    _delayStart: 0,
     _runningOperation: null,
     // per instance data
     params,

@@ -1,4 +1,5 @@
 import createQueue from '../util/queue'
+import { pause } from '../util/async'
 
 /**
  * A {Scheduler} is responsible for scheduling and running task instances,
@@ -134,7 +135,7 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
 
 function runTask(tp, ti, delay) {
   tp.lastStarted = ti
-  ti._delayStart = delay
+  if (delay > 0) ti._runningOperation = pause(delay).then(() => ti._start())
   ti._runningOperation = ti._start()
   return ti._runningOperation
 }

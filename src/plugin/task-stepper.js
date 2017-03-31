@@ -1,5 +1,3 @@
-import { pause } from '../util/async'
-
 /**
   A {Stepper} is responsible for iterating through the generator function.
 *  It iterates through each yield, while being mindful of the tis state.
@@ -20,8 +18,8 @@ export default function createTaskStepper(ti, subscriber, provider) {
       return ti
     },
 
-    handleYield(prev) {
-      // TODO await subscriber.asyncBeforeYield(ti)
+    async handleYield(prev) {
+      await subscriber.asyncBeforeYield(ti)
       let output = iter.next(prev)
       return output
     },
@@ -74,8 +72,6 @@ export default function createTaskStepper(ti, subscriber, provider) {
       async function takeAStep(prev = undefined) {
         let value, done
 
-        if (ti._delayStart > 0) await pause(ti._delayStart)     // DELAYED TODO
-
         if (ti.isCanceled) return stepper.handleCancel(value)   // CANCELED / PRE-START
 
         if (!ti.hasStarted) await stepper.handleStart()         // STARTED
@@ -83,7 +79,7 @@ export default function createTaskStepper(ti, subscriber, provider) {
         if (ti.isCanceled) return stepper.handleCancel(value)   // CANCELED / POST-START
 
         try {
-          ({ value, done } = stepper.handleYield(prev))
+          ({ value, done } = await stepper.handleYield(prev))
         }
         catch (err) {                                           // REJECTED
           // TODO better error handling

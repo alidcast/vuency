@@ -17,7 +17,6 @@ export default function createTaskProperty(host, operation, provider, autorun = 
       { subscriptions, ...subscriber } = createTaskSubscriber(host)
 
   return {
-    scheduler: null,
     // reactive data
     isActive: false,
     isIdle: true,
