@@ -1,3 +1,5 @@
+// import { isObj } from '../util/assert'
+
 /**
  * {TaskInjections} are helpers functions for common async operations that
  * automatically clean up after themselves (or have ways of being identified
@@ -6,8 +8,12 @@
 export default function createTaskInjections(host) {
   return {
     provider: {
-      cleanup(val) {
-        return val
+      isCancelable(value) {
+        // return isObj(value) && value._cancel_
+      },
+
+      cleanup(value) {
+        // if (value) value._cancel_()
       }
     },
     /**
@@ -42,10 +48,11 @@ function createCancelableTimeout(duration) {
       })
       // Timer Cancelation
       this.isCanceled = false
-      this.cancel = function() {
+      this._cancel_ = function() {
         clearPromise()
         clearTimeout(timerId)
         this.isCanceled = true
+        return 'hello'
       }
     }
   }

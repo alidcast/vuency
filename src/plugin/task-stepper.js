@@ -1,14 +1,21 @@
+import { isObj } from '../util/assert'
+
 /**
   A {Stepper} is responsible for iterating through the generator function.
-*  It iterates through each yield, while being mindful of the tis state.
-*  As long as the ti is not `Canceled` or `Rejected`, it continues to iterate
-*  until the ti is `Resolved`.
+*  It iterates through each yield, while being mindful of the task instance's
+*  state. As long as the instance is not `Canceled` or `Rejected`,
+*  it continues to iterate until the instance is `Resolved`.
+*
+* @note
+*   On each yield, if the output value is a promise and has a `_cancel_` method,
+*   then the value will be saved for cleanup incase the instance is canceled.
 *
 *  @returns {TaskInstance} after operation has finished running
 *  @constructs Task Stepper
 */
 export default function createTaskStepper(ti, subscriber, provider) {
-  let iter = ti._operation() // start generator
+  let iter = ti._operation(),
+      cancelablePromise
 
   return {
     async handleStart() {
@@ -47,22 +54,21 @@ export default function createTaskStepper(ti, subscriber, provider) {
      * so the cancelation and handeling are done seperately.
      */
     triggerCancel() {
-      // if (ti.isFinished) return ti
+      if (ti.isFinished) return ti
       ti.isCanceled = true
       ti._updateComputed()
       return ti
     },
-    handleCancel(val) {
+    handleCancel() {
       iter.return() // cause iter to terminate; still runs finally clause
-      provider.cleanup(val)
+      if (cancelablePromise) cancelablePromise._cancel_()
       subscriber.onCancel(ti)
       subscriber.onFinish(ti)
       return ti
     },
 
     /**
-     * At each step, checks the state of the task instance to know appropriate
-     * action and recursively iterates through generator function until
+     * Recursively iterates through generator function until
      * operation is either canceled, rejected, or resolved.
      */
     stepThrough(gen) {
@@ -71,11 +77,11 @@ export default function createTaskStepper(ti, subscriber, provider) {
       async function takeAStep(prev = undefined) {
         let value, done
 
-        if (ti.isCanceled) return stepper.handleCancel(value)   // CANCELED / PRE-START
+        if (ti.isCanceled) return stepper.handleCancel()        // CANCELED / PRE-START
 
         if (!ti.hasStarted) await stepper.handleStart()         // STARTED
 
-        if (ti.isCanceled) return stepper.handleCancel(value)   // CANCELED / POST-START
+        if (ti.isCanceled) return stepper.handleCancel()        // CANCELED / POST-START
 
         try {
           ({ value, done } = await stepper.handleYield(prev))
@@ -84,9 +90,11 @@ export default function createTaskStepper(ti, subscriber, provider) {
           return stepper.handleError(err)
         }
 
-        if (ti.isCanceled) return stepper.handleCancel(value)   // CANCELED / POST-ITER
+        if (isObj(value) && value._cancel_) cancelablePromise = value
 
+        if (ti.isCanceled) return stepper.handleCancel()        // CANCELED / POST-ITER
         value = await value
+
         if (done) return stepper.handleSuccess(value)           // RESOLVED
         else return takeAStep(value) // keep stepping
       }
