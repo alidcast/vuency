@@ -1,5 +1,5 @@
 import initTaskFactory from './plugin/index'
-import createTaskInjections from './task-injections'
+import createTaskInjections from './plugin/task-injections'
 import assert, { isFn } from './util/assert'
 
 let Vue
@@ -25,7 +25,7 @@ function initTasks() {
     assert(isFn(opts.tasks), 'The Tasks property must be a function')
 
     let taskHelpers = createTaskInjections(),
-        { createTask } = initTaskFactory(host),
+        createTask = initTaskFactory(host),
         tasks = Reflect.apply(opts.tasks, host, [createTask, taskHelpers])
 
     if (tasks.flow) { // it is a task object, so register as named function
