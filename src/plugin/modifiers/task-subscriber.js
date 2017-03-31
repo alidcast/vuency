@@ -21,11 +21,9 @@ export default function createTaskSubscriber(host) {
   let startFn,
       yieldFn,
       cancelFn,
-      dropFn,
-      restartFn,
       errorFn,
       successFn,
-      endFn
+      finalFn
 
   return {
     /**
@@ -46,12 +44,6 @@ export default function createTaskSubscriber(host) {
     onCancel(taskInstance) {
       if (cancelFn) Reflect.apply(cancelFn, host, [taskInstance])
     },
-    onDrop(taskInstance) {
-      if (dropFn) Reflect.apply(dropFn, host, [taskInstance])
-    },
-    onRestart(taskInstance) {
-      if (restartFn) Reflect.apply(restartFn, host, [taskInstance])
-    },
     onError(taskInstance) {
       if (errorFn) Reflect.apply(errorFn, host, [taskInstance])
     },
@@ -61,8 +53,8 @@ export default function createTaskSubscriber(host) {
     /**
      * `After` actions.
      */
-    afterEnd(taskInstance) {
-      if (endFn) Reflect.apply(endFn, host, [taskInstance])
+    finally(taskInstance) {
+      if (finalFn) Reflect.apply(finalFn, host, [taskInstance])
     },
 
     subscriptions: {
@@ -78,14 +70,6 @@ export default function createTaskSubscriber(host) {
         cancelFn = fn
         return this
       },
-      onDrop(fn) {
-        dropFn = fn
-        return this
-      },
-      onRestart(fn) {
-        restartFn = fn
-        return this
-      },
       onError(fn) {
         errorFn = fn
         return this
@@ -94,8 +78,8 @@ export default function createTaskSubscriber(host) {
         successFn = fn
         return this
       },
-      afterEnd(fn) {
-        endFn = fn
+      finally(fn) {
+        finalFn = fn
         return this
       }
     }

@@ -31,7 +31,7 @@ export default function createTaskStepper(ti, subscriber, provider) {
       ti.value = val
       ti._updateComputed()
       subscriber.onSuccess(ti)
-      subscriber.afterEnd(ti)
+      subscriber.finally(ti)
       return ti
     },
 
@@ -40,7 +40,7 @@ export default function createTaskStepper(ti, subscriber, provider) {
       ti.error = err
       ti._updateComputed()
       subscriber.onError(ti)
-      subscriber.afterEnd(ti)
+      subscriber.finally(ti)
       return ti
     },
 
@@ -58,10 +58,8 @@ export default function createTaskStepper(ti, subscriber, provider) {
       console.log(val)
       iter.return() // cause iter to terminate; still runs finally clause
       provider.cleanup(val)
-      if (ti.isDropped) subscriber.onDrop(ti)
-      else if (ti.isRestarted) subscriber.onRestart(ti)
       subscriber.onCancel(ti)
-      subscriber.afterEnd(ti)
+      subscriber.finally(ti)
       return ti
     },
 
