@@ -11,7 +11,7 @@ import createTaskListeners from './modifiers/task-listeners'
  * @param {Object} policy - the task scheduling policy
  * @constructor Task Property
  */
-export default function createTaskProperty(host, operation, provider, autorun = true) {
+export default function createTaskProperty(host, operation, autorun = true) {
   let { policy, ...policyModifiers } = createTaskPolicy(),
       { events, watchers } = createTaskListeners(host),
       { subscriptions, ...subscriber } = createTaskSubscriber(host)
@@ -49,7 +49,7 @@ export default function createTaskProperty(host, operation, provider, autorun = 
       if (!this.scheduler) this.scheduler = createTaskScheduler(this, policy)
       this.isAborted = false
       let instanceData = { params, operation: operation.bind(host, ...params) },
-          ti = createTaskInstance(instanceData, subscriber, provider)
+          ti = createTaskInstance(instanceData, subscriber)
       if (autorun) this.scheduler.schedule(ti)
       return ti
     },

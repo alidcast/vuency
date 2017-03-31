@@ -13,7 +13,7 @@ import { isObj } from '../util/assert'
 *  @returns {TaskInstance} after operation has finished running
 *  @constructs Task Stepper
 */
-export default function createTaskStepper(ti, subscriber, provider) {
+export default function createTaskStepper(ti, subscriber) {
   let iter = ti._operation(),
       cancelablePromise
 
