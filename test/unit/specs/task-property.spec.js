@@ -71,17 +71,34 @@ describe('Task Property', function() {
     expect(tp.isActive).to.be.false
   })
 
-  it('runs onFinish subscription even if task is dropped', async () => {
+  it('fires onFinish subscription even if task is dropped', async () => {
     let tp = createTaskProperty(new Vue(), exTask, provider)
             .flow('drop')
-            .onCancel(() => {
+            .onFinish(() => {
               callback()
             }),
         ti1 = tp.run(),
         ti2 = tp.run()
     ti2.cancel()
+    await ti1._runningOperation
     expect(ti2.isDropped).to.be.true
+    expect(ti1.hasStarted).to.be.true
     expect(callback.called).to.be.true
+  })
+
+  it('finalizes waiting tasks', async () => {
+    let tp = createTaskProperty(new Vue(), exTask, provider)
+      .flow('enqueue')
+      .onFinish(() => {
+        console.log('hello')
+        callback()
+      }),
+      ti1 = tp.run()
+    tp.run()
+    tp.run()
+    tp.abort()
+    await ti1._runningOperation
+    expect(callback.calledThrice).to.be.true
   })
 
   it('even listener runs task and updates data', (done) => {
