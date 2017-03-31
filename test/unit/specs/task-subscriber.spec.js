@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-expressions */
 /* global describe, it, expect, beforeEach */
 
-import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
+import createTaskSubscriptions from 'src/plugin/modifiers/task-subscriptions'
 
-describe('Task Subscribions', function() {
+describe('Task Subscripions', function() {
   let subs
   beforeEach(() => {
-    let subscriber = createTaskSubscriber()
+    let subscriber = createTaskSubscriptions()
     subs = subscriber.subscriptions
   })
 

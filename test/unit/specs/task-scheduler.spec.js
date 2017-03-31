@@ -5,7 +5,6 @@ import Vue from 'vue'
 import createTaskScheduler from 'src/plugin/task-scheduler'
 import createTaskProperty from 'src/plugin/task-property'
 import createTaskPolicy from 'src/plugin/modifiers/task-policy'
-import createTaskInjections from 'src/plugin/task-injections'
 import { pause } from 'src/util/async'
 
 function * exTask(error = false) {
@@ -18,7 +17,6 @@ function * exTask(error = false) {
 
 describe('Task Scheduler', function() {
   let policy = createTaskPolicy('enqueue', 2).policy,
-      { provider } = createTaskInjections(),
       tp,
       ti1,
       ti2,
@@ -28,7 +26,7 @@ describe('Task Scheduler', function() {
       autoScheduler
 
   beforeEach(() => {
-    tp = createTaskProperty(new Vue(), exTask, provider, false)
+    tp = createTaskProperty(new Vue(), exTask, false)
     ti1 = tp.run()
     ti2 = tp.run()
     ti3 = tp.run()

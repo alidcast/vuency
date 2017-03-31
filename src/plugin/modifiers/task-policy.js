@@ -8,17 +8,18 @@ import assert from '../../util/assert'
 *  @constructs TaskPolicy
 */
 export default function createTaskPolicy(_type = 'default', _num = 1, _time = 0) {
-  let flowTypes = ['default', 'enqueue', 'restart', 'drop'],
-      policy = {
-        flow: _type,
-        maxRunning: _num,
-        delay: _time
-      }
+  let flowTypes = ['default', 'enqueue', 'restart', 'drop']
+
+  const currentPolicy = {
+    flow: _type,
+    delay: _time,
+    maxRunning: _num
+  }
 
   return {
     // default scheduler policy
     get policy() {
-      return policy
+      return currentPolicy
     },
 
     /**
@@ -27,8 +28,8 @@ export default function createTaskPolicy(_type = 'default', _num = 1, _time = 0)
      */
     flow(type, time = 0) {
       assert(flowTypes.indexOf(type) > -1, `${type} is not a flow control option`)
-      policy.flow = type
-      policy.delay = time
+      currentPolicy.flow = type
+      currentPolicy.delay = time
       return this
     },
 
@@ -36,7 +37,7 @@ export default function createTaskPolicy(_type = 'default', _num = 1, _time = 0)
      * Sets the number of instances allowed to run concurrently.
      */
     maxRunning(num) {
-      policy.maxRunning = num
+      currentPolicy.maxRunning = num
       return this
     }
   }

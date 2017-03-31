@@ -2,8 +2,7 @@
 /* global describe, it, expect, beforeEach */
 
 import createTaskInstance from 'src/plugin/task-instance'
-import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
-import createTaskInjections from 'src/plugin/task-injections'
+import createTaskSubscriptions from 'src/plugin/modifiers/task-subscriptions'
 
 function * exTask() {
   return 'passed'
@@ -11,11 +10,10 @@ function * exTask() {
 
 describe('Task Instance', function() {
   let ti,
-      { ...subscriber } = createTaskSubscriber(),
-      { provider } = createTaskInjections()
+      { ...subscriptions } = createTaskSubscriptions()
 
   beforeEach(() => {
-    ti = createTaskInstance({ operation: exTask }, subscriber, provider)
+    ti = createTaskInstance({ operation: exTask }, subscriptions)
   })
 
   it('has correct props', () => {

@@ -3,11 +3,11 @@
 
 import createTaskStepper from 'src/plugin/task-stepper'
 import createTaskInstance from 'src/plugin/task-instance'
-import createTaskSubscriber from 'src/plugin/modifiers/task-subscriber'
+import createTaskSubscriptions from 'src/plugin/modifiers/task-subscriptions'
 import createTaskInjections from 'src/plugin/task-injections'
 import { pause } from 'src/util/async'
 
-let { ...subscriber } = createTaskSubscriber(),
+let { ...subscriber } = createTaskSubscriptions(),
     { provider } = createTaskInjections()
 
 function * exTask() {

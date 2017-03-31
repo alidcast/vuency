@@ -1,7 +1,7 @@
 import createTaskInstance from './task-instance'
 import createTaskScheduler from './task-scheduler'
 import createTaskPolicy from './modifiers/task-policy'
-import createTaskSubscriber from './modifiers/task-subscriber'
+import createTaskSubscriptions from './modifiers/task-subscriptions'
 import createTaskListeners from './modifiers/task-listeners'
 
 /**
@@ -13,8 +13,8 @@ import createTaskListeners from './modifiers/task-listeners'
  */
 export default function createTaskProperty(host, operation, autorun = true) {
   let { policy, ...policyModifiers } = createTaskPolicy(),
-      { events, watchers } = createTaskListeners(host),
-      { subscriptions, ...subscriber } = createTaskSubscriber(host)
+      { subscriptions, ...subscriper } = createTaskSubscriptions(host),
+      { events, watchers } = createTaskListeners(host)
 
   return {
     // reactive data
@@ -49,7 +49,7 @@ export default function createTaskProperty(host, operation, autorun = true) {
       if (!this.scheduler) this.scheduler = createTaskScheduler(this, policy)
       this.isAborted = false
       let instanceData = { params, operation: operation.bind(host, ...params) },
-          ti = createTaskInstance(instanceData, subscriber)
+          ti = createTaskInstance(instanceData, subscriper)
       if (autorun) this.scheduler.schedule(ti)
       return ti
     },

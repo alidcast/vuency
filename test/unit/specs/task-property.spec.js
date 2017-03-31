@@ -3,7 +3,6 @@
 
 import Vue from 'vue'
 import createTaskProperty from 'src/plugin/task-property'
-import createTaskInjections from 'src/plugin/task-injections'
 import { pause } from 'src/util/async'
 
 function * exTask() {
@@ -12,12 +11,13 @@ function * exTask() {
 }
 
 describe('Task Property', function() {
-  let tp,
-      callback,
-      { provider } = createTaskInjections()
+  let vm,
+      tp,
+      callback
 
   beforeEach(() => {
-    tp = createTaskProperty(new Vue(), exTask, provider).flow('enqueue')
+    vm = new Vue()
+    tp = createTaskProperty(vm, exTask).flow('enqueue')
     callback = sinon.spy()
   })
 
@@ -72,7 +72,7 @@ describe('Task Property', function() {
   })
 
   it('fires onFinish subscription even if task is dropped', async () => {
-    let tp = createTaskProperty(new Vue(), exTask, provider)
+    let tp = createTaskProperty(vm, exTask)
             .flow('drop')
             .onFinish(() => {
               callback()
@@ -87,12 +87,12 @@ describe('Task Property', function() {
   })
 
   it('finalizes waiting tasks', async () => {
-    let tp = createTaskProperty(new Vue(), exTask, provider)
-      .flow('enqueue')
-      .onFinish(() => {
-        callback()
-      }),
-      ti1 = tp.run()
+    let tp = createTaskProperty(vm, exTask)
+              .flow('enqueue')
+              .onFinish(() => {
+                callback()
+              }),
+        ti1 = tp.run()
     tp.run()
     tp.run()
     tp.abort()
@@ -100,42 +100,35 @@ describe('Task Property', function() {
     expect(callback.calledThrice).to.be.true
   })
 
-  it('even listener runs task and updates data', (done) => {
-    let vm = new Vue({
-      tasks(t) {
-        return t(function * myTask() {
-          callback()
-        }).runOn('runTask')
-      }
-    })
+  it('event listener runs task and updates data', (done) => {
+    createTaskProperty(vm, function * myTask() {
+      callback()
+    }).runOn('runTask')
 
     vm.$emit('runTask')
     Vue.nextTick(() => {
       expect(callback.called).to.be.true
-      expect(vm.myTask.lastCalled).to.not.be.undefined
       done()
     })
   })
 
   it('watcher runs instance and updates task data', (done) => {
-    let vm = new Vue({
-      data: ({
+    let watcherVm = new Vue({
+      data: () => ({
         changed: false
-      }),
-      tasks(t) {
-        return t(function * myTask() {
-          callback()
-        }).runWith('changed')
-      }
+      })
     })
 
-    vm.changed = true
+    createTaskProperty(watcherVm, function * myTask() {
+      callback()
+    }).runWith('changed')
+
+    watcherVm.changed = true
     // watcher takes longer to run for some reason so we wait for
     // two ticks to finish before checking assertions
     Vue.nextTick(() => {
       Vue.nextTick(() => {
         expect(callback.called).to.be.true
-        expect(vm.myTask.lastCalled).to.not.be.undefined
         done()
       })
     })
