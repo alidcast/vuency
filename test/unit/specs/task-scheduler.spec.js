@@ -103,6 +103,12 @@ describe('Task Scheduler', function() {
     expect(scheduler.isActive).to.be.false
   })
 
+  it('returns cleared instances', () => {
+    scheduler.schedule(ti1).schedule(ti2).advance(ti3)
+    let canceled = scheduler.clear()
+    expect(canceled.length).to.equal(3)
+  })
+
   it('manually updates last', async () => {
     scheduler.schedule(ti1).advance()
     await ti1._runningOperation

@@ -21,6 +21,7 @@ export default function createTaskProperty(host, operation, provider, autorun = 
     // reactive data
     isActive: false,
     isIdle: true,
+    isAborted: false,
     state: 'idle',
     // last instance data (set by scheduler)
     lastCalled: null,
@@ -47,6 +48,7 @@ export default function createTaskProperty(host, operation, provider, autorun = 
      */
     run(...params) {
       if (!this.scheduler) this.scheduler = createTaskScheduler(this, policy)
+      this.isAborted = false
       let instanceData = { params, operation: operation.bind(host, ...params) },
           ti = createTaskInstance(instanceData, subscriber, provider)
       if (autorun) this.scheduler.schedule(ti)
@@ -57,8 +59,12 @@ export default function createTaskProperty(host, operation, provider, autorun = 
      * Cancels all scheduled task instances.
      */
     abort() {
-      let { scheduler } = this
-      if (scheduler && scheduler.isActive) scheduler.clear()
+      let canceledInstances, { scheduler } = this
+      if (scheduler && scheduler.isActive) {
+        canceledInstances = scheduler.clear()
+        this.isAborted = true
+      }
+      return canceledInstances || []
     },
 
     /**

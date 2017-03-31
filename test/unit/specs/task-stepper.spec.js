@@ -16,8 +16,8 @@ function * exTask() {
 
 describe('Task Stepper', function() {
   it('solves empty function', async () => {
-    let operation = function * () {}
-    let ti = createTaskInstance({ operation }),
+    let operation = function * () {},
+        ti = createTaskInstance({ operation }),
         stepper = createTaskStepper(ti, subscriber, provider)
     await stepper.stepThrough()
     expect(ti.value).to.be.undefined
@@ -46,7 +46,7 @@ describe('Task Stepper', function() {
       return await sinon.stub().returns('success')()
     }
     let operation = function * () {
-            return yield asyncFn()
+          return yield asyncFn()
         },
         ti = createTaskInstance({ operation }),
         stepper = createTaskStepper(ti, subscriber, provider)

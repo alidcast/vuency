@@ -77,12 +77,13 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
      * Cancels all scheduled task instances and clears queues.
      */
     clear() {
+      let instances = [].concat(waiting.alias).concat(running.alias)
       cancelQueued(waiting, 'self')
       cancelQueued(running, 'self')
       waiting.clear()
       running.clear()
       tp._updateReactive()
-      return this
+      return instances
     },
 
     get isActive() {
