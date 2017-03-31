@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-/* global describe, it, expect, sinon */
+/* global describe, it, expect */
 
 import Vue from 'vue'
 import Vuency from 'index'
@@ -44,47 +44,5 @@ describe('Tasks API', function() {
     })
     expect(isObj(vm.ex1)).to.be.true
     expect(isObj(vm.ex2)).to.be.true
-  })
-
-  it('even listener runs task and updates data', (done) => {
-    let callback = sinon.spy(),
-        vm = new Vue({
-          tasks(t) {
-            return t(function * myTask() {
-              callback()
-            }).runOn('runTask')
-          }
-        })
-
-    vm.$emit('runTask')
-    Vue.nextTick(() => {
-      expect(callback.called).to.be.true
-      expect(vm.myTask.lastCalled).to.not.be.undefined
-      done()
-    })
-  })
-
-  it('watcher runs instance and updates task data', (done) => {
-    let callback = sinon.spy(),
-        vm = new Vue({
-          data: ({
-            changed: false
-          }),
-          tasks(t) {
-            return t(function * myTask() {
-              callback()
-            }).runWith('changed')
-          }
-        })
-    vm.changed = true
-    // watcher takes longer to run for some reason so we wait for
-    // two ticks to finish before checking assertions
-    Vue.nextTick(() => {
-      Vue.nextTick(() => {
-        expect(callback.called).to.be.true
-        expect(vm.myTask.lastCalled).to.not.be.undefined
-        done()
-      })
-    })
   })
 })

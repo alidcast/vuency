@@ -22,6 +22,6 @@ describe('Task Subscribions', function() {
   })
 
   it('has correct `after` subscriptions', async () => {
-    expect(subs.finally).to.not.be.undefined
+    expect(subs.onFinish).to.not.be.undefined
   })
 })

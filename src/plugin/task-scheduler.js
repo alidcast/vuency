@@ -15,20 +15,45 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
       running = createQueue(),
       { flow, delay, maxRunning } = policy
 
+  /**
+   * Drop instances when total queued reaches concurrency limit.
+   */
   function shouldDrop() {
     return flow === 'drop' && (waiting.size + running.size === maxRunning)
   }
 
+  /**
+   * Restart instances when currently running tasks reaches concurrency limit.
+   */
   function shouldRestart() {
     return flow === 'restart' && running.size === maxRunning
   }
 
+  /**
+   * All custom flow types are added to waiting queue, since not all of them
+   * will be dropped or restarted.
+   */
   function shouldWait() {
     return flow === 'enqueue' || flow === 'restart' || flow === 'drop'
   }
 
+  /**
+   * Unless the default behavior is desired, only attempt to run an instance if
+   * there is atleast one waiting and the concurrency has freed up.
+   */
   function shouldRun() {
     return (waiting.isActive && running.size < maxRunning) || flow === 'default'
+  }
+
+  /**
+   * We start all task instances, even dropped ones, so that the stepper
+   * can handle the per instance logic (it won't actually run the operation).
+   */
+  function handleTask(ti, shouldDrop = false) {
+    if (shouldDrop) ti._runningOperation = ti._cancel()._start()
+    else if (delay > 0) ti._runningOperation = pause(delay).then(() => ti._start())
+    else ti._runningOperation = ti._start()
+    return ti._runningOperation
   }
 
   return {
@@ -38,10 +63,9 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
     schedule(ti) {
       tp.lastCalled = ti
       if (shouldDrop()) {
-        ti._cancel()
-        updateLastFinished(tp, ti)
+        handleTask(ti, true).then(() => this.finalize(ti, false))
       }
-      else if (shouldWait()) {
+      else if (shouldWait()) { // no dropped instances are being run
         if (shouldRestart()) cancelQueued(running)
         waiting.add(ti)
         if (autorun) this.advance()
@@ -56,7 +80,8 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
     advance(ti = null) {
       if (shouldRun()) {
         if (!ti) ti = waiting.remove().pop()
-        runTask(tp, ti, delay).then(() => this.finalize(ti))
+        tp.lastStarted = ti
+        handleTask(ti).then(() => this.finalize(ti))
         running.add(ti)
         tp._updateReactive()
       }
@@ -66,8 +91,8 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
     /**
      * Removes the task instance from running and updates last instance data.
      */
-    finalize(ti) {
-      running.extract(item => item === ti)
+    finalize(ti, didRun = true) {
+      if (didRun) running.extract(item => item === ti)
       updateLastFinished(tp, ti)
       tp._updateReactive()
       if (autorun && waiting.isActive) this.advance()
@@ -131,13 +156,6 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
       }
     }
   }
-}
-
-function runTask(tp, ti, delay) {
-  tp.lastStarted = ti
-  if (delay > 0) ti._runningOperation = pause(delay).then(() => ti._start())
-  ti._runningOperation = ti._start()
-  return ti._runningOperation
 }
 
 function updateLastFinished(tp, ti) {

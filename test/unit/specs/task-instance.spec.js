@@ -31,7 +31,7 @@ describe('Task Instance', function() {
     expect(ti.isDropped).to.not.be.undefined
     expect(ti.isRestarted).to.not.be.undefined
     expect(ti.isRunning).to.not.be.undefined
-    expect(ti.isOver).to.not.be.undefined
+    expect(ti.isFinished).to.not.be.undefined
     expect(ti.state).to.not.be.undefined
   })
 
@@ -67,18 +67,18 @@ describe('Task Instance', function() {
     expect(ti.isRestarted).to.be.true
   })
 
-  it('updates computed isOver correctly', () => {
+  it('updates computed isFinished correctly', () => {
     ti.isResolved = true
     ti._updateComputed()
-    expect(ti.isOver).to.be.true
+    expect(ti.isFinished).to.be.true
     ti.isResolved = false
     ti.isCanceled = true
     ti._updateComputed()
-    expect(ti.isOver).to.be.true
+    expect(ti.isFinished).to.be.true
     ti.isCanceled = false
     ti.isRejected = true
     ti._updateComputed()
-    expect(ti.isOver).to.be.true
+    expect(ti.isFinished).to.be.true
   })
 
   it('differentiates between self cancelation', () => {

@@ -23,7 +23,7 @@ export default function createTaskSubscriber(host) {
       cancelFn,
       errorFn,
       successFn,
-      finalFn
+      finishFn
 
   return {
     /**
@@ -50,11 +50,8 @@ export default function createTaskSubscriber(host) {
     onSuccess(taskInstance) {
       if (successFn) Reflect.apply(successFn, host, [taskInstance])
     },
-    /**
-     * `After` actions.
-     */
-    finally(taskInstance) {
-      if (finalFn) Reflect.apply(finalFn, host, [taskInstance])
+    onFinish(taskInstance) {
+      if (finishFn) Reflect.apply(finishFn, host, [taskInstance])
     },
 
     subscriptions: {
@@ -78,8 +75,8 @@ export default function createTaskSubscriber(host) {
         successFn = fn
         return this
       },
-      finally(fn) {
-        finalFn = fn
+      onFinish(fn) {
+        finishFn = fn
         return this
       }
     }

@@ -29,7 +29,7 @@ export default function createTaskStepper(ti, subscriber, provider) {
       ti.value = val
       ti._updateComputed()
       subscriber.onSuccess(ti)
-      subscriber.finally(ti)
+      subscriber.onFinish(ti)
       return ti
     },
 
@@ -38,7 +38,7 @@ export default function createTaskStepper(ti, subscriber, provider) {
       ti.error = err
       ti._updateComputed()
       subscriber.onError(ti)
-      subscriber.finally(ti)
+      subscriber.onFinish(ti)
       return ti
     },
 
@@ -47,17 +47,16 @@ export default function createTaskStepper(ti, subscriber, provider) {
      * so the cancelation and handeling are done seperately.
      */
     triggerCancel() {
-      if (ti.isOver) return ti
+      // if (ti.isFinished) return ti
       ti.isCanceled = true
       ti._updateComputed()
       return ti
     },
     handleCancel(val) {
-      console.log(val)
       iter.return() // cause iter to terminate; still runs finally clause
       provider.cleanup(val)
       subscriber.onCancel(ti)
-      subscriber.finally(ti)
+      subscriber.onFinish(ti)
       return ti
     },
 
@@ -66,7 +65,7 @@ export default function createTaskStepper(ti, subscriber, provider) {
      * action and recursively iterates through generator function until
      * operation is either canceled, rejected, or resolved.
      */
-    async stepThrough(gen) {
+    stepThrough(gen) {
       let stepper = this
 
       async function takeAStep(prev = undefined) {
@@ -82,7 +81,6 @@ export default function createTaskStepper(ti, subscriber, provider) {
           ({ value, done } = await stepper.handleYield(prev))
         }
         catch (err) {                                           // REJECTED
-          // TODO better error handling
           return stepper.handleError(err)
         }
 
@@ -90,7 +88,7 @@ export default function createTaskStepper(ti, subscriber, provider) {
 
         value = await value
         if (done) return stepper.handleSuccess(value)           // RESOLVED
-        else return takeAStep(value)
+        else return takeAStep(value) // keep stepping
       }
 
       return takeAStep()

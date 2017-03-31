@@ -26,14 +26,14 @@ export default function createTaskInstance(data, subscriber, provider) {
     isDropped: false,
     isRestarted: false,
     isRunning: false,
-    isOver: false,
+    isFinished: false,
     state: 'waiting',
 
     _updateComputed() {
       this.isDropped = !this.hasStarted && this.isCanceled
       this.isRestarted = this.hasStarted && this.isCanceled
-      this.isOver = this.isCanceled || this.isRejected || this.isResolved
-      this.isRunning = this.hasStarted && !this.isOver
+      this.isFinished = this.isCanceled || this.isRejected || this.isResolved
+      this.isRunning = this.hasStarted && !this.isFinished
       this.state = getState(this)
     },
 

@@ -199,10 +199,12 @@ describe('Task Scheduler', function() {
     let dropPolicy = createTaskPolicy('drop', 1).policy,
         dropScheduler = createTaskScheduler(tp, dropPolicy, true)
     dropScheduler.schedule(ti1).schedule(ti2)
-    expect(ti2.isDropped).to.be.true
-    expect(tp.lastCanceled).to.equal(ti2)
     await ti1._runningOperation
+    await ti2._runningOperation
     expect(tp.lastResolved).to.equal(ti1)
+    expect(tp.lastCanceled).to.equal(ti2)
+    expect(ti2.isDropped).to.be.true
+    expect(dropScheduler.isActive).to.be.false
   })
 
   it('(restart) restarts previous calls and updates last', async () => {
