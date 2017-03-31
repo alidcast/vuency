@@ -17,13 +17,11 @@ describe('Task Subscribions', function() {
 
   it('has correct `on` subscriptions', async () => {
     expect(subs.onCancel).to.not.be.undefined
-    expect(subs.onDrop).to.not.be.undefined
-    expect(subs.onRestart).to.not.be.undefined
     expect(subs.onError).to.not.be.undefined
     expect(subs.onSuccess).to.not.be.undefined
   })
 
   it('has correct `after` subscriptions', async () => {
-    expect(subs.afterEnd).to.not.be.undefined
+    expect(subs.finally).to.not.be.undefined
   })
 })

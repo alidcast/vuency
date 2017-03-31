@@ -15,7 +15,7 @@ describe('Task Instance', function() {
       { provider } = createTaskInjections()
 
   beforeEach(() => {
-    ti = createTaskInstance(exTask, subscriber, provider)
+    ti = createTaskInstance({ operation: exTask }, subscriber, provider)
   })
 
   it('has correct props', () => {
