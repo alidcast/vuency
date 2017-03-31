@@ -20,8 +20,8 @@ export default function createTaskStepper(ti, subscriber, provider) {
       return ti
     },
 
-    async handleYield(prev) {
-      await subscriber.asyncBeforeYield(ti)
+    handleYield(prev) {
+      // TODO await subscriber.asyncBeforeYield(ti)
       let output = iter.next(prev)
       return output
     },
@@ -55,6 +55,7 @@ export default function createTaskStepper(ti, subscriber, provider) {
       return ti
     },
     handleCancel(val) {
+      console.log(val)
       iter.return() // cause iter to terminate; still runs finally clause
       provider.cleanup(val)
       if (ti.isDropped) subscriber.onDrop(ti)
@@ -84,7 +85,7 @@ export default function createTaskStepper(ti, subscriber, provider) {
         if (ti.isCanceled) return stepper.handleCancel(value)   // CANCELED / POST-START
 
         try {
-          ({ value, done } = await stepper.handleYield(prev))
+          ({ value, done } = stepper.handleYield(prev))
         }
         catch (err) {                                           // REJECTED
           // TODO better error handling

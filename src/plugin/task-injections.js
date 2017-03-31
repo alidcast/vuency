@@ -7,7 +7,6 @@ export default function createTaskInjections(host) {
   return {
     provider: {
       cleanup(val) {
-        console.log(val)
         return val
       }
     },
