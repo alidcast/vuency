@@ -90,7 +90,6 @@ describe('Task Property', function() {
     let tp = createTaskProperty(new Vue(), exTask, provider)
       .flow('enqueue')
       .onFinish(() => {
-        console.log('hello')
         callback()
       }),
       ti1 = tp.run()

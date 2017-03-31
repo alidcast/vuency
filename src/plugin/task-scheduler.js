@@ -45,27 +45,6 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
     return (waiting.isActive && running.size < maxRunning) || flow === 'default'
   }
 
-  /** TODO and change name of runningOperation
-   * We start all task instances, even dropped ones, so that the stepper
-   * can handle the per instance logic (it won't actually run the operation).
-   */
-  const handleTask = {
-    start(ti) {
-      if (delay > 0) ti._runningOperation = pause(delay).then(() => ti._start())
-      else ti._runningOperation = ti._start()
-      return ti._runningOperation
-    },
-    drop(ti) {
-      ti._runningOperation = ti._cancel()._start()
-      return ti._runningOperation
-    },
-    cancel(ti, canceler = 'scheduler') {
-      let cancelMethod
-      canceler === 'self' ? cancelMethod = 'cancel' : cancelMethod = '_cancel'
-      return ti[cancelMethod]()
-    }
-  }
-
   return {
     /**
      * Add task instance to waiting queue.
@@ -73,10 +52,10 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
     schedule(ti) {
       tp.lastCalled = ti
       if (shouldDrop()) {
-        handleTask.drop(ti, true).then(() => this.finalize(ti, false))
+        instance.drop(ti, true).then(() => this.finalize(ti, false))
       }
       else if (shouldWait()) {
-        if (shouldRestart()) running.forEach(item => handleTask.cancel(item))
+        if (shouldRestart()) running.forEach(item => instance.cancel(item))
         waiting.add(ti)
         if (autorun) this.advance()
       }
@@ -91,7 +70,7 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
       if (shouldRun()) {
         if (!ti) ti = waiting.remove().pop()
         tp.lastStarted = ti
-        handleTask.start(ti).then(() => this.finalize(ti))
+        instance.start(ti, delay).then(() => this.finalize(ti))
         running.add(ti)
         tp._updateReactive()
       }
@@ -118,8 +97,8 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
       // the task-graph demo smoother, so it's "noticably" faster. :)
       // if (waiting.size === 1) waiting.pop()
 
-      waiting.forEach(item => handleTask.drop(item, 'self'))
-      running.forEach(item => handleTask.cancel(item, 'self'))
+      waiting.forEach(item => instance.drop(item, 'self'))
+      running.forEach(item => instance.cancel(item, 'self'))
       waiting.clear()
       running.clear()
       tp._updateReactive()
@@ -176,4 +155,27 @@ function updateLastFinished(tp, ti) {
   if (ti.isCanceled) tp.lastCanceled = ti
   else if (ti.isRejected) tp.lastRejected = ti
   else if (ti.isResolved) tp.lastResolved = ti
+}
+
+/**
+ * Handler for per instance operations.
+ *
+ * We start all task instances, even dropped ones, so that the stepper
+ * can handle the per instance logic (it won't actually run the operation).
+ */
+const instance = {
+  start(ti, delay) {
+    if (delay > 0) ti._runningOperation = pause(delay).then(() => ti._start())
+    else ti._runningOperation = ti._start()
+    return ti._runningOperation
+  },
+  drop(ti) {
+    ti._runningOperation = ti._cancel()._start()
+    return ti._runningOperation
+  },
+  cancel(ti, canceler = 'scheduler') {
+    let cancelMethod
+    canceler === 'self' ? cancelMethod = 'cancel' : cancelMethod = '_cancel'
+    return ti[cancelMethod]()
+  }
 }
