@@ -12,7 +12,8 @@ export default function createTaskPolicy(_type = 'default', _num = 1, _time = 0)
       currentPolicy = {
         flow: _type,
         delay: _time,
-        maxRunning: _num
+        maxRunning: _num,
+        bindings: {}
       }
 
   return {
@@ -24,11 +25,21 @@ export default function createTaskPolicy(_type = 'default', _num = 1, _time = 0)
     /**
      *  Sets the scheduling rule for repeat calls.
      */
-    flow(type, opts) {
+    flow(type, opts = {}) {
       assert(flowTypes.indexOf(type) > -1, `${type} is not a flow control option`)
       currentPolicy.flow = type
-      if (opts && opts.delay) currentPolicy.delay = opts.delay
-      if (opts && opts.maxRunning) currentPolicy.maxRunning = opts.maxRunning
+      if (Reflect.has(opts, 'delay')) currentPolicy.delay = opts.delay
+      if (Reflect.has(opts, 'maxRunning')) currentPolicy.maxRunning = opts.maxRunning
+      return this
+    },
+
+    /**
+     *  Per instance configuration.
+     */
+    forCall(id, opts = {}) {
+      let instancePolicy = {}
+      if (Reflect.has(opts, 'keepAlive')) instancePolicy.keepAlive = opts.keepAlive
+      currentPolicy.bindings[id] = instancePolicy
       return this
     }
   }

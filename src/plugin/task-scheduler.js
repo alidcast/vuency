@@ -13,7 +13,7 @@ import { pause } from '../util/async'
 export default function createTaskScheduler(tp, policy, autorun = true) {
   let waiting = createQueue(),
       running = createQueue(),
-      { flow, delay, maxRunning } = policy
+      { flow, delay, maxRunning, bindings } = policy
 
   /**
    * Drop instances when total queued reaches concurrency limit.
@@ -45,11 +45,21 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
     return (waiting.isActive && running.size < maxRunning) || flow === 'default'
   }
 
+  /**
+   * Attaches the per instance policy to the instance.
+   */
+  function assignInstanceBindings(ti) {
+    let count = waiting.size + running.size + 1
+    if (bindings[count]) ti.bindings = bindings[count]
+    return ti
+  }
+
   return {
     /**
      * Add task instance to waiting queue.
      */
     schedule(ti) {
+      assignInstanceBindings(ti)
       tp.lastCalled = ti
       if (shouldDrop()) {
         instance.drop(ti, true).then(() => this.finalize(ti, false))
@@ -81,7 +91,8 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
      * Removes the task instance from running and updates last instance data.
      */
     finalize(ti, didRun = true) {
-      if (didRun) running.extract(item => item === ti)
+      let { keepAlive } = ti.bindings
+      if (didRun && !keepAlive) running.extract(item => item === ti)
       updateLastFinished(tp, ti)
       tp._updateReactive()
       if (autorun && waiting.isActive) this.advance()
@@ -96,7 +107,6 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
       // if one item in queue, then we just handle it directly; this made
       // the task-graph demo smoother, so it's "noticably" faster. :)
       // if (waiting.size === 1) waiting.pop()
-
       waiting.forEach(item => instance.drop(item, 'self'))
       running.forEach(item => instance.cancel(item, 'self'))
       waiting.clear()
