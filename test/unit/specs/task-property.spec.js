@@ -71,6 +71,13 @@ describe('Task Property', function() {
     expect(tp.isActive).to.be.false
   })
 
+  it('accepts per instance keepAlive options', async () => {
+    let infiniteTp = createTaskProperty(vm, exTask).forCall(1, { keepAlive: true }),
+        ti1 = infiniteTp.run()
+    await ti1._runningOperation
+    expect(infiniteTp.isActive).to.be.true
+  })
+
   it('fires onFinish subscription even if task is dropped', async () => {
     let tp = createTaskProperty(vm, exTask)
             .flow('drop')
