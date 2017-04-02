@@ -1,5 +1,5 @@
 <script>
-import QuestionGenie from '~components/tasks/QuestionGenie.vue'
+import QuestionGenie from '~examples/QuestionGenie.vue'
 
 export default {
   components: {
@@ -8,50 +8,62 @@ export default {
 }
 </script>
 
-<div>
-    <QuestionGenie> </QuestionGenie>
+## Question Genie
+
+(The component below is a modified version of an example shown in the [Vuejs documentation about watchers](https://vuejs.org/v2/guide/computed.html#Watchers)).
+
+<div class="showcase">
+    <QuestionGenie />
 </div>
 
-The example we'll be working on below is basically an input form that takes in question and, using the `yesno.wtf` API, returns an answer. This example was actually taken from the [Vuejs documentation about watchers](https://vuejs.org/v2/guide/computed.html#Watchers). In the second snippet below, you'll see the refactored version that uses Vuency.
 
+#### Javascript
 
 ```js
-// template
-<div>
-  <p>
-    Ask a yes/no question: <input v-model="question">
-  </p>
-  <p>{{ answer }}</p>
-</div>
-
-// javascript
 export default {
-  data() {
-    return {
-      question: '',
-      answer: 'I cannot give you an answer until you ask a question!'
-    }
-  },
-  tasks(t, { pause }) {
+  data: () => ({
+    question: '',
+    answer: ''
+  }),
+  tasks(t, { timeout }) {
     return t(function * getAnswer() {
       this.answer = 'Thinking...'
-      yield pause(200)
+      yield timeout(600)
       this.answer = Math.random() < 0.5 ? 'Yes' : 'No'
     })
-    .flow('restart', 400).runWith('question')
-    .beforeStart(({ cancel }) => {
+    // Simulate `Debounce`: If within 400ms the user starts typing
+    // again, then the current operation will be canceled
+    // and started again.
+    .flow('restart', { delay: 400 })
+    // Simulate Vue `Watcher`: The task fires upon creation and
+    // every time the `question` input changes.
+    .runWith('question', { immediate: true })
+    // Handle corner cases and cancel the task if necessary.
+    .beforeStart(instance => {
       if (this.question.length === 0) {
         this.answer = 'Questions must contain words!'
-        cancel()
-      }
-      else if (this.question.indexOf('?') === -1) {
+        instance.cancel()
+      } else if (this.question.indexOf('?') === -1) {
         this.answer = 'Questions usually contain a question mark. ;-)'
-        cancel()
+        instance.cancel()
       }
     })
+    // Handle debounce.
     .onCancel(({ selfCanceled }) => {
       if (!selfCanceled) this.answer = 'Waiting for you to stop typing...'
     })
   }
 }
+```
+
+#### Template
+
+```html
+<div class="question-genie">
+  <h4> Question Genie </h4>
+  <p>
+    Ask a yes/no question: <input id="question" v-model="question">
+  </p>
+  <p id="answer">{{ answer }}</p>
+</div>
 ```

@@ -26,6 +26,7 @@ module.exports = {
       // aliases
       config.resolve.alias['~articles'] = resolve(__dirname, 'articles')
       config.resolve.alias['~utilities'] = resolve(__dirname, 'utilities')
+      config.resolve.alias['~examples'] = resolve(__dirname, '../examples')
       // loaders
       config.module.rules.push(
       {

@@ -6,9 +6,7 @@ module.exports = {
     ],
     ['core-concepts',
       [
-        // task state
-        // task cancellation
-        'managing-concurrency' // task flow and concurrency
+        'task-flow'
       ]
     ],
     ['API',
@@ -19,6 +17,9 @@ module.exports = {
     ],
     ['examples',
       [
+        'coin-flip',
+        'countdown-timer',
+        'infinite-ajax',
         'question-genie'
       ]
     ]

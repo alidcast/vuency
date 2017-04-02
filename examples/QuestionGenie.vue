@@ -1,6 +1,5 @@
 <template>
   <div class="question-genie">
-    <h4> Question Genie </h4>
     <p>
       Ask a yes/no question: <input id="question" v-model="question">
     </p>
@@ -10,19 +9,17 @@
 
 <script>
 export default {
-  data() {
-    return {
-      question: '',
-      answer: 'Questions must contain words!'
-    }
-  },
+  data: () => ({
+    question: '',
+    answer: ''
+  }),
   tasks(t, { timeout }) {
     return t(function * getAnswer() {
       this.answer = 'Thinking...'
-      yield timeout(200)
+      yield timeout(600)
       this.answer = Math.random() < 0.5 ? 'Yes' : 'No'
     })
-    .flow('restart', { delay: 400 }).runWith('question')
+    .flow('restart', { delay: 400 }).runWith('question', { immediate: true })
     .beforeStart(instance => {
       if (this.question.length === 0) {
         this.answer = 'Questions must contain words!'
@@ -30,7 +27,7 @@ export default {
       } else if (this.question.indexOf('?') === -1) {
         this.answer = 'Questions usually contain a question mark. ;-)'
         instance.cancel()
-      } else this.answer = 'Thinking...'
+      }
     })
     .onCancel(({ selfCanceled }) => {
       if (!selfCanceled) this.answer = 'Waiting for you to stop typing...'

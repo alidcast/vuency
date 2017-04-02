@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h4> Countdown Timer </h4>
     <div class="countdown-timer ">
       <p> Count: {{ this.count }}</p>
       <button @click="counter.run()"> Start Over </button>
@@ -15,7 +14,6 @@ export default {
   data: () => ({
     count: COUNT_START
   }),
-
   tasks: (t, { timeout }) => ({
     counter: t(function* () {
       this.count = COUNT_START

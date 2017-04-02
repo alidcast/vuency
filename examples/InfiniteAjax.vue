@@ -1,25 +1,26 @@
 <template>
-  <div>
-    <h4> Ajax Throttling </h4>
-    <ul>
+  <div class="infinite-ajax">
+    <div class="ajax-controls">
+      <button v-if="infiniteAjax.isActive" @click="infiniteAjax.abort()">
+        Nuke All
+      </button>
+      <button v-else @click="infiniteAjax.run()">
+        Start Again
+      </button>
+
+      <ul v-if="instances">
+        <li v-for="(instance, index) in instances" v-if="instance.isRunning">
+          <button @click="instance.cancel()">
+              Cancel Task: {{ index }}
+            </button>
+        </li>
+      </ul>
+    </div>
+
+    <ul class="ajax-calls">
       <li v-for="log in logs"
           :style="{ color: log.color }">
         {{ log.message }}
-      </li>
-    </ul>
-
-    <button v-if="infiniteAjax.isActive" @click="infiniteAjax.abort()">
-      Cancel All
-    </button>
-    <button v-else @click="infiniteAjax.run()">
-      Start Again
-    </button>
-
-    <ul v-if="instances">
-      <li v-for="(instance, index) in instances" v-if="instance.isRunning">
-        <button @click="instance.cancel()">
-            Cancel Task: {{ index }}
-          </button>
       </li>
     </ul>
   </div>
@@ -44,12 +45,10 @@ export default {
       } else {
         this.log(color, `Task ${id}: Sorry, I've been sent to the abyss!`)
       }
-
       if (!loopingAjax.isAborted) {
         this.instances[id] = loopingAjax.run(id, color)
       }
     })
-
     return {
       infiniteAjax: t(function * () {
         let { instances } = this
@@ -69,11 +68,9 @@ export default {
       })
     }
   },
-
   created() {
     this.infiniteAjax.run()
   },
-
   methods: {
     log(color, message) {
       let logs = this.logs || []
@@ -82,5 +79,19 @@ export default {
     }
   }
 }
-
 </script>
+
+<style>
+.infinite-ajax {
+  min-height: 12rem;
+}
+.ajax-calls,
+.ajax-controls {
+  display: inline-block;
+  vertical-align: top;
+  margin: 1rem;
+}
+.ajax-controls {
+  min-width: 20%;
+}
+</style>
