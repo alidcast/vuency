@@ -18,17 +18,19 @@ export default {
   },
   tasks(t) {
     return t(function * getAnswer() {
-      this.answer = yield Math.random() < 0.5 ? 'Yes' : 'No'
+      this.answer = 'Thinking...'
+      yield timeout(200)
+      this.answer = Math.random() < 0.5 ? 'Yes' : 'No'
     })
-    .flow('restart', 400).runWith('question')
-    .beforeYield(({ cancel }) => {
+    .flow('restart', { delay: 400 }).runWith('question')
+    .beforeStart(instance => {
       if (this.question.length === 0) {
         this.answer = 'Questions must contain words!'
-        cancel()
+        instance.cancel()
       }
       else if (this.question.indexOf('?') === -1) {
         this.answer = 'Questions usually contain a question mark. ;-)'
-        cancel()
+        instance.cancel()
       }
       else this.answer = 'Thinking...'
     })

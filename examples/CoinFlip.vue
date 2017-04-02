@@ -13,9 +13,10 @@ export default {
   data: () => ({
     answer: ''
   }),
-  tasks(t, { pause }) {
+  tasks(t, { timeout }) { // TODO working weirdly
     return t(function* flipCoin() {
-      this.answer = yield pause(1000).then(() => Math.random() < 0.5 ? 'Heads' : 'Tails')
+      this.answer = yield timeout(2000) 
+      this.answer = Math.random() < 0.5 ? 'Heads' : 'Tails'
     })
     .flow('drop')
     .beforeStart(() => {
@@ -24,8 +25,8 @@ export default {
   },
   computed: {
     isRunning() {
-      return this.flipCoin.lastCalled
-        ? this.flipCoin.lastCalled.isRunning : false
+      let { flipCoin } = this
+      return flipCoin.lastStarted ? flipCoin.lastStarted.isRunning : false
     }
   }
 }

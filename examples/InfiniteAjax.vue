@@ -7,32 +7,72 @@
         {{ log.message }}
       </li>
     </ul>
+
+    <button v-if="infiniteAjax.isActive" @click="infiniteAjax.abort()">
+      Cancel All
+    </button>
+    <button v-else @click="infiniteAjax.run()">
+      Start Again
+    </button>
+
+    <ul v-if="instances">
+      <li v-for="(instance, index) in instances" v-if="instance.isRunning">
+        <button @click="instance.cancel()">
+            Cancel Task: {{ index }}
+          </button>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
 export default {
   data: () => ({
-    logs: []
+    logs: [],
+    instances: []
   }),
-  tasks: (t, { pause }) => ({
-    loopingAjaxTask: t(function * (id, color) {
+  tasks(t, { timeout }) {
+    let loopingAjax = t(function * (id, color) {
       this.log(color, `Task ${id}: making AJAX request`)
-      yield pause(1000 + 2000 * Math.random()) // simulate slow AJAX
-      this.log(color, `Task ${id}: Done, sleeping.`)
-      this.loopingAjaxTask.run(id, color)
-    }).flow('enqueue').maxRunning(3)
-  }),
-  mounted() {
-    this.loopingAjaxTask.run(0, '#0000FF')
-    this.loopingAjaxTask.run(1, '#8A2BE2')
-    this.loopingAjaxTask.run(2, '#A52A2A')
-    this.loopingAjaxTask.run(3, '#DC143C')
-    this.loopingAjaxTask.run(4, '#20B2AA')
-    this.loopingAjaxTask.run(5, '#FF1493')
-    this.loopingAjaxTask.run(6, '#228B22')
-    this.loopingAjaxTask.run(7, '#DAA520')
+      yield timeout(1000 + 2000 * Math.random()) // simulate slow AJAX
+    })
+    .flow('enqueue', { maxRunning: 3 })
+    .onFinish(({ params, isCanceled }) => {
+      let id = params[0], color = params[1]
+      if (!isCanceled) {
+        this.log(color, `Task ${id}: Done, sleeping.`)
+      } else {
+        this.log(color, `Task ${id}: Sorry, I've been sent to the abyss!`)
+      }
+      if (!loopingAjax.isAborted) {
+        this.instances[id] = loopingAjax.run(id, color)
+      }
+    })
+
+    return {
+      infiniteAjax:  t(function * () {
+        let { instances } = this
+        instances.push(loopingAjax.run(1, '#0000FF'))
+        instances.push(loopingAjax.run(2, '#8A2BE2'))
+        instances.push(loopingAjax.run(3, '#DC143C'))
+        instances.push(loopingAjax.run(4, '#20B2AA'))
+        instances.push(loopingAjax.run(5, '#FF1493'))
+        instances.push(loopingAjax.run(6, '#DAA520'))
+        instances.push(loopingAjax.run(7, '#4FC40A'))
+      })
+      .flow('drop')
+      .nthCall(1, { keepRunning: true })
+      .onKill(() => {
+        loopingAjax.abort()
+        this.instances = []
+      })
+    }
   },
+
+  created() {
+    this.infiniteAjax.run()
+  },
+
   methods: {
     log(color, message) {
       let logs = this.logs || []
@@ -41,4 +81,5 @@ export default {
     }
   }
 }
+
 </script>
