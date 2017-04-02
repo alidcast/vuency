@@ -14,7 +14,7 @@ export default function createTaskInstance(data, subscriber) {
     _runningOperation: null,
     // per instance data
     params,
-    bindings: {
+    options: {
       keepRunning: false
     },
     // results

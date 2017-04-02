@@ -13,7 +13,7 @@ export default function createTaskPolicy(_type = 'default', _num = 1, _time = 0)
         flow: _type,
         delay: _time,
         maxRunning: _num,
-        bindings: {}
+        options: {}
       }
 
   return {
@@ -41,7 +41,7 @@ export default function createTaskPolicy(_type = 'default', _num = 1, _time = 0)
       assert(isObj(opts), `Per instance options must be passed as an object.`)
       let instancePolicy = {}
       if (Reflect.has(opts, 'keepRunning')) instancePolicy.keepRunning = opts.keepRunning
-      currentPolicy.bindings[id] = instancePolicy
+      currentPolicy.options[id] = instancePolicy
       return this
     }
   }

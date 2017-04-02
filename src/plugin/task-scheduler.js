@@ -13,7 +13,7 @@ import { pause } from '../util/async'
 export default function createTaskScheduler(tp, policy, autorun = true) {
   let waiting = createQueue(),
       running = createQueue(),
-      { flow, maxRunning, delay, bindings } = policy
+      { flow, maxRunning, delay, options } = policy
 
   /**
    * Drop instances when total queued reaches concurrency limit.
@@ -48,9 +48,9 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
   /**
    * Attaches the per instance policy to the instance.
    */
-  function assignInstanceBindings(ti) {
+  function assignInstanceOptions(ti) {
     let count = waiting.size + running.size + 1
-    if (bindings[count]) ti.bindings = bindings[count]
+    if (options[count]) ti.options = options[count]
     return ti
   }
 
@@ -59,7 +59,7 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
      * Determines the way the task instance should be scheduled.
      */
     schedule(ti) {
-      assignInstanceBindings(ti)
+      assignInstanceOptions(ti)
       tp.lastCalled = ti
       if (shouldDrop()) {
         ti._cancel().then(() => this.finalize(ti, false))
@@ -96,7 +96,7 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
      * from running if it wasn't dropped or called with the keep running binding.
      */
     finalize(ti, didRun = true) {
-      let { keepRunning } = ti.bindings
+      let { keepRunning } = ti.options
       if (didRun && !keepRunning) running.extract(item => item === ti)
       updateLastFinished(tp, ti)
       tp._updateReactive()
@@ -174,11 +174,11 @@ function startInstance(ti, delay) {
 function cancelQueued(queue, type = 'race') {
   if (queue.size === 1) {
     let ti = queue.pop()
-    if (ti.bindings.keepRunning) return ti.destroy()
+    if (ti.options.keepRunning) return ti.destroy()
     else return ti._cancel()
   } else {
     let canceledOperations = queue.map(ti => {
-      if (ti.bindings.keepRunning) return ti.destroy()
+      if (ti.options.keepRunning) return ti.destroy()
       else return ti._cancel()
     })
     return Promise[type](canceledOperations)

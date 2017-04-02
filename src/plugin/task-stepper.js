@@ -15,7 +15,7 @@ import { isObj } from '../util/assert'
 */
 export default function createTaskStepper(ti, callbacks) {
   let iter = ti._operation(),
-      keepRunning = ti.bindings.keepRunning,
+      keepRunning = ti.options.keepRunning,
       cancelablePromise
 
   return {
