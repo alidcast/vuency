@@ -16,7 +16,7 @@ export default {
       answer: 'Questions must contain words!'
     }
   },
-  tasks(t) {
+  tasks(t, { timeout }) {
     return t(function * getAnswer() {
       this.answer = 'Thinking...'
       yield timeout(200)
@@ -27,12 +27,10 @@ export default {
       if (this.question.length === 0) {
         this.answer = 'Questions must contain words!'
         instance.cancel()
-      }
-      else if (this.question.indexOf('?') === -1) {
+      } else if (this.question.indexOf('?') === -1) {
         this.answer = 'Questions usually contain a question mark. ;-)'
         instance.cancel()
-      }
-      else this.answer = 'Thinking...'
+      } else this.answer = 'Thinking...'
     })
     .onCancel(({ selfCanceled }) => {
       if (!selfCanceled) this.answer = 'Waiting for you to stop typing...'

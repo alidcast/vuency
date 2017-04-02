@@ -15,7 +15,7 @@ export default {
   }),
   tasks(t, { timeout }) { // TODO working weirdly
     return t(function* flipCoin() {
-      this.answer = yield timeout(2000) 
+      this.answer = yield timeout(2000)
       this.answer = Math.random() < 0.5 ? 'Heads' : 'Tails'
     })
     .flow('drop')

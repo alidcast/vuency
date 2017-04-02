@@ -44,13 +44,14 @@ export default {
       } else {
         this.log(color, `Task ${id}: Sorry, I've been sent to the abyss!`)
       }
+
       if (!loopingAjax.isAborted) {
         this.instances[id] = loopingAjax.run(id, color)
       }
     })
 
     return {
-      infiniteAjax:  t(function * () {
+      infiniteAjax: t(function * () {
         let { instances } = this
         instances.push(loopingAjax.run(1, '#0000FF'))
         instances.push(loopingAjax.run(2, '#8A2BE2'))
