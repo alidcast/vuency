@@ -90,8 +90,7 @@ export default function createTaskStepper(ti, callbacks) {
 
         try {
           ({ value, done } = await stepper.handleYield(prev))
-        }
-        catch (err) {                                                         // REJECTED
+        } catch (err) {                                                         // REJECTED
           return stepper.handleError.bind(stepper, err)
         }
 

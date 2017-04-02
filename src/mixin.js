@@ -30,8 +30,7 @@ function initTasks() {
 
     if (tasks.flow) { // it is a task object, so register as named function
       Vue.util.defineReactive(host, tasks.operation.name, tasks)
-    }
-    else { // it is a list of task objects, so register as named objects
+    } else { // it is a list of task objects, so register as named objects
       Object.keys(tasks).forEach(key => {
         Vue.util.defineReactive(host, key, tasks[key])
       })

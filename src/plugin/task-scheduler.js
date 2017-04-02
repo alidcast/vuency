@@ -63,18 +63,15 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
       tp.lastCalled = ti
       if (shouldDrop()) {
         ti._cancel().then(() => this.finalize(ti, false))
-      }
-      else if (shouldRestart()) {
+      } else if (shouldRestart()) {
         cancelQueued(running, 'race').then(() => {
           waiting.add(ti)
           if (autorun) this.advance()
         })
-      }
-      else if (shouldWait()) {
+      } else if (shouldWait()) {
         waiting.add(ti)
         if (autorun) this.advance()
-      }
-      else this.advance(ti)
+      } else this.advance(ti)
       return this
     },
 
@@ -179,8 +176,7 @@ function cancelQueued(queue, type = 'race') {
     let ti = queue.pop()
     if (ti.bindings.keepRunning) return ti.destroy()
     else return ti._cancel()
-  }
-  else {
+  } else {
     let canceledOperations = queue.map(ti => {
       if (ti.bindings.keepRunning) return ti.destroy()
       else return ti._cancel()

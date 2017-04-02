@@ -118,8 +118,7 @@ describe('Task Stepper', function() {
           try {
             result = 'try'
             yield pause(500)
-          }
-          finally {
+          } finally {
             result = 'finally'
           }
         },
@@ -136,8 +135,7 @@ describe('Task Stepper', function() {
           try {
             result = 'try'
             yield pause(500)
-          }
-          finally {
+          } finally {
             result = 'finally'
           }
         },
