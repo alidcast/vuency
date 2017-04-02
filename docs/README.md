@@ -1,3 +1,1 @@
-# vuency-docs
-
-> vuency documentation
+# Vuency Documentation
