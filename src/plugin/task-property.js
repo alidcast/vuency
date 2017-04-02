@@ -12,7 +12,8 @@ import createTaskListeners from './modifiers/task-listeners'
  * @constructor Task Property
  */
 export default function createTaskProperty(host, operation, autorun = true) {
-  let { policy, ...policyModifiers } = createTaskPolicy(),
+  let scheduler,
+      { policy, ...policyModifiers } = createTaskPolicy(),
       { subscriptions, ...subscriber } = createTaskSubscriptions(host),
       { events, watchers } = createTaskListeners(host)
 
@@ -36,7 +37,6 @@ export default function createTaskProperty(host, operation, autorun = true) {
      * are added to the scheduler's running queue.
      */
     _updateReactive() {
-      let { scheduler } = this
       this.isActive = scheduler.running.isActive
       this.isIdle = !scheduler.running.isActive
       this.state = this.isActive ? 'active' : 'idle'
@@ -46,11 +46,11 @@ export default function createTaskProperty(host, operation, autorun = true) {
      * Creates a new task instance and schedules it to run.
      */
     run(...params) {
-      if (!this.scheduler) this.scheduler = createTaskScheduler(this, policy)
+      if (!scheduler) scheduler = createTaskScheduler(this, policy)
       this.isAborted = false
       let instanceData = { params, operation: operation.bind(host, ...params) },
           ti = createTaskInstance(instanceData, subscriber)
-      if (autorun) this.scheduler.schedule(ti)
+      if (autorun) scheduler.schedule(ti)
       return ti
     },
 
@@ -58,7 +58,7 @@ export default function createTaskProperty(host, operation, autorun = true) {
      * Cancels and destroys all scheduled task instances.
      */
     abort() {
-      let canceledInstances, { scheduler } = this
+      let canceledInstances
       if (scheduler && scheduler.isActive) {
         canceledInstances = scheduler.clear()
         this.isAborted = true
