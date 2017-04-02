@@ -21,4 +21,4 @@ Vue.use(Vuency)
 
 ## Documentation
 
-The [Vuency documentation](https://vuency.alidcastano.com) is a [nuxt.js] generated static site with interactive examples.
+The [Vuency documentation](https://vuency.alidcastano.com) is a [nuxt.js](https://github.com/nuxt/nuxt.js) generated static site with interactive examples.
