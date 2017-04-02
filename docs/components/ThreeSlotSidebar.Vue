@@ -17,11 +17,14 @@
   +position('fixed', 0, null, 0, 0)
   +color('primary 100')
 .top
-  +flex-span(20%, fixed)
+  +flex-span(15%, fixed)
   +flex-place('children', center, center)
+  margin: .75rem 1rem 1.5rem 1rem
 .middle
-  +flex-span(fluid)
+  +flex-span(65%, fluid)
   +color('primary 50')
+  overflow-y: scroll
+  margin-bottom: 1rem
 .bottom
   +flex-span(10%, fixed)
   +flex-place('children', center, center)

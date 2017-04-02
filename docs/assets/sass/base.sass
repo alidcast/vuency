@@ -27,43 +27,43 @@ body
   color: $body-color
   background: $body-bg
 
-// // No `:visited` state is required by default (browsers will use `a`)
-// a
-//   color: $link-color
-//   text-decoration: none
-//
-//   // `:focus` is linked to `:hover` for basic accessibility
-//   &:hover,
-//   &:focus
-//     text-decoration: underline
-//
-//   strong
-//     color: inherit
+// No `:visited` state is required by default (browsers will use `a`)
+a
+  // color: $link-color
+  text-decoration: none
 
-// img
-//   display: block
-//   max-width: 100%
-//   margin: 0 0 1rem
-//   border-radius: 5px
-//
-// table
-//   margin-bottom: 1rem
-//   width: 100%
-//   font-size: 85%
-//   border: 1px solid #e5e5e5
-//   border-collapse: collapse
-//
-// td,
-// th
-//   padding: .25rem .5rem
-//   border: 1px solid #e5e5e5
-//
-// th
-//   text-align: left
-//
-// tbody tr:nth-child(odd) td,
-// tbody tr:nth-child(odd) th
-//   background-color: #f9f9f9
+  // `:focus` is linked to `:hover` for basic accessibility
+  &:hover,
+  &:focus
+    text-decoration: underline
+
+  strong
+    color: inherit
+
+img
+  display: block
+  max-width: 100%
+  margin: 0 0 1rem
+  border-radius: 5px
+
+table
+  margin-bottom: 1rem
+  width: 100%
+  font-size: 85%
+  border: 1px solid #e5e5e5
+  border-collapse: collapse
+
+td,
+th
+  padding: .25rem .5rem
+  border: 1px solid #e5e5e5
+
+th
+  text-align: left
+
+tbody tr:nth-child(odd) td,
+tbody tr:nth-child(odd) th
+  background-color: #f9f9f9
 
 // --------------------
 // Code
@@ -128,9 +128,6 @@ p
 ul, ol, dl
   margin-top: 0
   margin-bottom: 1rem
-  // removed bullet point styles
-  list-style: none
-  padding-left: 0
 
 dt
   font-weight: bold

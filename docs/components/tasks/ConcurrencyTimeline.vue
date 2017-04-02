@@ -1,17 +1,19 @@
 <template>
   <div>
-    <button @click="runTrackerInstance"> task.run() </button>
-    <button @click="clearTimeline">Clear Timeline</button>
-    <button
-      v-if="canCancelLast && trackerTask.lastCalled && !trackerTask.lastCalled.isOver"
-      @click="trackerTask.lastStarted.cancel()">
-      Cancel Last
-    </button>
-    <button
-      v-if="trackerTask.isActive"
-      @click="trackerTask.abort()">
-      Cancel All
-    </button>
+    <div>
+      <button @click="runTrackerInstance"> Run Task </button>
+      <button @click="clearTimeline">Clear Timeline</button>
+      <button
+        v-if="canCancelLast && trackerTask.lastCalled && !trackerTask.lastCalled.isFinished"
+        @click="trackerTask.lastStarted.cancel()">
+        Cancel Last
+      </button>
+      <button
+        v-if="canCancelAll && trackerTask.isActive"
+        @click="trackerTask.abort()">
+        Cancel All
+      </button>
+    </div>
 
     <svg class="concurrencyTimeline">
       <g>
@@ -97,11 +99,17 @@ export default {
     flow: {
       type: String, required: true
     },
+    maxRunning: {
+      type: Number, default: 1
+    },
+    delay: {
+      type: Number, default: 0
+    },
     canCancelLast: {
       type: Boolean, default: false
     },
     canCancelAll: {
-      type: Boolean, default: true
+      type: Boolean, default: false
     }
   },
 
@@ -114,17 +122,17 @@ export default {
       xTimeline: 0
     }
   },
-  tasks(t, { pause }) {
+  tasks(t, { timeout }) {
     return {
       trackerTask: t(function * () {
-        yield pause(2000)
-      }).flow(this.flow),
+        yield timeout(2000)
+      }).flow(this.flow, { delay: this.delay, maxRunning: this.maxRunning }),
 
       ticker: t(function * () {
         while (true) {
           this.timeElapsed = new Date() - this.startTime
           window.requestAnimationFrame(this.updateInstances)
-          yield pause(10)
+          yield timeout(10)
         }
       }).flow('drop')
     }
@@ -198,7 +206,9 @@ function pickFrom(list, index) {
 <style lang="sass">
 .concurrencyTimeline
   width: 100%
-  padding: 5px
+  padding: 1rem 0 0 .25rem
+  // fix extra spacing
+  margin-bottom: -2.5rem
 
 .taskTrackerInstance
   height: 20px

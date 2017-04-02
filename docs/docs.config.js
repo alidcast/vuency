@@ -6,7 +6,10 @@ module.exports = {
     ],
     ['core-concepts',
       [
-        'task-flow'
+        'task-flow',
+        'task-state',
+        'task-cancelation',
+        'task-subscriptions'
       ]
     ],
     ['API',

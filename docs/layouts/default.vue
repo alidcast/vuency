@@ -44,6 +44,10 @@ export default {
   a
     color: inherit
     text-decoration: inherit
+  // removed bullet point styles
+  ul
+    list-style: none
+    padding-left: 0
   .sidebar-header
     text-align: center
     .site-title
@@ -59,7 +63,6 @@ export default {
         position: absolute
         right: 0
   .sidebar-menu
-    margin-top: .5rem
     padding: 1rem
   .sidebar-links
     .github-link

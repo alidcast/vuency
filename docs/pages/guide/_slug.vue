@@ -24,14 +24,21 @@ export default {
 
 <style lang="sass">
 .content
-  margin: 2.5rem 0 0 2rem
+  margin: 2.5rem 0 4rem 0
   max-width: 40rem
   // content styles
   h1
     margin-bottom: 1rem
   h2
+    // underline
     border-bottom: 1px solid #ddd
     padding-bottom: .5rem
-    margin-bottom: 1rem
+    // space out
     margin-top: 2rem
+    margin-bottom: 1rem
+
+.showcase
+  background-color: #f9f9f9
+  margin: 2rem 0 2rem 0
+  padding: 1rem
 </style>
