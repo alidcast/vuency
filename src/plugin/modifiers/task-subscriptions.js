@@ -23,11 +23,12 @@ export default function createTaskSubscriber(host) {
       cancelFn,
       errorFn,
       successFn,
-      finishFn
+      finishFn,
+      killFn
 
   return {
     /**
-     * `Before` actions.
+     * `Before` instance callbacks.
      *
      * These operations are async so that they can be use to timeout logic
      *  (e.g. the `pause` helper) to better update UI state.
@@ -39,7 +40,7 @@ export default function createTaskSubscriber(host) {
       if (yieldFn) await Reflect.apply(yieldFn, host, [taskInstance])
     },
     /**
-     * `On` actions.
+     * `On` instance callbacks.
      */
     onCancel(taskInstance) {
       if (cancelFn) Reflect.apply(cancelFn, host, [taskInstance])
@@ -52,6 +53,12 @@ export default function createTaskSubscriber(host) {
     },
     onFinish(taskInstance) {
       if (finishFn) Reflect.apply(finishFn, host, [taskInstance])
+    },
+    /**
+     * `On` property callbacks.
+     */
+    onKill(taskInstance) {
+      if (killFn) Reflect.apply(killFn, host, [taskInstance])
     },
 
     subscriptions: {
@@ -77,6 +84,10 @@ export default function createTaskSubscriber(host) {
       },
       onFinish(fn) {
         finishFn = fn
+        return this
+      },
+      onKill(fn) {
+        killFn = fn
         return this
       }
     }

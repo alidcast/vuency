@@ -15,6 +15,7 @@ import { isObj } from '../util/assert'
 */
 export default function createTaskStepper(ti, callbacks) {
   let iter = ti._operation(),
+      keepRunning = ti.bindings.keepRunning,
       cancelablePromise
 
   return {
@@ -64,27 +65,25 @@ export default function createTaskStepper(ti, callbacks) {
       return ti
     },
 
-    /**
-     *
-     */
     handleEnd(resultCallback) {
       resultCallback()
       callbacks.onFinish(ti)
-      return this
+      if (keepRunning) callbacks.onKill(ti)
+      return ti
     },
 
     /**
-     * Recursively iterates through generator function until
-     * operation is either canceled, rejected, or resolved.
+     *  Recursively iterates through generator function until the operation is
+     *  either canceled, rejected, or resolved.
+     *
+     *  When the operation is finished, we return the resulting handle method
+     *  so that it can be executed or returned, in the cases where the final
+     *  callback needs to be deferred for later handling.
      */
-    async stepThrough(gen) {
+    async stepThrough() {
       let stepper = this
 
-      if (ti.isCanceled) return stepper.handleEnd(stepper.handleCancel)       // CANCELED / PRE-START
-
-      if (!ti.hasStarted) await stepper.handleStart()                         // STARTED
-
-      const resultCallback = await (async function takeAStep(prev = undefined) {
+      async function takeAStep(prev = undefined) {
         let value, done
 
         if (ti.isCanceled) return stepper.handleCancel                        // CANCELED / POST-START
@@ -98,13 +97,18 @@ export default function createTaskStepper(ti, callbacks) {
 
         if (isObj(value) && value._cancel_) cancelablePromise = value
         value = await value
-        if (ti.isCanceled) return stepper.handleCancel()                      // CANCELED / POST-YIELD
+        if (ti.isCanceled) return stepper.handleCancel                        // CANCELED / POST-YIELD
 
         if (done) return stepper.handleSuccess.bind(stepper, value)           // RESOLVED
-        else return takeAStep(value)
-      })()
+        else return await takeAStep(value)
+      }
 
-      return stepper.handleEnd(resultCallback)
+      if (ti.isCanceled) return stepper.handleEnd(stepper.handleCancel)       // CANCELED / DROPPED
+      if (!ti.hasStarted) await stepper.handleStart()                         // STARTED
+      const resultCallback = await takeAStep()                                // RESOLVED / REJECTED / CANCELED
+
+      if (keepRunning) return stepper.handleEnd.bind(stepper, resultCallback)
+      else return stepper.handleEnd(resultCallback)
     }
   }
 }

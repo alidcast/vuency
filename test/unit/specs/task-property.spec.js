@@ -3,11 +3,9 @@
 
 import Vue from 'vue'
 import createTaskProperty from 'src/plugin/task-property'
-import { pause } from 'src/util/async'
 
 function * exTask() {
-  yield pause(90)
-  return 'passed'
+  return yield 'passed'
 }
 
 describe('Task Property', function() {
@@ -62,28 +60,26 @@ describe('Task Property', function() {
     expect(tp.isAborted).to.be.false
   })
 
-  it('cancels instance and clears queue', async () => {
-    let ti = tp.run()
-    ti._cancel()
-    await ti._runningOperation
-    expect(ti.isCanceled).to.be.true
-    expect(tp.lastCanceled).to.equal(ti)
-    expect(tp.isActive).to.be.false
-  })
-
-  it('accepts per instance keepAlive options', async () => {
-    let infiniteTp = createTaskProperty(vm, exTask).forCall(1, { keepAlive: true }),
+  it('keep instance alive and runs `onKill` callback', async () => {
+    let infiniteTp = createTaskProperty(vm, exTask)
+                      .nthCall(1, { keepRunning: true })
+                      .onKill(() => {
+                        callback()
+                      }),
         ti1 = infiniteTp.run()
-    await ti1._runningOperation
     expect(infiniteTp.isActive).to.be.true
+    infiniteTp.abort()
+    expect(infiniteTp.isActive).to.be.false
+    await ti1._runningOperation
+    expect(callback.called).to.be.true
   })
 
   it('fires onFinish subscription even if task is dropped', async () => {
     let tp = createTaskProperty(vm, exTask)
-            .flow('drop')
-            .onFinish(() => {
-              callback()
-            }),
+              .flow('drop')
+              .onFinish(() => {
+                callback()
+              }),
         ti1 = tp.run(),
         ti2 = tp.run()
     ti2.cancel()
@@ -140,4 +136,6 @@ describe('Task Property', function() {
       })
     })
   })
+
+  // TODO clears timers
 })

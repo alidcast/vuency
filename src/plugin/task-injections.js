@@ -3,7 +3,7 @@
  * automatically clean up after themselves (or have ways of being identified
  * and canceled) upon task cancelation.
  */
-export default function createTaskInjections(host) {
+export default function createTaskInjections() {
   return {
     timeout: (duration) => createCancelableTimeout(duration)
   }

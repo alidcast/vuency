@@ -8,6 +8,7 @@ export function createQueue(queue = []) {
     forEach: queue.forEach.bind(queue),
     push: queue.push.bind(queue),
     pop: queue.pop.bind(queue),
+    map: queue.map.bind(queue),
 
     /**
      * Adds a list of items to to the queue

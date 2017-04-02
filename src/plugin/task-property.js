@@ -13,7 +13,7 @@ import createTaskListeners from './modifiers/task-listeners'
  */
 export default function createTaskProperty(host, operation, autorun = true) {
   let { policy, ...policyModifiers } = createTaskPolicy(),
-      { subscriptions, ...subscriper } = createTaskSubscriptions(host),
+      { subscriptions, ...subscriber } = createTaskSubscriptions(host),
       { events, watchers } = createTaskListeners(host)
 
   return {
@@ -49,13 +49,13 @@ export default function createTaskProperty(host, operation, autorun = true) {
       if (!this.scheduler) this.scheduler = createTaskScheduler(this, policy)
       this.isAborted = false
       let instanceData = { params, operation: operation.bind(host, ...params) },
-          ti = createTaskInstance(instanceData, subscriper)
+          ti = createTaskInstance(instanceData, subscriber)
       if (autorun) this.scheduler.schedule(ti)
       return ti
     },
 
     /**
-     * Cancels all scheduled task instances.
+     * Cancels and destroys all scheduled task instances.
      */
     abort() {
       let canceledInstances, { scheduler } = this

@@ -13,7 +13,7 @@ import { pause } from '../util/async'
 export default function createTaskScheduler(tp, policy, autorun = true) {
   let waiting = createQueue(),
       running = createQueue(),
-      { flow, delay, maxRunning, bindings } = policy
+      { flow, maxRunning, delay, bindings } = policy
 
   /**
    * Drop instances when total queued reaches concurrency limit.
@@ -56,16 +56,21 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
 
   return {
     /**
-     * Add task instance to waiting queue.
+     * Determines the way the task instance should be scheduled.
      */
     schedule(ti) {
       assignInstanceBindings(ti)
       tp.lastCalled = ti
       if (shouldDrop()) {
-        instance.drop(ti, true).then(() => this.finalize(ti, false))
+        ti._cancel().then(() => this.finalize(ti, false))
+      }
+      else if (shouldRestart()) {
+        cancelQueued(running, 'race').then(() => {
+          waiting.add(ti)
+          if (autorun) this.advance()
+        })
       }
       else if (shouldWait()) {
-        if (shouldRestart()) running.forEach(item => instance.cancel(item))
         waiting.add(ti)
         if (autorun) this.advance()
       }
@@ -74,13 +79,15 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
     },
 
     /**
-     * Move task instance from waiting to running queue.
+     *  Move task instance from waiting to running queue.
+     *  (Can also be advanced directly if called with a task instance.)
      */
     advance(ti = null) {
       if (shouldRun()) {
         if (!ti) ti = waiting.remove().pop()
         tp.lastStarted = ti
-        instance.start(ti, delay).then(() => this.finalize(ti))
+        startInstance(ti, delay)
+          .then(() => this.finalize(ti))
         running.add(ti)
         tp._updateReactive()
       }
@@ -88,11 +95,12 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
     },
 
     /**
-     * Removes the task instance from running and updates last instance data.
+     * Updates last instance and reactive data, and removes the task instance
+     * from running if it wasn't dropped or called with the keep running binding.
      */
     finalize(ti, didRun = true) {
-      let { keepAlive } = ti.bindings
-      if (didRun && !keepAlive) running.extract(item => item === ti)
+      let { keepRunning } = ti.bindings
+      if (didRun && !keepRunning) running.extract(item => item === ti)
       updateLastFinished(tp, ti)
       tp._updateReactive()
       if (autorun && waiting.isActive) this.advance()
@@ -104,13 +112,8 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
      */
     clear() {
       let instances = [].concat(waiting.alias).concat(running.alias)
-      // if one item in queue, then we just handle it directly; this made
-      // the task-graph demo smoother, so it's "noticably" faster. :)
-      // if (waiting.size === 1) waiting.pop()
-      waiting.forEach(item => instance.drop(item, 'self'))
-      running.forEach(item => instance.cancel(item, 'self'))
-      waiting.clear()
-      running.clear()
+      cancelQueued(waiting, 'all').then(waiting.clear())
+      cancelQueued(running, 'all') // running instances clear themselves
       tp._updateReactive()
       return instances
     },
@@ -161,31 +164,37 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
   }
 }
 
+function startInstance(ti, delay) {
+  if (delay > 0) return pause(delay).then(() => ti._start())
+  else return ti._start()
+}
+
+/**
+ * If there's only one item in queue, then we just cancel it directly (this
+ * made the task-graph demo smoother, so it's "noticably" faster). Otherwise,
+ * it's a `Promise.race` or `Promise.all` on all canceled instances.
+ */
+function cancelQueued(queue, type = 'race') {
+  if (queue.size === 1) {
+    let ti = queue.pop()
+    if (ti.bindings.keepRunning) return ti.destroy()
+    else return ti._cancel()
+  }
+  else {
+    let canceledOperations = queue.map(ti => {
+      if (ti.bindings.keepRunning) return ti.destroy()
+      else return ti._cancel()
+    })
+    return Promise[type](canceledOperations)
+  }
+}
+
+// function destroyQueued() {
+//
+// }
+
 function updateLastFinished(tp, ti) {
   if (ti.isCanceled) tp.lastCanceled = ti
   else if (ti.isRejected) tp.lastRejected = ti
   else if (ti.isResolved) tp.lastResolved = ti
-}
-
-/**
- * Handler for per instance operations.
- *
- * We start all task instances, even dropped ones, so that the stepper
- * can handle the per instance logic (it won't actually run the operation).
- */
-const instance = {
-  start(ti, delay) {
-    if (delay > 0) ti._runningOperation = pause(delay).then(() => ti._start())
-    else ti._runningOperation = ti._start()
-    return ti._runningOperation
-  },
-  drop(ti) {
-    ti._runningOperation = ti._cancel()._start()
-    return ti._runningOperation
-  },
-  cancel(ti, canceler = 'scheduler') {
-    let cancelMethod
-    canceler === 'self' ? cancelMethod = 'cancel' : cancelMethod = '_cancel'
-    return ti[cancelMethod]()
-  }
 }

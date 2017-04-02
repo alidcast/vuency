@@ -8,11 +8,11 @@ import createTaskPolicy from 'src/plugin/modifiers/task-policy'
 import { pause } from 'src/util/async'
 
 function * exTask(error = false) {
-  yield pause(90)
+  yield pause(5)
   if (error) {
     throw new Error()
   }
-  return 'passed'
+  return yield 'passed'
 }
 
 describe('Task Scheduler', function() {
@@ -79,8 +79,8 @@ describe('Task Scheduler', function() {
 
   it('finalizes canceled instances', async () => {
     scheduler.schedule(ti1).advance()
-    ti1._cancel()
-    await ti1._runningOperation
+    await ti1._cancel()
+    await pause(5) // make up for timer
     expect(tp.lastCanceled).to.equal(ti1)
     expect(scheduler.running.size).to.equal(0)
     expect(scheduler.running.isActive).to.be.false
@@ -208,7 +208,9 @@ describe('Task Scheduler', function() {
   it('(restart) restarts previous calls and updates last', async () => {
     let restartPolicy = createTaskPolicy('restart', 1).policy,
         restartScheduler = createTaskScheduler(tp, restartPolicy, true)
-    restartScheduler.schedule(ti1).schedule(ti2)
+    restartScheduler
+      .schedule(ti1) // canceled
+      .schedule(ti2) // started
     await ti1._runningOperation
     await ti2._runningOperation
     expect(tp.lastStarted).to.equal(ti2)

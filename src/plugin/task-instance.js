@@ -15,7 +15,7 @@ export default function createTaskInstance(data, subscriber) {
     // per instance data
     params,
     bindings: {
-      keepAlive: false
+      keepRunning: false
     },
     // results
     value: null,
@@ -42,22 +42,37 @@ export default function createTaskInstance(data, subscriber) {
 
     _start() {
       if (!stepper) stepper = createTaskStepper(this, subscriber)
-      return stepper.stepThrough()
+      this._runningOperation = stepper.stepThrough()
+      return this._runningOperation
     },
 
     /**
-     * To differentiate between self cancelation versus scheduler cancelation,
-     * the task instance has both a private and public `cancel` method.
+     *  An instance can be canceled by the scheduler (e.g. due to flow control)
+     *  or self canceled (e.g. if the task was aborted).
      */
     selfCanceled: false,
-    _cancel() {
-      if (!stepper) stepper = createTaskStepper(this, subscriber)
-      return stepper.triggerCancel()
+    cancel() { // self canceled
+      this._cancel('self')
+      return this
     },
-    cancel() {
+    _cancel(canceler = 'scheduler') { // scheduler canceled
       if (!stepper) stepper = createTaskStepper(this, subscriber)
-      this.selfCanceled = true
-      return stepper.triggerCancel()
+      if (canceler === 'self') this.selfCanceled = true
+      stepper.triggerCancel()
+      // We "start" the dropped instances so that the stepper can handle
+      // the per instance logic (it won't actually run the operation).
+      if (this.isDropped) this._start()
+      return this._runningOperation
+    },
+
+    /**
+     * To finalize an instance that was called with the `keepRunning` binding,
+     * we call the resulting handle method returned by the stepper.
+     */
+    destroy() {
+      if (!this.isFinished) this.cancel()
+      this._runningOperation.then(resolved => resolved())
+      return this._runningOperation
     }
   }
 }
