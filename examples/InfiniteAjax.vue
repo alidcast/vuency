@@ -62,7 +62,7 @@ export default {
       })
       .flow('drop')
       .nthCall(1, { keepRunning: true })
-      .onKill(() => {
+      .onDestroy(() => {
         loopingAjax.abort()
         this.instances = []
       })
