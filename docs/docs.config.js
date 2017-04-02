@@ -2,6 +2,7 @@ module.exports = {
   menu: [
     [
       'introduction',
+      'installation',
       'getting-started'
     ],
     ['core-concepts',
@@ -9,7 +10,8 @@ module.exports = {
         'task-flow',
         'task-state',
         'task-cancelation',
-        'task-subscriptions'
+        'task-subscriptions',
+        'task-bindings'
       ]
     ],
     ['API',
