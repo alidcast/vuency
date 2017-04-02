@@ -1,8 +1,6 @@
 # Vuency  
 
-> Gain complete control and transparency over the execution of concurrent and asyncronous operations, with almost no code.
-
-*Inspired by [ember-concurrency](https://github.com/machty/ember-concurrency)*.
+> Gain complete control and transparency over the execution of concurrent and asyncronous operations, with almost no code. (*Inspired by [ember-concurrency](https://github.com/machty/ember-concurrency)*).
 
 # 🚧 Under active development.
 
