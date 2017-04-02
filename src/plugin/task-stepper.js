@@ -68,7 +68,7 @@ export default function createTaskStepper(ti, callbacks) {
     handleEnd(resultCallback) {
       resultCallback()
       callbacks.onFinish(ti)
-      if (keepRunning) callbacks.onKill(ti)
+      if (keepRunning) callbacks.onDestroy(ti)
       return ti
     },
 

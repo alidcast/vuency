@@ -60,10 +60,10 @@ describe('Task Property', function() {
     expect(tp.isAborted).to.be.false
   })
 
-  it('keep instance alive and runs `onKill` callback', async () => {
+  it('keep instance alive and runs `onDestroy` callback', async () => {
     let infiniteTp = createTaskProperty(vm, exTask)
                       .nthCall(1, { keepRunning: true })
-                      .onKill(() => {
+                      .onDestroy(() => {
                         callback()
                       }),
         ti1 = infiniteTp.run()

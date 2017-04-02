@@ -24,7 +24,7 @@ export default function createTaskSubscriber(host) {
       errorFn,
       successFn,
       finishFn,
-      killFn
+      destroyFn
 
   return {
     /**
@@ -57,8 +57,8 @@ export default function createTaskSubscriber(host) {
     /**
      * `On` property callbacks.
      */
-    onKill(taskInstance) {
-      if (killFn) Reflect.apply(killFn, host, [taskInstance])
+    onDestroy(taskInstance) {
+      if (destroyFn) Reflect.apply(destroyFn, host, [taskInstance])
     },
 
     subscriptions: {
@@ -86,8 +86,8 @@ export default function createTaskSubscriber(host) {
         finishFn = fn
         return this
       },
-      onKill(fn) {
-        killFn = fn
+      onDestroy(fn) {
+        destroyFn = fn
         return this
       }
     }
