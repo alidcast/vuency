@@ -12,7 +12,7 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
-    "brace-style": ["error", "stroustrup"],
+    "brace-style": ["error", "1tbs"],
     "one-var": ["error", "always"],
     "space-before-function-paren": ["error", {
       "anonymous": "never",
