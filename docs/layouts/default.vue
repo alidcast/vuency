@@ -4,10 +4,8 @@
       div.sidebar-header(slot="top")
         a.site-title(href="/") Vuency
         p.site-slogan Concurrency management <span> for Vuejs. </span>
-
       div.sidebar-menu(slot="middle")
         VerticalMenu(:menu="menu")
-
       div.sidebar-links(slot="bottom")
         a.github-link(href="https://github.com/alidcastano/vuency")
           span.icon-github
@@ -38,9 +36,10 @@ export default {
 @import "../assets/sass/global.sass"
 
 .main
-  margin-left: 18rem
+  margin-left: 20rem
 
 .sidebar-content
+  width: 15rem
   padding-left: 1rem
   // removed hyperlink styles
   a
@@ -70,12 +69,13 @@ export default {
   .sidebar-menu
     padding: 1rem 1rem 1rem 1.5rem
   .sidebar-links
+    // button theme
+    background-color: #408c7a
+    padding: .5rem 4rem
     .github-link
-      // button theme
-      background-color: #408c7a
-      padding: .5rem 4rem
-      +flex-contain(row)
       +flex-place('children', center, center)
+      .icon-github, .plugin-version
+        +flex-span(25%)
       .icon-github
         font-size: 2.25rem
         color: #fff
