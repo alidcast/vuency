@@ -22,9 +22,9 @@ module.exports = {
     ],
     ['examples',
       [
-        'coin-flip',
-        'countdown-timer',
-        'infinite-ajax',
+        // 'coin-flip',
+        // 'countdown-timer',
+        // 'infinite-ajax',
         'question-genie'
       ]
     ]
