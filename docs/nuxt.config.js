@@ -3,7 +3,7 @@ const resolve = require('path').resolve,
 
 module.exports = {
   head: {
-    title: 'starter',
+    title: 'Vuency',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -26,7 +26,6 @@ module.exports = {
       // aliases
       config.resolve.alias['~articles'] = resolve(__dirname, 'articles')
       config.resolve.alias['~utilities'] = resolve(__dirname, 'utilities')
-      config.resolve.alias['~examples'] = resolve(__dirname, '../examples')
       // loaders
       config.module.rules.push({
         test: /\.md/,
@@ -42,7 +41,6 @@ module.exports = {
       }
     },
     vendor: [
-      'axios',
       'vuency'
     ]
   },
@@ -50,23 +48,21 @@ module.exports = {
     '~plugins/vuency'
   ],
   generate: {
-    routeParams: {
-      '/guide/:slug': menuToRouteParams(config.menu)
-    }
+    routes: menuToRoutes(config.menu)
   }
 }
 
-/**
+/** TODO fix for nuxt routes change
  * Convert a list of menu items to an array of dynamic route params.
  *
  * For simplicity, we ignore group headings and just create a top level route
  * for each subsection.
  */
-function menuToRouteParams(menu, query = 'slug') {
+function menuToRoutes(menu, query = 'guide') {
   let routes = []
   menu.forEach(group => {
-    if (group[1] instanceof Array) group[1].forEach(subsection => routes.push({ [query]: subsection }))
-    else group.forEach(section => routes.push({ [query]: section }))
+    if (group[1] instanceof Array) group[1].forEach(subsection => routes.push(`/${query}/${subsection}`))
+    else group.forEach(section => routes.push(`/${query}/${section}`))
   })
   return routes
 }

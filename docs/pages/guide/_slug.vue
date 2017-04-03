@@ -8,7 +8,7 @@ import docs from '~articles/index'
 import { toHeading } from '~utilities/to-transforms'
 
 export default {
-  data: ({ params }) => ({
+  asyncData: ({ params }) => ({
     currentArticle: params.slug || 'introduction'
   }),
 
