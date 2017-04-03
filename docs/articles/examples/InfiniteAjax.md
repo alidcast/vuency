@@ -1,5 +1,5 @@
 <script>
-import InfiniteAjax from '~examples/InfiniteAjax.vue'
+import InfiniteAjax from '~components/tasks/examples/InfiniteAjax.vue'
 
 export default {
   components: {

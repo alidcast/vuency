@@ -1,5 +1,5 @@
 <script>
-import QuestionGenie from '~examples/QuestionGenie.vue'
+import QuestionGenie from '~components/tasks/examples/QuestionGenie.vue'
 
 export default {
   components: {

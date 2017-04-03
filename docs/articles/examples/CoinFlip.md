@@ -1,5 +1,5 @@
 <script>
-import CoinFlip from '~examples/CoinFlip.vue'
+import CoinFlip from '~components/tasks/examples/CoinFlip.vue'
 
 export default {
   components: {
@@ -32,7 +32,7 @@ export default {
     // Don't allow repeat calls to fire (one flip at a time!).
     .flow('drop')
     // Cleanup after each flip.
-    .beforeStart(function() {
+    .beforeStart(function () {
       this.answer = ''
     })
   })

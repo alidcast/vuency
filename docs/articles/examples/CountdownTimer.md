@@ -1,5 +1,5 @@
 <script>
-import CountdownTimer from '~examples/CountdownTimer.vue'
+import CountdownTimer from '~components/tasks/examples/CountdownTimer.vue'
 
 export default {
   components: {

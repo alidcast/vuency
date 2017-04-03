@@ -1,35 +1,32 @@
 <template>
-  <div>
+  <div class="question-genie">
     <p>
-      Ask a yes/no question: <input v-model="question">
+      Ask a yes/no question: <input id="question" v-model="question">
     </p>
-    <p>{{ answer }}</p>
+    <p id="answer">{{ answer }}</p>
   </div>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      question: '',
-      answer: 'I cannot give you an answer until you ask a question!'
-    }
-  },
-  tasks(t, { pause }) {
+  data: () => ({
+    question: '',
+    answer: ''
+  }),
+  tasks(t, { timeout }) {
     return t(function * getAnswer() {
       this.answer = 'Thinking...'
-      yield pause(200)
+      yield timeout(600)
       this.answer = Math.random() < 0.5 ? 'Yes' : 'No'
     })
-    .flow('restart', 400).runWith('question')
-    .beforeStart(({ cancel }) => {
+    .flow('restart', { delay: 400 }).runWith('question', { immediate: true })
+    .beforeStart(instance => {
       if (this.question.length === 0) {
         this.answer = 'Questions must contain words!'
-        cancel()
-      }
-      else if (this.question.indexOf('?') === -1) {
+        instance.cancel()
+      } else if (this.question.indexOf('?') === -1) {
         this.answer = 'Questions usually contain a question mark. ;-)'
-        cancel()
+        instance.cancel()
       }
     })
     .onCancel(({ selfCanceled }) => {
