@@ -1,5 +1,5 @@
-const resolve = require('path').resolve
-const config = require('./docs.config')
+const resolve = require('path').resolve,
+      config = require('./docs.config')
 
 module.exports = {
   head: {
@@ -22,14 +22,13 @@ module.exports = {
     color: '#3B8070'
   },
   build: {
-    extend (config, ctx) {
+    extend(config, ctx) {
       // aliases
       config.resolve.alias['~articles'] = resolve(__dirname, 'articles')
       config.resolve.alias['~utilities'] = resolve(__dirname, 'utilities')
       config.resolve.alias['~examples'] = resolve(__dirname, '../examples')
       // loaders
-      config.module.rules.push(
-      {
+      config.module.rules.push({
         test: /\.md/,
         loader: 'vue-markdown-loader'
       })
@@ -66,10 +65,8 @@ module.exports = {
 function menuToRouteParams(menu, query = 'slug') {
   let routes = []
   menu.forEach(group => {
-    if (group[1] instanceof Array)
-      group[1].forEach(subsection => routes.push({ [query]: subsection }))
-    else
-      group.forEach(section => routes.push({ [query]: section }))
+    if (group[1] instanceof Array) group[1].forEach(subsection => routes.push({ [query]: subsection }))
+    else group.forEach(section => routes.push({ [query]: section }))
   })
   return routes
 }
