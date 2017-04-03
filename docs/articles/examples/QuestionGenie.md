@@ -16,7 +16,6 @@ export default {
     <QuestionGenie />
 </div>
 
-
 #### Javascript
 
 ```js

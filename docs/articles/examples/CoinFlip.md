@@ -14,7 +14,6 @@ export default {
     <CoinFlip />
 </div>
 
-
 #### Javascript
 
 ```js

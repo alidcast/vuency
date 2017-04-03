@@ -16,7 +16,6 @@ export default {
 
 #### Javascript
 
-
 ```js
 export default {
   data: () => ({
