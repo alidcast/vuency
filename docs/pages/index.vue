@@ -12,7 +12,7 @@
           div
             h4 Manage the flow of repeat requests
             p
-              | Vuency has task scheduling and cancelation baked in, so
+              | Vuency has task scheduling and cancellation baked in, so
               | controlling if and how repeat calls to the same operation
               | are run is effortless.
         li.benefit-section
@@ -20,7 +20,7 @@
           div
             h4 Handle common UI operations
             p
-              | Vuency has a task's state is baked in, so common UI operations
+              | Vuency has a task's state baked in, so common UI operations
               | such as displaying loading spinners or styling inactive buttons
               | take minimal code.
         li.benefit-section
