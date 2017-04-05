@@ -5,8 +5,8 @@
       h3.intro-description
         | Gain complete control and transparency over the execution of concurrent
         |  and asyncronous operations, with almost no code.
-    div
-      ul.benefits-container
+    div.benefits-container
+      ul
         li.benefit-section
           span.icon-control
           div
@@ -64,6 +64,8 @@
   +flex-contain(row, wrap)
   +flex-place('children', start, top)
   margin: 3rem auto 0 auto
+  ul
+    padding-left: 0
   .benefit-section
     +flex-span(100%)
     +flex-contain(row, wrap)
@@ -73,7 +75,7 @@
       +flex-span(50%)
     span
       font-size: 1.5rem
-      padding: 0 .5rem
+      padding: 0 .5rem 0 0
       +media('>tablet')
         font-size: 2rem
     h4
@@ -88,7 +90,7 @@
   .action-link
     +flex-span(40%)
     +flex-place('children', center, center)
-    margin: 2rem
+    margin: .5rem
     // button theme
     background-color: #3b8070
     border-color: #3b8070
@@ -97,6 +99,7 @@
     padding: .5rem 0 .025rem 0
     +media('>tablet')
       +flex-span(30%)
+      margin: 2rem
       padding: .5rem .5rem .125rem .5rem
     p
       font-size: 1.125rem
