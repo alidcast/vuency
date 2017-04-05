@@ -50,18 +50,20 @@
 .landing-container
   max-width: 55rem
   margin: 0 auto
+
 .intro-container
   width: 88%
   margin: 0 auto
-  padding-left: 2rem
+  +media('>tablet')
+    padding-left: 2rem
   .intro-description
     font-weight: 400
     margin-top: 0
 
 .benefits-container
   +flex-contain(row, wrap)
-  +flex-place('children', space-between, top)
-  margin-top: 3rem
+  +flex-place('children', start, top)
+  margin: 3rem auto 0 auto
   .benefit-section
     +flex-span(100%)
     +flex-contain(row, wrap)

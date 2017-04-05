@@ -18,7 +18,7 @@ export default {
 @import "../assets/sass/global.sass"
 
 .main
-  padding: 1rem
+  padding: .75rem
   +media('>tablet')
     margin-left: 18rem
 </style>

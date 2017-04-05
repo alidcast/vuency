@@ -55,7 +55,8 @@ export default {
   +flex-place('children', end, center)
   width: 100vw
   height: 4rem
-  +media('<=tablet')
+  padding: 0 .75rem
+  +media('>phone')
     padding: 0 2rem
   +media('>tablet')
     +flex-contain(column)
@@ -99,12 +100,15 @@ export default {
   position: relative
 .mobile-menu-button
   display: block
-  margin: 1rem 2rem
-  padding: .5rem .75rem
+  margin: 1rem 1rem
+  padding: .3rem .5rem
   background-color: #3b8070
   border: #3b8070 1px solid
   color: #fff
   border-radius: .4rem
+  +media('>phone')
+    margin: 1rem 2rem
+    padding: .5rem .75rem
   +media('>tablet')
     display: none
 .main-menu
@@ -124,7 +128,6 @@ export default {
   .icon-github
     font-size: 2rem
     color: #408c7a
-    margin: .25rem
   .plugin-version
     display: none
   +media('>tablet')
