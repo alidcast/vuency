@@ -24,7 +24,6 @@ export default {
 
 <style lang="sass">
 .content
-  margin: 2.5rem 0 4rem 0
   max-width: 40rem
   // content styles
   h1

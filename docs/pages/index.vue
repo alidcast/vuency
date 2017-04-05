@@ -50,7 +50,6 @@
 .landing-container
   max-width: 55rem
   margin: 0 auto
-  margin-top: 2.5rem
 .intro-container
   width: 88%
   margin: 0 auto
@@ -58,38 +57,48 @@
   .intro-description
     font-weight: 400
     margin-top: 0
+
 .benefits-container
   +flex-contain(row, wrap)
   +flex-place('children', space-between, top)
   margin-top: 3rem
   .benefit-section
-    +flex-span(50%)
+    +flex-span(100%)
     +flex-contain(row, wrap)
     +flex-place('children', center, start)
     padding: .25rem
+    +media('>tablet')
+      +flex-span(50%)
     span
-      +flex-span(16%)
-      font-size: 2rem
+      font-size: 1.5rem
+      padding: 0 .5rem
+      +media('>tablet')
+        font-size: 2rem
     h4
       margin-top: 0
     div
       +flex-span(84%)
+
 .actions-container
   +flex-contain(row, wrap)
   +flex-place('children', center, center)
   text-align: center
   .action-link
-    +flex-span(25%)
-    +flex-place('self', space-between, center)
+    +flex-span(40%)
+    +flex-place('children', center, center)
     margin: 2rem
     // button theme
     background-color: #3b8070
     border-color: #3b8070
     color: #fff
-    // button styling
-    padding: .5rem .5rem .125rem .5rem
     border-radius: .4rem
+    padding: .5rem 0 .025rem 0
+    +media('>tablet')
+      +flex-span(30%)
+      padding: .5rem .5rem .125rem .5rem
     p
-      font-size: 1.75rem
+      font-size: 1.125rem
       +flex-place('self', center, center)
+      +media('>tablet')
+        font-size: 1.75rem
 </style>

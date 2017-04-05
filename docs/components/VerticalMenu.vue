@@ -41,6 +41,14 @@ export default {
 </script>
 
 <style lang="sass">
+.menu-container
+  ul
+    list-style: none
+    padding-left: 0
+  a
+    &:hover
+      text-decoration: none
+
 .group-heading
   margin-bottom: .75rem
   font-size: .9rem
