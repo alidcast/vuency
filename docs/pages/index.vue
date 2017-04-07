@@ -54,23 +54,28 @@
 .intro-container
   width: 88%
   margin: 0 auto
-  +media('>tablet')
-    padding-left: 2rem
+  .intro-title
+    font-size: 1.5rem
+    +media('>tablet')
+      font-size: 2.5rem
   .intro-description
+    font-size: 1.125rem
     font-weight: 400
     margin-top: 0
+    +media('>tablet')
+      font-size: 1.5rem
 
 .benefits-container
-  +flex-contain(row, wrap)
-  +flex-place('children', start, top)
   margin: 3rem auto 0 auto
   ul
     padding-left: 0
+    +flex-contain(row, wrap)
+    +flex-place('children', start, top)
   .benefit-section
-    +flex-span(100%)
     +flex-contain(row, wrap)
     +flex-place('children', center, start)
     padding: .25rem
+    +flex-span(100%)
     +media('>tablet')
       +flex-span(50%)
     span
@@ -97,6 +102,7 @@
     color: #fff
     border-radius: .4rem
     padding: .5rem 0 .025rem 0
+    text-decoration: none
     +media('>tablet')
       +flex-span(30%)
       margin: 2rem

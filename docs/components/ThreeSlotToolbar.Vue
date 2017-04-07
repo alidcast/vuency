@@ -59,21 +59,19 @@ export default {
   +media('>phone')
     padding: 0 2rem
   +media('>tablet')
-    +flex-contain(column)
+    +flex-contain(column, nowrap)
     +flex-place('children', start, center)
     +position('fixed', 0, null, 0, 0)
-    max-width: 100%
     width: 15rem
+    max-width: 100%
     height: 100vh
 .toolbar-start
   text-align: center
   +media('<=tablet')
     +flex-place('self', start, center)
   +media('>tablet')
+    margin-top: 1rem
     margin-bottom: 2rem
-.toolbar-center, .toolbar-end
-  +media('>tablet')
-    width: 100%
 
 // title is always shown, but slogan is only shown in sidebar display
 .site-title
@@ -88,7 +86,7 @@ export default {
     display: block
     +position(relative)
     margin: 0 auto
-    font-size: 90%
+    font-size: 88%
     font-weight: 400
     text-align: left
     span
@@ -96,8 +94,11 @@ export default {
       +position(absolute, null, 0, null, null)
 
 // mobile menu displayed on click, sidebar menu is always shown
-.menu-containter
+.menu-container
   position: relative
+  +media('>tablet')
+    height: 70%
+    width: 111.25%
 .mobile-menu-button
   display: block
   margin: 1rem 1rem
@@ -113,18 +114,22 @@ export default {
     display: none
 .main-menu
   +color('primary 50')
-  +position(absolute, 4rem, 0, 0, 0)
   padding: 1rem .5rem 1rem 1.5rem
   overflow: scroll
+  +media('<=tablet')
+    +position(absolute, 4rem, 0, 0, 0)
   +media('>tablet')
     // override mobile data
     display: block !important
-    +position(relative, 0, 0, 0, 0)
+    height: 100%
     // theme
     border-top: #3b8070 2px solid
     border-left: #3b8070 2px solid
 
 .github-link
+  +media('>tablet')
+    width: 100%
+    margin-left: .75rem
   .icon-github
     font-size: 2rem
     color: #408c7a
