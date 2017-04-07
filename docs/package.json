@@ -34,6 +34,6 @@
     "push-dir": "^0.4.1",
     "sass-loader": "^4.1.1",
     "vue-markdown-loader": "^0.6.1",
-    "vuency": "0.0.32"
+    "vuency": "0.0.33"
   }
 }
