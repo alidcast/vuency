@@ -63,12 +63,8 @@ export default function createTaskScheduler(tp, policy, autorun = true) {
       tp.lastCalled = ti
       if (shouldDrop()) {
         ti._cancel().then(() => this.finalize(ti, false))
-      } else if (shouldRestart()) {
-        cancelQueued(running, 'race').then(() => {
-          waiting.add(ti)
-          if (autorun) this.advance()
-        })
       } else if (shouldWait()) {
+        if (shouldRestart()) cancelQueued(running)
         waiting.add(ti)
         if (autorun) this.advance()
       } else this.advance(ti)

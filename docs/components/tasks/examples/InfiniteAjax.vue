@@ -19,7 +19,7 @@
         <li v-for="(instance, index) in instances" v-if="instance.isRunning">
           <button @click="instance.cancel()">
               Cancel Task: {{ index }}
-            </button>
+          </button>
         </li>
       </ul>
     </div>
