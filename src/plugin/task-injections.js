@@ -18,17 +18,16 @@ export default function createTaskInjections() {
  *  @notes
  *    - Super() does not have `this` context so we have to create the timer
  *      via a factory function and use closures for the cancelation data.
- *    - Methods outside the consctutor do not persist with the extended
+ *    - Methods outside the constuctor do not persist with the extended
  *      promise object so we have to declare them via `this`.
  *  @constructor Timer
  */
 function createCancelableTimeout(duration) {
-  // let timerData = new WeakMap()
   let timerId, clearPromise
   class Timer extends Promise {
     constructor() {
       // Promise Construction
-      super(resolve => {
+      super((resolve, reject) => {
         clearPromise = resolve
         timerId = setTimeout(resolve, duration)
       })
@@ -38,9 +37,10 @@ function createCancelableTimeout(duration) {
         clearPromise()
         clearTimeout(timerId)
         this.isCanceled = true
-        return 'hello'
       }
     }
   }
+  // For this to work in Safari, we have to convert the timer back to a Promise
+  Timer.prototype.constructor = Promise
   return new Timer()
 }
