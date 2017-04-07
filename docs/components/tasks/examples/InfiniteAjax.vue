@@ -1,6 +1,13 @@
 <template>
   <div class="infinite-ajax">
-    <div class="ajax-controls">
+    <ul class="ajax-calls">
+      <li v-for="log in logs"
+          :style="{ color: log.color }">
+        {{ log.message }}
+      </li>
+    </ul>
+
+    <div class="ajax-controls" v-if="logs">
       <button v-if="infiniteAjax.isActive" @click="infiniteAjax.abort()">
         Nuke All
       </button>
@@ -16,13 +23,6 @@
         </li>
       </ul>
     </div>
-
-    <ul class="ajax-calls">
-      <li v-for="log in logs"
-          :style="{ color: log.color }">
-        {{ log.message }}
-      </li>
-    </ul>
   </div>
 </template>
 
@@ -91,7 +91,16 @@ export default {
   vertical-align: top;
   margin: 1rem;
 }
+
+.ajax-calls {
+  width: 60%
+}
+
 .ajax-controls {
   min-width: 20%;
+}
+.ajax-controls ul {
+  list-style: none;
+  padding-left: 0;
 }
 </style>

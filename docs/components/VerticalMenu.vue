@@ -46,6 +46,7 @@ export default {
     list-style: none
     padding-left: 0
   a
+    color: inherit
     &:hover
       text-decoration: none
 

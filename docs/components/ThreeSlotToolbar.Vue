@@ -70,7 +70,7 @@ export default {
   +media('<=tablet')
     +flex-place('self', start, center)
   +media('>tablet')
-    margin-top: 1rem
+    margin-top: .25rem
     margin-bottom: 2rem
 
 // title is always shown, but slogan is only shown in sidebar display

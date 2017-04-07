@@ -18,7 +18,7 @@
     "normalize.css": "^5.0.0",
     "nuxt": "^0.10.3",
     "sass-chunks": "file:///Users/acastano/Sites/vue/sass-chunks",
-    "vuency": "0.0.31"
+    "vuency": "latest"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
@@ -33,6 +33,7 @@
     "pug": "^2.0.0-beta11",
     "push-dir": "^0.4.1",
     "sass-loader": "^4.1.1",
-    "vue-markdown-loader": "^0.6.1"
+    "vue-markdown-loader": "^0.6.1",
+    "vuency": "0.0.32"
   }
 }
