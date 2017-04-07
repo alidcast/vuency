@@ -6,8 +6,7 @@
   "plugins": [
     "transform-runtime",
     "transform-vue-jsx",
-    "transform-decorators-legacy",
-    "transform-class-properties"
+    "transform-decorators-legacy"
   ],
   "comments": false
 }
