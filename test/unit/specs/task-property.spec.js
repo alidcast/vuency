@@ -136,6 +136,4 @@ describe('Task Property', function() {
       })
     })
   })
-
-  // TODO clears timers
 })

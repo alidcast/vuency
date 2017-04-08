@@ -4,11 +4,10 @@
 import createTaskStepper from 'src/plugin/task-stepper'
 import createTaskInstance from 'src/plugin/task-instance'
 import createTaskSubscriptions from 'src/plugin/modifiers/task-subscriptions'
-import createTaskInjections from 'src/plugin/task-injections'
 import { pause } from 'src/util/async'
+import { createCancelableTimeout } from 'src/plugin/task-injections'
 
-let { ...subscriber } = createTaskSubscriptions(),
-    { provider } = createTaskInjections()
+let { ...subscriber } = createTaskSubscriptions()
 
 function * exTask() {
   return 'success'
@@ -18,7 +17,7 @@ describe('Task Stepper', function() {
   it('solves empty function', async () => {
     let operation = function * () {},
         ti = createTaskInstance({ operation }),
-        stepper = createTaskStepper(ti, subscriber, provider)
+        stepper = createTaskStepper(ti, subscriber)
     await stepper.stepThrough()
     expect(ti.value).to.be.undefined
     expect(ti.error).to.be.null
@@ -26,7 +25,7 @@ describe('Task Stepper', function() {
 
   it('resolves yields from primitives', async () => {
     let ti = createTaskInstance({ operation: exTask }),
-        stepper = createTaskStepper(ti, subscriber, provider)
+        stepper = createTaskStepper(ti, subscriber)
     await stepper.stepThrough()
     expect(ti.value).to.equal('success')
   })
@@ -36,7 +35,7 @@ describe('Task Stepper', function() {
           return yield sinon.stub().returns('success')()
         },
         ti = createTaskInstance({ operation }),
-        stepper = createTaskStepper(ti, subscriber, provider)
+        stepper = createTaskStepper(ti, subscriber)
     await stepper.stepThrough()
     expect(ti.value).to.equal('success')
   })
@@ -49,7 +48,7 @@ describe('Task Stepper', function() {
           return yield asyncFn()
         },
         ti = createTaskInstance({ operation }),
-        stepper = createTaskStepper(ti, subscriber, provider)
+        stepper = createTaskStepper(ti, subscriber)
     await stepper.stepThrough()
     expect(ti.isResolved).to.true
     expect(ti.value).to.equal('success')
@@ -60,7 +59,7 @@ describe('Task Stepper', function() {
           return 'success'
         },
         ti = createTaskInstance({ operation }),
-        stepper = createTaskStepper(ti, subscriber, provider)
+        stepper = createTaskStepper(ti, subscriber)
     await stepper.stepThrough()
     expect(ti.hasStarted).to.be.true
     expect(ti.isResolved).to.be.true
@@ -74,7 +73,7 @@ describe('Task Stepper', function() {
           return yield sinon.stub().returns('failed').throws()()
         },
         ti = createTaskInstance({ operation }),
-        stepper = createTaskStepper(ti, subscriber, provider)
+        stepper = createTaskStepper(ti, subscriber)
     await stepper.stepThrough()
     expect(ti.isRejected).to.be.true
     expect(ti.isResolved).to.be.false
@@ -86,7 +85,7 @@ describe('Task Stepper', function() {
 
   it('drops the task', () => {
     let ti = createTaskInstance({ operation: exTask }),
-        stepper = createTaskStepper(ti, subscriber, provider)
+        stepper = createTaskStepper(ti, subscriber)
     stepper.triggerCancel()
     stepper.stepThrough()
     expect(ti.hasStarted).to.be.false
@@ -101,7 +100,7 @@ describe('Task Stepper', function() {
           return yield pause(500)
         },
         ti = createTaskInstance({ operation }),
-        stepper = createTaskStepper(ti, subscriber, provider),
+        stepper = createTaskStepper(ti, subscriber),
         ongoing = stepper.stepThrough()
     stepper.triggerCancel()
     await ongoing
@@ -110,6 +109,31 @@ describe('Task Stepper', function() {
     expect(ti.isRejected).to.be.false
     expect(ti.value).to.be.null
     expect(ti.error).to.be.null
+  })
+
+  it('clears timeout upon cancelation', async () => {
+    let timeoutPreTest = createCancelableTimeout(600),
+        timeout,
+        operation = function * () {
+          timeout = createCancelableTimeout(1800)
+          yield timeout
+        },
+        ti = createTaskInstance({ operation }, subscriber),
+        stepper = createTaskStepper(ti, subscriber)
+
+    // test timeout cancelation individually
+    timeoutPreTest._cancel_()
+    expect(timeoutPreTest._v).to.be.equal('timeout canceled')
+    expect(timeoutPreTest.isCanceled).to.be.true
+
+    // test stepper cancelation of timeout
+    stepper.stepThrough()
+    await pause(0) // wait for timeout to be set
+    stepper.triggerCancel()
+    await timeout
+    expect(ti.isCanceled).to.be.true
+    expect(timeout.isCanceled).to.be.true
+    expect(timeout._v).to.be.equal('timeout canceled')
   })
 
   it('runs finally block upon completion', async () => {
@@ -123,7 +147,7 @@ describe('Task Stepper', function() {
           }
         },
         ti = createTaskInstance({ operation }),
-        stepper = createTaskStepper(ti, subscriber, provider),
+        stepper = createTaskStepper(ti, subscriber),
         ongoing = stepper.stepThrough()
     await ongoing
     expect(result).to.equal('finally')
@@ -140,7 +164,7 @@ describe('Task Stepper', function() {
           }
         },
         ti = createTaskInstance({ operation }),
-        stepper = createTaskStepper(ti, subscriber, provider),
+        stepper = createTaskStepper(ti, subscriber),
         ongoing = stepper.stepThrough()
     stepper.triggerCancel()
     await ongoing
@@ -175,7 +199,7 @@ describe('Task Stepper', function() {
     }
 
     let ti = createTaskInstance({ operation: taskReq }),
-        stepper = createTaskStepper(ti, subscriber, provider)
+        stepper = createTaskStepper(ti, subscriber)
     await stepper.stepThrough()
     expect(ti.isResolved).to.be.true
     expect(ti.isRejected).to.be.false

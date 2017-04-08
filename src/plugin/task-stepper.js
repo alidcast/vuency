@@ -54,13 +54,15 @@ export default function createTaskStepper(ti, callbacks) {
      */
     triggerCancel() {
       if (ti.isFinished) return ti
+      // cancel timeout/promises as soon as cancelation is fired
+      // so that it does not outlive operation lifespan
+      if (cancelablePromise) cancelablePromise._cancel_()
       ti.isCanceled = true
       ti._updateComputed()
       return ti
     },
     handleCancel() {
       iter.return() // cause iter to terminate; still runs finally clause
-      if (cancelablePromise) cancelablePromise._cancel_()
       callbacks.onCancel(ti)
       return ti
     },

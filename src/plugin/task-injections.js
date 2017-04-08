@@ -22,21 +22,25 @@ export default function createTaskInjections() {
  *      promise object so we have to declare them via `this`.
  *  @constructor Timer
  */
-function createCancelableTimeout(duration) {
-  let timerId, clearPromise
+export function createCancelableTimeout(duration) {
+  let timerId, cancelPromise
   class Timer extends Promise {
     constructor() {
       // Promise Construction
       super((resolve, reject) => {
-        clearPromise = resolve
-        timerId = setTimeout(resolve, duration)
+        cancelPromise = resolve.bind(null, 'timeout canceled')
+        timerId = setTimeout(function() {
+          resolve('timeout done')
+        }, duration)
       })
       // Timer Cancelation
       this.isCanceled = false
-      this._cancel_ = function() {
-        clearPromise()
-        clearTimeout(timerId)
-        this.isCanceled = true
+      this._cancel_ = () => {
+        if (this._v !== 'timeout done') {
+          cancelPromise()
+          clearTimeout(timerId)
+          this.isCanceled = true
+        }
       }
     }
   }
