@@ -54,15 +54,15 @@ export default function createTaskStepper(ti, callbacks) {
      */
     triggerCancel() {
       if (ti.isFinished) return ti
-      // cancel timeout/promises as soon as cancelation is fired
-      // so that it does not outlive operation lifespan
+      // cancel timeout/promises as soon as cancelation is triggered
+      // so that it does not outlive operation lifespan in the UI interaction
       if (cancelablePromise) cancelablePromise._cancel_()
       ti.isCanceled = true
       ti._updateComputed()
       return ti
     },
     handleCancel() {
-      iter.return() // cause iter to terminate; still runs finally clause
+      if (!ti.isDropped) iter.return() // cause iter to terminate; still runs finally clause.
       callbacks.onCancel(ti)
       return ti
     },
@@ -88,8 +88,6 @@ export default function createTaskStepper(ti, callbacks) {
       async function takeAStep(prev = undefined) {
         let value, done
 
-        if (ti.isCanceled) return stepper.handleCancel                        // CANCELED / POST-START
-
         try {
           ({ value, done } = await stepper.handleYield(prev))
         } catch (err) {                                                         // REJECTED
@@ -97,14 +95,14 @@ export default function createTaskStepper(ti, callbacks) {
         }
 
         if (isObj(value) && value._cancel_) cancelablePromise = value
-        value = await value
         if (ti.isCanceled) return stepper.handleCancel                        // CANCELED / POST-YIELD
 
+        value = await value
         if (done) return stepper.handleSuccess.bind(stepper, value)           // RESOLVED
         else return await takeAStep(value)
       }
 
-      if (ti.isCanceled) return stepper.handleEnd(stepper.handleCancel)       // CANCELED / DROPPED
+      if (ti.isCanceled) return stepper.handleEnd(stepper.handleCancel)       // CANCELED / PRE-START
       if (!ti.hasStarted) await stepper.handleStart()                         // STARTED
       const resultCallback = await takeAStep()                                // RESOLVED / REJECTED / CANCELED
 

@@ -95,6 +95,24 @@ describe('Task Stepper', function() {
     expect(ti.error).to.be.null
   })
 
+  it('does not run dropped instance', () => {
+    let callback = sinon.spy(),
+        operation = function * () {
+          try {
+            yield pause(100)
+          } finally {
+            callback()
+          }
+        },
+        ti = createTaskInstance({ operation }),
+        stepper = createTaskStepper(ti, subscriber)
+
+    stepper.triggerCancel()
+    stepper.stepThrough()
+    expect(ti.isDropped).to.be.true
+    expect(callback.called).to.be.false
+  })
+
   it('cancels the task', async () => {
     let operation = function * () {
           return yield pause(500)
