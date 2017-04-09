@@ -1,3 +1,6 @@
+machine:
+  node:
+    version: 7.2.1
 test:
   post:
     - npm run codecov
