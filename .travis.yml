@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+  - "7.2"
+  - "6.9"
+  - "5.12"
+  - "4.7"
+install:
+  - npm install
+  - npm run build
+script:
+  - npm run unit
