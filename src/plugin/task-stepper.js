@@ -1,4 +1,4 @@
-import { isObj } from '../util/assert'
+import { isObj, isGen } from '../util/assert'
 
 /**
   A {Stepper} is responsible for iterating through the generator function.
@@ -14,9 +14,11 @@ import { isObj } from '../util/assert'
 *  @constructs Task Stepper
 */
 export default function createTaskStepper(ti, callbacks) {
-  let iter = ti._operation(),
-      keepRunning = ti.options.keepRunning,
-      cancelablePromise
+  let iter,
+      cancelablePromise,
+      keepRunning = ti.options.keepRunning
+
+  if (isGen(ti._operation)) iter = ti._operation()
 
   return {
     async handleStart() {
@@ -75,39 +77,58 @@ export default function createTaskStepper(ti, callbacks) {
     },
 
     /**
-     *  Recursively iterates through generator function until the operation is
-     *  either canceled, rejected, or resolved.
+     *  Wrapper for task's operation.
      *
-     *  When the operation is finished, we return the resulting handle method
-     *  so that it can be executed or returned, in the cases where the final
-     *  callback needs to be deferred for later handling.
+     *  Runs operation, updates state, and either executes resulting callback
+     *  or, if operation is kept running, defers it for later handling.
      */
     async stepThrough() {
       let stepper = this
 
-      async function takeAStep(prev = undefined) {
-        let value, done
+      if (ti.isCanceled) return stepper.handleEnd(stepper.handleCancel)     // CANCELED / PRE-START
 
-        try {
-          ({ value, done } = await stepper.handleYield(prev))
-        } catch (err) {                                                         // REJECTED
-          return stepper.handleError.bind(stepper, err)
-        }
+      if (!ti.hasStarted) await stepper.handleStart()                       // STARTED
 
-        if (isObj(value) && value._cancel_) cancelablePromise = value
-        if (ti.isCanceled) return stepper.handleCancel                        // CANCELED / POST-YIELD
-
-        value = await value
-        if (done) return stepper.handleSuccess.bind(stepper, value)           // RESOLVED
-        else return await takeAStep(value)
-      }
-
-      if (ti.isCanceled) return stepper.handleEnd(stepper.handleCancel)       // CANCELED / PRE-START
-      if (!ti.hasStarted) await stepper.handleStart()                         // STARTED
-      const resultCallback = await takeAStep()                                // RESOLVED / REJECTED / CANCELED
+      const resultCallback = isGen(ti._operation)                           // RESOLVED / REJECTED / CANCELED
+          ? await stepper._iterThrough()
+          : await stepper._syncThrough()
 
       if (keepRunning) return stepper.handleEnd.bind(stepper, resultCallback)
       else return stepper.handleEnd(resultCallback)
+    },
+
+    /**
+     * Recursively iterates through generator function until the operation is
+     * either resolved, rejected, or canceled.
+     * @return resulting handle callback
+     */
+    async _iterThrough(prev = undefined) {
+      let value, done, stepper = this
+
+      try {
+        ({ value, done } = await stepper.handleYield(prev))
+      } catch (err) {                                                    // REJECTED
+        return stepper.handleError.bind(stepper, err)
+      }
+
+      if (isObj(value) && value._cancel_) cancelablePromise = value
+      if (ti.isCanceled) return stepper.handleCancel                     // CANCELED / POST-YIELD
+
+      value = await value
+      if (done) return stepper.handleSuccess.bind(stepper, value)        // RESOLVED
+      else return await this._iterThrough(value)
+    },
+
+    /**
+     *  Awaits the async function until the operation is either resolved
+     *  or rejected. (Cancelation is not an option with async functions.)
+     *  @return resulting handle callback
+     */
+    async _syncThrough() {
+      let stepper = this
+      return ti._operation()
+        .then(val => stepper.handleSuccess.bind(stepper, val))
+        .catch(err => stepper.handleError.bind(stepper, err))
     }
   }
 }

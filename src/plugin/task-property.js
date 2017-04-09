@@ -48,7 +48,8 @@ export default function createTaskProperty(host, operation, autorun = true) {
     run(...params) {
       if (!scheduler) scheduler = createTaskScheduler(this, policy)
       this.isAborted = false
-      let instanceData = { params, operation: operation.bind(host, ...params) },
+      let boundOperation = reflectBind(host, operation, params),
+          instanceData = { params, operation: boundOperation },
           ti = createTaskInstance(instanceData, subscriber)
       if (autorun) scheduler.schedule(ti)
       return ti
@@ -74,4 +75,16 @@ export default function createTaskProperty(host, operation, autorun = true) {
     ...watchers,
     ...subscriptions
   }
+}
+
+/**
+ * Function neutral bind operation.
+ *
+ * If `bind` is used on a gen function, it changes its prototype to `Function`.
+ * So we make sure to set the prototype of each operation back to its original.
+ */
+function reflectBind(ctx, operation, args) {
+  let boundOperation = operation.bind(ctx, ...args)
+  Reflect.setPrototypeOf(boundOperation, operation)
+  return boundOperation
 }

@@ -66,8 +66,8 @@ export default function createTaskInstance(data, subscriber) {
     },
 
     /**
-     * To finalize an instance that was called with the `keepRunning` binding,
-     * we call the resulting handle method returned by the stepper.
+     *  To finalize an instance called with the `keepRunning` binding,
+     *  we call the resulting handle method returned by the stepper.
      */
     destroy() {
       if (!this.isFinished) this.cancel()

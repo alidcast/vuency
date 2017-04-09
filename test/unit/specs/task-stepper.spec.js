@@ -13,7 +13,7 @@ function * exTask() {
   return 'success'
 }
 
-describe('Task Stepper', function() {
+describe('Task Stepper - Generator Functions', function() {
   it('solves empty function', async () => {
     let operation = function * () {},
         ti = createTaskInstance({ operation }),
@@ -78,7 +78,6 @@ describe('Task Stepper', function() {
     expect(ti.isRejected).to.be.true
     expect(ti.isResolved).to.be.false
     expect(ti.isCanceled).to.be.false
-    // TODO should rejected task still attempt to return value?
     expect(ti.value).to.be.null
     expect(ti.error).to.not.be.null
   })
@@ -222,5 +221,33 @@ describe('Task Stepper', function() {
     expect(ti.isResolved).to.be.true
     expect(ti.isRejected).to.be.false
     expect(ti.value).to.equal('Success')
+  })
+})
+
+describe('Task Stepper - Async Functions', function() {
+  it('resolves operation', async () => {
+    let operation = async function() {
+          return 'success'
+        },
+        ti = createTaskInstance({ operation }),
+        stepper = createTaskStepper(ti, subscriber)
+    await stepper.stepThrough()
+    expect(ti.isResolved).to.be.true
+    expect(ti.isRejected).to.be.false
+    expect(ti.value).to.equal('success')
+    expect(ti.error).to.be.null
+  })
+
+  it('rejects the task instance', async () => {
+    let operation = async function() {
+          return await sinon.stub().returns('failed').throws()()
+        },
+        ti = createTaskInstance({ operation }),
+        stepper = createTaskStepper(ti, subscriber)
+    await stepper.stepThrough()
+    expect(ti.isRejected).to.be.true
+    expect(ti.isResolved).to.be.false
+    expect(ti.value).to.be.null
+    expect(ti.error).to.not.be.null
   })
 })

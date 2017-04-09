@@ -10,7 +10,7 @@ export function isNamedFn(fn) {
   return isFn(fn) && fn.name !== 'undefined' && fn.name !== ''
 }
 
-export function isGenFn(fn) {
+export function isGen(fn) {
   return fn.constructor.name === 'GeneratorFunction'
 }
 
