@@ -1,3 +1,5 @@
+import assert, { isGen } from '../../util/assert'
+
 /**
 *  The {TaskSubscriber} is responsbile for delegating each
 *  "subscriptions", or callbacks, so that they can be called in the
@@ -37,6 +39,7 @@ export default function createTaskSubscriber(host) {
       if (startFn) await Reflect.apply(startFn, host, [taskInstance])
     },
     async asyncBeforeYield(taskInstance) {
+      assert(isGen(taskInstance._operation), 'Only generator operations have the `beforeYield` callback')
       if (yieldFn) await Reflect.apply(yieldFn, host, [taskInstance])
     },
     /**

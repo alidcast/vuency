@@ -18,7 +18,7 @@ export default function createTaskStepper(ti, callbacks) {
       cancelablePromise,
       keepRunning = ti.options.keepRunning
 
-  if (isGen(ti._operation)) iter = ti._operation()
+  if (isGen(ti._operation)) iter = ti._operation() // start generator
 
   return {
     async handleStart() {
@@ -64,7 +64,7 @@ export default function createTaskStepper(ti, callbacks) {
       return ti
     },
     handleCancel() {
-      if (!ti.isDropped) iter.return() // cause iter to terminate; still runs finally clause.
+      if (iter && !ti.isDropped) iter.return() // cause iter to terminate; still runs finally clause.
       callbacks.onCancel(ti)
       return ti
     },
