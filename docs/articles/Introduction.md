@@ -1,6 +1,9 @@
 # What's is Vuency?
 
-Vuency brings structured concurrency to your Vuejs applications, by giving you complete control and transparency over the execution of asynchronous and concurrent operations.
+Vuency brings structured concurrency to your Vuejs applications, by giving you complete *control* and *transparency* over the execution of asynchronous and concurrent operations.
+
+Vuency gives you an extra layer of control between an event and the execution that event.
+
 
 By controllable operations, we mean that the operations are cancellable. Currently, promises and async functions are not cancellable; and as of March 2017, there is no active TC39 specification for adding it. Sure, you can clutter your code by setting `isRunning` flags before and after an operation has started to control repeat requests, but you still can't in any way cancel an operation that's already in progress. In contrast, with Vuency, you can easily `enqueue`, `drop`, or `restart` repeat calls to the same operation with only one extra line of code.
 

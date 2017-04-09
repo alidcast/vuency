@@ -1,6 +1,5 @@
-machine:
-  node:
-    version: 7.2.1
-test:
-  post:
-    - bash <(curl -s https://codecov.io/bash)
+install:
+  - npm install -g codecov
+script:
+  - istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
+  - codecov

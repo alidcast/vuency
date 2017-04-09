@@ -10,13 +10,13 @@ module.exports = function (config) {
       './index.js': ['webpack', 'sourcemap']
     },
     webpack: webpackConfig,
-    webpackMiddleware: { 
+    webpackMiddleware: {
       noInfo: true
     },
     coverageReporter: {
       dir: './coverage',
       reporters: [
-        { type: 'lcov', subdir: '.' },
+       {type:'lcovonly', subdir: '.'},
         { type: 'text-summary' }
       ]
     }

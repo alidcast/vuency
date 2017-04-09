@@ -16,6 +16,7 @@
     "e2e": "cross-env NODE_ENV=development node test/e2e/runner.js",
     "unit": "cross-env NODE_ENV=development karma start test/unit/karma.conf.js",
     "test": "npm run unit -- --single-run",
+    "report-coverage": "codecov",
     "purge": "rm -rf dist/",
     "bundle": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "build": "npm run purge && npm run bundle",
