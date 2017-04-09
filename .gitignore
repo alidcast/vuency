@@ -2,6 +2,8 @@
 .git
 node_modules/
 dist/
+nuxt/
 npm-debug.log
 selenium-debug.log
-nuxt/
+test/unit/coverage
+test/e2e/reports

@@ -5,6 +5,12 @@
   "author": "Alid Castano <alidcastano@gmail.com>",
   "module": "dist/build.js",
   "main": "dist/build.js",
+  "private": false,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://https://github.com/alidcastano/vuency.git"
+  },
   "scripts": {
     "dev": "cross-env NODE_ENV=development node demo/server.js",
     "e2e": "cross-env NODE_ENV=development node test/e2e/runner.js",
