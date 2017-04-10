@@ -42,11 +42,11 @@ export default {
 ```
 #### Enqueue
 
-With `.flow('enqueue')`, repeat calls are enqueued and only run when the previous call finishes running.
+With `.flow('enqueue')`, repeat calls are enqueued and only run when the previous call finishes.
 
-Think of this as the "love all children equally" scheduling policy. All created instances are enqueued and thus eventually run, getting their equal share of time in existence before being removed, garbage collected, and forever forgotten.
+Think of this as the "love all children equally" scheduling policy. It's useful when all instances are equally important and you want all of them to run but not during the same span of time so as not to overpower the main thread.
 
-In the demo below, notice how repeat calls do not overlap anymore, as each instance waits for any ongoing operations to resolve before starting themselves, but all of them are indeed eventually run to completion.
+In the demo below, notice how repeat calls do not overlap anymore, but all of them are indeed eventually run to completion.
 
 <div class="showcase">
   <ConcurrencyTimeline flow="enqueue" />
@@ -56,25 +56,22 @@ In the demo below, notice how repeat calls do not overlap anymore, as each insta
 
 With `.flow('drop')`, repeat calls are dropped and ignored.
 
-Think of this as the "favor the first born" scheduling policy. After the first instance, all other demands during the same period of time are dropped, garbage collected, and forever forgotten.
+Think of this as the "favor the first born" scheduling policy. It's useful when all instances are equally important but you only need one instance to run to completion during the same span of time.
 
-
-In the demo below, notice how once the first instance starts running, any repeat calls during the same time period are dropped and never waited on or fired.
-
+In the demo below, notice how once the first instance starts running, any other calls during the same time period are dropped never waited on or fired.
 
 <div class="showcase">
   <ConcurrencyTimeline flow="drop" />
 </div>
 
+
 #### Restart
 
-With `flow('restart')`, repeat calls cause any ongoing operations to be canceled and a new instance is started in its favor.
+With `flow('restart')`, repeat calls cause any ongoing operations to be canceled and in favor of the newest instance of the operation.
 
-Think of this as the "favor the youngest child" scheduling policy. If new instances are created during the span of time, any older ones still alive are canceled, removed, garbage collected, forever forgotten.
+Think of this as the "favor the youngest child" scheduling policy. It's useful when the most recent call is the most important, for example if it holds newer data that renders the previous call useless, so you don't need the older ones to keep running.
 
-In the example below, notice how if you try to run another task instance, the previously running instance is canceled while the new instance is started.
-
-// TODO fix bugs
+In the example below, notice how if a new instance is created during the same span of time, the older, ongoing instance is immediately canceled.
 
 <div>
   <ConcurrencyTimeline flow="restart" />
@@ -128,4 +125,4 @@ Now, when you run the task, each instance waits 400ms before starting. If it's c
 
 Vuency buffers the execution of tasks using queues, while throttle and debounce functions use timers. The benefit of using queues, is that it gives you more control over how repeat requests are run because you always have access to the ongoing operations.
 
-Also, the differences and use cases between `debounce` and `throttle` are hard to grasp, while Vuency's flow policies are more straight forward and semantic. Nonetheless, if we were to compare them, `debounce` would be most similar to the `restart` policy with a `delay` configured, and `throttle` would be most similar to the (TODO) `keepLatest`; but neither approach can easily `drop` all repeat requests or even attempt to `restart` an ongoing operation, which are flow control options that are special to Vuency's built in framework for handling concurrency. (:
+An additional benefit of Vuency's flow policies is that their usage is more straightforward and semantic.

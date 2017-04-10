@@ -6,22 +6,19 @@ Think of a `task` as a more powerful alternative to Vue's built in `method`. Som
 
 ## Working with Tasks
 
-There are three main steps to working with tasks:
+There are two main steps to working with tasks:
 
-1. Converting each operation into a task object and using its properties.
+1. Converting an operation into a task object and using its properties.
 2. Creating and using task instances.
 3. Registering the task so that Vuency can inject it into the component instance.
 
 We'll go over each one individually and then put them together.
 
+### Creating and using a task
 
-// TODO go over [generator functions](/https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*)
+To create a task, pass your desired operation as the first parameter to the  `task factory` function.
 
-
-### Creating and using tasks
-
-
-To create a task, Vuency exposes the `task` factory function. You can use it on an your desired operation to turn it into a task object.
+The operation can be either a [generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*) or [async function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function). The main difference between the two options is that generator functions give control over each step of their execution and so can be canceled at any point; whereas async functions are not cancelable and (as of March 2017) there is no active TC39 specification for adding it. For this reason, we recommend you use generator functions, as we do in our examples, so that you can take advantage of the full power of Vuency.
 
 ```js
 import { task } from 'vuency/task-factory'
@@ -30,10 +27,6 @@ let myTask = task(function * taskOperation() {...})
 ```
 
 This returns a task object that you can use to run the operation or check its state, along with other useful task properties.
-
-<p class="warning">
-  You can't call a task like a regular function, e.g. <code>myTask()</code>, because a task is exposed as an object. To use a task you call its properties, such as <code>myTask.run()</code>.
-</p>
 
 For example:
 

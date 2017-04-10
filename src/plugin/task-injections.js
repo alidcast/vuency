@@ -35,12 +35,15 @@ export function createCancelableTimeout(duration) {
       })
       // Timer Cancelation
       this.isCanceled = false
-      this._cancel_ = () => {
+      this.cancel = function() {
         if (this._v !== 'timeout done') {
           cancelPromise()
           clearTimeout(timerId)
           this.isCanceled = true
         }
+      }
+      this._cancel_ = function() { // for internal timeout identitication and cancelation
+        this.cancel()
       }
     }
   }

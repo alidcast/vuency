@@ -1,16 +1,26 @@
 # What's is Vuency?
 
-Vuency brings structured concurrency to your Vuejs applications, by giving you complete *control* and *transparency* over the execution of asynchronous and concurrent operations.
+Put simply, Vuency helps you manage complex, event-driven operations with minimal code.
 
-Vuency gives you an extra layer of control between an event and the execution that event.
+Under thei hood, Vuency adds an extra layer between an operation and the execution of that operation. This allows Vuency to equip the operation with common, boilerplate logic that you would otherwise have to handle yourself.
 
+The two main benefits are:
 
-By controllable operations, we mean that the operations are cancellable. Currently, promises and async functions are not cancellable; and as of March 2017, there is no active TC39 specification for adding it. Sure, you can clutter your code by setting `isRunning` flags before and after an operation has started to control repeat requests, but you still can't in any way cancel an operation that's already in progress. In contrast, with Vuency, you can easily `enqueue`, `drop`, or `restart` repeat calls to the same operation with only one extra line of code.
+* **Implicit state**: The operation's state is baked in, so that you don't have to manually set `isRunning` flags yourself, to handle common UI interactions.
 
-As an added benefit, each task's state, such as `isRunning`, is built in and updated automatically.
-That's in fact what we mean by transparent operations; Vuency exposes as much derived state as possible that you don't have to clutter your code with boilerplate logic. Because of this, handling everyday UI tasks such as displaying loading spinners and styling active buttons are effortless.
+* **Flow control**: Scheduling and cancellation for every instance of the operation is baked in, so you can easily manage the flow of repeat requests without the need for hacky `setTimeout` solutions, as well as manually cancel an operation at any moment.
 
-Put simply, with Vuency, it's dead simple to manage the flow of repeat requests and to handle UI tasks that depend on the state on an operation.
+The additional benefits:
+
+* **Callback subscriptions**: Subscribe to callbacks that are called based on the stage or result of the operation, e.g. `beforeStart` or `onCancel`. This semantically separates the handling of corner cases from the core logic, which makes your code easier to reason about.
+
+* **Bind data**: Bind specific parameters or options to the `nth` call of the instance, e.g. using `nth(1, { keepRunning: true })`, so that you can simulate an infinite loop without overpowering the main thread.
+
+* **Async helpers**: Common async utilities, such as `timeout` helpers, that are automatically cleanup when the operation is over, which ensures that UI interactions flow with minimal latency.
+
+* **Vue helpers**: Vue `watchers` and `events` are wrapped as additional modifiers, e.g. `runWith` for watchers, so that all logic for the operation can be nicely encapsulated together.
+
+If that isn't enough, Vuency's API strikes a nice balance between declarative and imperative styles of programming, which makes complex code simple and fun to write.
 
 ## Moving forward with Vuency
 
@@ -28,8 +38,6 @@ Advanced:
 ## Not convinced? - See Vuency in action
 
 If you're still not convinced, check out the demos and code from the examples linked below and see the benefits yourself.
-
-As you look at the examples, ask yourself: what would it take to do this without Vuency? And, if you were to compare the result with and without Vuency: which code would be better structured and easier to reason about?
 
 Beginner examples:
 

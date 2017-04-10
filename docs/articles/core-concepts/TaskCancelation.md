@@ -7,15 +7,13 @@ export default {
 }
 </script>
 
-// TODO task cancel states
-
-## Canceling a Task Yourself
+# Canceling a Task Yourself
 
 There are two main ways that tasks are canceled: implicitly (based on how the task is configured, or because the task's host object was destroyed) or explicitly (by calling one of the cancel methods on the task property or task instance).
 
 In most cases, you'll want to configure your tasks (via the task's [flow modifier](/guide/task-flow)) such that are automatically and implicitly canceled at the right time. But there are still cases where you'll need to manually cancel the task yourself.
 
-### Self Cancelation
+## Self Cancelation
 
 There are three ways to self cancel a task:
 
@@ -23,41 +21,27 @@ There are three ways to self cancel a task:
 2. Call `task[lastCalled/lastStarted].cancel()` to cancel the most recent instance.
 3. Get each individual instance and call `taskInstance.cancel()` on it.
 
-Here's a basic example of each approach:
-
-```js
-let instance1 = task.run(),
-    instance2 = task.run()
-
-task.abort()              // both instances would be canceled
-task.lastStarted.cancel() // only instance2 would be canceled
-instance1.cancel()        // only instance1 would be canceled
-```
-
-Sometimes you'll also need to differentiate between instances that you canceled versus those canceled due to flow control policies. For this, you can check the `selfCanceled` property of each instance, which will only be true if the instance was canceled manually.
+Sometimes you'll also need to differentiate between instances that you canceled versus those that were canceled due to flow control policies. For this, you can check the `selfCanceled` property of each instance, which will only be true if the instance was canceled manually.
 
 For example:
 
 ```js
-// we set the flow policy to 'drop', so repeat requests
-// are automatically canceled
 task.flow('drop', { maxRunning: 1 })
 
 let instance1 = task.run(),
     instance2 = task.run()
 
-instance1.selfCanceled // false, still running
-instance2.selfCanceled // false, canceled by the task's scheduler
+instance2.isCanceled   // true
+instance2.selfCanceled // false, canceled because of 'drop' policy
 
-instance1.cancel()     // manually cancel
-instance1.selfCanceled // true
+instance1.cancel()    
+instance1.isCanceled   // true
+instance1.selfCanceled // true, manually canceled
 ```
 
 ## Task Cancelation Demo
 
 Here's a demo that shows that differences between all these approaches and how they all work together:
-
-// TODO fix bugs
 
 <div class="showcase">
   <CancelationTracker />
