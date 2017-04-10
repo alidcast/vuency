@@ -89,6 +89,8 @@ export default function createTaskStepper(ti, callbacks) {
 
       if (!ti.hasStarted) await stepper.handleStart()                       // STARTED
 
+      if (ti.isCanceled) return stepper.handleEnd(stepper.handleCancel)     // CANCELED / POST-START
+
       const resultCallback = isGen(ti._operation)                           // RESOLVED / REJECTED / CANCELED
           ? await stepper._iterThrough()
           : await stepper._syncThrough()
