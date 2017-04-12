@@ -52,7 +52,7 @@ module.exports = {
   }
 }
 
-/** TODO fix for nuxt routes change
+/**
  * Convert a list of menu items to an array of dynamic route params.
  *
  * For simplicity, we ignore group headings and just create a top level route
