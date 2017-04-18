@@ -1,12 +1,16 @@
 {
   "presets": [
-    ["es2015", { "modules": false }],
+    ["env", { "modules": false }],
     "stage-1"
   ],
   "plugins": [
-    "transform-runtime",
-    "transform-vue-jsx",
-    "transform-decorators-legacy"
+    "transform-runtime"
   ],
-  "comments": false
+  "comments": false,
+  "env": {
+    "test": {
+      "presets": ["env", "stage-1"],
+      "plugins": [ "istanbul" ]
+    }
+  }
 }

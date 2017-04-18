@@ -1,6 +1,6 @@
 import applyMixin from './mixin'
 
-function plugin(Vue) {
+function plugin (Vue) {
   if (plugin.installed) return
   applyMixin(Vue)
 }

@@ -16,25 +16,25 @@
 *
 *  @constructs TaskSubscriber
 */
-export default function createTaskListeners(host) {
+export default function createListeners (host) {
   return {
     events: {
-      runOn(vmEvent, opts) {
+      runOn (vmEvent, opts) {
         host.$on(vmEvent, this.run.bind(this), opts)
         return this
       },
-      abortOn(vmEvent, callback) {
+      abortOn (vmEvent, callback) {
         host.$on(vmEvent, this.abort.bind(this))
         callback()
         return this
       }
     },
     watchers: {
-      runWith(vmData, opts) {
+      runWith (vmData, opts) {
         host.$watch(vmData, this.run.bind(this), opts)
         return this
       },
-      abortWith(vmData, callback) {
+      abortWith (vmData, callback) {
         host.$watch(vmData, this.run.bind(this))
         callback()
         return this

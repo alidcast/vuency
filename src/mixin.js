@@ -1,9 +1,8 @@
-import initTaskFactory from './plugin/index'
-import createTaskInjections from './plugin/task-injections'
-import assert, { isFn } from './util/assert'
+import { initTask, createDisposables } from 'ency'
+import assert, { isFn } from './util'
 
-let Vue
-export default function(_Vue) {
+var Vue
+export default function (_Vue) {
   Vue = _Vue
   Vue.mixin({
     created: initTasks
@@ -17,19 +16,19 @@ export default function(_Vue) {
  * so that each task operation can be converted into a task object before being
  * injected into the component instance.
  */
-function initTasks() {
-  let host = this,
-      opts = this.$options
+function initTasks () {
+  const host = this
+  const opts = this.$options
 
   if (opts.tasks) {
     assert(isFn(opts.tasks), 'The Tasks property must be a function')
 
-    let taskHelpers = createTaskInjections(),
-        createTask = initTaskFactory(host),
-        tasks = Reflect.apply(opts.tasks, host, [createTask, taskHelpers])
+    const taskHelpers = createDisposables()
+    const createTask = initTask(host)
+    const tasks = Reflect.apply(opts.tasks, host, [createTask, taskHelpers])
 
     if (tasks.flow) { // it is a task object, so register as named function
-      Vue.util.defineReactive(host, tasks.operation.name, tasks)
+      Vue.util.defineReactive(host, tasks._operation.name, tasks)
     } else { // it is a list of task objects, so register as named objects
       Object.keys(tasks).forEach(key => {
         Vue.util.defineReactive(host, key, tasks[key])

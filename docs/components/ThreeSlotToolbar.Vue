@@ -1,8 +1,8 @@
 <template lang="pug">
   div.toolbar.responsive-toolbar
     div.toolbar-start
-      a.site-title(href="/") Vuency
-      p.site-slogan Concurrency management <span> for Vuejs. </span>
+      a.site-title(href="/") Ency.js
+      p.site-slogan Concurrency management <span> for Javascript. </span>
 
     div.toolbar-center.menu-container
       button.mobile-menu-button(@click="showMenu = !showMenu") Guide

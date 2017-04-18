@@ -61,7 +61,7 @@ export default {
         instances.push(loopingAjax.run(7, '#4FC40A'))
       })
       .flow('drop')
-      .nthCall(1, { keepRunning: true })
+      .nthCall(1, { keepRunning: true }) // TODO keepActive - deactivate / dispose 
       .onDestroy(() => {
         loopingAjax.abort()
         this.instances = []

@@ -93,7 +93,7 @@ const prodConfig = {
     path: prodRoot,
     publicPath: '/dist/',
     filename: 'build.js',
-    library: 'vueMobiledocEditor',
+    library: 'vuency',
     libraryTarget: 'umd'
   },
   externals: {
