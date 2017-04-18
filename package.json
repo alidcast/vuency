@@ -1,7 +1,7 @@
 {
   "name": "vuency",
   "description": "a vuejs concurrency management plugin",
-  "version": "0.0.91",
+  "version": "0.0.92",
   "author": "Alid Castano <alidcastano@gmail.com>",
   "main": "dist/build.js",
   "private": false,
@@ -22,7 +22,7 @@
     "upgrade": "npm --no-git-tag-version version patch && npm run build && npm publish"
   },
   "dependencies": {
-    "ency": "file:///Users/acastano/Sites/ency",
+    "ency": "0.0.18",
     "vue": "^2.1.8"
   },
   "devDependencies": {
