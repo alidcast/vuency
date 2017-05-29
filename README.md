@@ -44,3 +44,64 @@ If that isn't enough, Vuency's API strikes a nice balance between declarative an
 ## Documentation
 
 The [Vuency documentation](https://vuency.alidcastano.com) is a [nuxt.js](https://github.com/nuxt/nuxt.js) generated static site with interactive examples.
+
+
+### ----
+
+3. Registering the task so that Vuency can inject it into the component instance.
+
+### Registering a task
+
+To allow you to easily register tasks, Vuency mixes the `tasks` property into each component instance.
+
+Similar to Vue's `data` property, the tasks property must be declared as function, so that Vuency can inject a fresh copy of the  registered tasks into each component instance.
+
+Also, for you're convenience, Vuency passes the the task factory function as the first argument to `tasks` so that you don't have to manually import it every time. Since you'll likely be using this function a lot, the convention is to abbreviate this function to `t`.
+
+<p class="danger">
+  All registered tasks must be named, either as named functions or named objects.
+</p>
+
+
+```js
+// if registering only one task, then you can return the named function
+export default {
+  Tasks(t) {
+    return t(function * myTask() {...})
+  }
+}
+
+// if your registering one or more tasks, then return the named objects
+export default {
+  Tasks(t) {
+    return {
+      myTask: t(function * () {...}),
+      myOtherTask: t(function * () {...})
+    }
+  }
+}
+```
+
+If you like brevity, you can also use ES6 arrow syntax:
+
+<p class="danger">
+  Keep in mind that if you use ES6 arrow syntax for `tasks` property function,
+  then the component's `this` context will only be available inside the task's function.
+</p>
+
+```js
+// registering only one task, then return the named function
+export default {
+  Tasks: t => t(function * myTask() {...})
+}
+
+// registering one or more tasks, then return the named objects
+export default {
+  Tasks: (t) => ({
+    myTask: t(function * () {...}),
+    myOtherTask: t(function * () {...})
+  })
+}
+```
+
+Then, when the component is created, Vuency will iterate through the list of returned task objects and inject each one (by the function or objects name) into the component instance.

@@ -23,8 +23,8 @@ function initTasks () {
 
     // call `tasks` with task factory so that each operation can be converted
     // into a task object before being injected into component instance
-    const createTask = initTask(host, listeners)
-    const tasks = Reflect.apply(opts.tasks, host, [createTask, asyncHelpers])
+    const createTask = initTask(listeners)
+    const tasks = Reflect.apply(opts.tasks, host, [createTask.bind(host), asyncHelpers])
 
     if (tasks.flow) { // it is a task object, so register as named function
       Vue.util.defineReactive(host, tasks._operation.name, tasks)

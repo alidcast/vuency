@@ -91,9 +91,6 @@ describe('Tasks Property', function () {
     expect(ti1.isResolved).to.be.true
     expect(ti2.isCanceled).to.be.true
     expect(vm.exTask.lastResolved).to.equal(ti1)
-
-    // TODO should dropped instances be put in last canceled?
-    // expect(vm.exTask.lastCanceled).to.equal(ti2)
   })
 
   /**
@@ -107,9 +104,6 @@ describe('Tasks Property', function () {
     Vue.nextTick(() => {
       expect(callback.called).to.be.true
       expect(vm.exTask.isActive).to.be.false
-
-      // // TODO is value being set?
-      // expect(vm.exTask.value).to.equal('success')
       done()
     })
   })
