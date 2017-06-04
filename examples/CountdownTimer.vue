@@ -14,8 +14,9 @@ export default {
   data: () => ({
     count: COUNT_START
   }),
-  tasks: (t, { timeout }) => ({
-    counter: t(function* () {
+
+  tasks: (t, { timeout }) => {
+    return t(function * counter() {
       this.count = COUNT_START
       while (this.count > 0) {
         yield timeout(300)
@@ -23,6 +24,6 @@ export default {
       }
       this.count = 'DONE'
     }).flow('restart')
-  })
+  }
 }
 </script>

@@ -13,13 +13,19 @@ export default {
     question: '',
     answer: ''
   }),
+
+  beforeMount () { // TODO runWith not working
+    console.log(this.getAnswer)
+  },
+
   tasks(t, { timeout }) {
     return t(function * getAnswer() {
       this.answer = 'Thinking...'
       yield timeout(600)
       this.answer = Math.random() < 0.5 ? 'Yes' : 'No'
     })
-    .flow('restart', { delay: 400 }).runWith('question', { immediate: true })
+    .flow('restart', { delay: 400 })
+    .runWith('question', { immediate: true })
     .beforeStart(instance => {
       if (this.question.length === 0) {
         this.answer = 'Questions must contain words!'

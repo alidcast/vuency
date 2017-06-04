@@ -29,7 +29,7 @@ Vue.use(Vuency)
 
 ### Registering a task
 
-Ency mixes the `tasks` property into each component instance.
+Vuency mixes the `tasks` property into each component instance.
 
 Similar to Vue's `data` property, the tasks property must be declared as function, so that Vuency can inject a fresh copy of the  registered tasks into each component instance.
 
