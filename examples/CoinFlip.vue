@@ -13,7 +13,7 @@ export default {
     answer: ''
   }),
   tasks: (t, { timeout }) => ({
-    flipCoin: t(function* () {
+    flipCoin: t(function * () {
       this.answer = yield timeout(1000)
         .then(() => Math.random() < 0.5 ? 'Heads' : 'Tails')
     })

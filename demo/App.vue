@@ -1,5 +1,9 @@
 <template>
   <div id="app" class="component">
+    <a href="/countdown-timer"> countdown </a>
+    <a href="/coin-flip"> coin flip </a>
+    <a href="/question-genie"> question genie </a>
+    <a href="/infinite-ajax"> infinite ajax </a>
     <component :is="currentView" />
   </div>
 </template>
@@ -30,3 +34,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.component a {
+  padding-right: 1rem
+}
+</style>
