@@ -2,36 +2,38 @@ import { initTask, createDisposables } from 'ency'
 import createListeners from './modifiers/listeners'
 import assert, { isFn } from './util'
 
-var Vue
-export default function applyMixin (_Vue) {
-  Vue = _Vue
-  Vue.mixin({
-    created: initTasks
-    // TODO beforeDestory {} // cancel tasks, remove listeners, take down task watcher etc
-  })
-}
+function createTasks (host, registered) {
+  const modifiers = { ...createListeners(host) }
+  const asyncHelpers = createDisposables()
 
-function initTasks () {
-  const host = this
-  const opts = this.$options
+  const createTask = initTask(modifiers)
+  const tasks = Reflect.apply(registered, host, [createTask.bind(host), asyncHelpers])
 
-  if (opts.tasks) {
-    assert(isFn(opts.tasks), 'The Tasks property must be a function')
-
-    const listeners = createListeners(host)
-    const asyncHelpers = createDisposables()
-
-    // call `tasks` with task factory so that each operation can be converted
-    // into a task object before being injected into component instance
-    const createTask = initTask(listeners)
-    const tasks = Reflect.apply(opts.tasks, host, [createTask.bind(host), asyncHelpers])
-
-    if (tasks.flow) { // single named function
-      Vue.util.defineReactive(host, tasks._operation.name, tasks)
-    } else { // list of named objects
-      Object.keys(tasks).forEach(key => {
-        Vue.util.defineReactive(host, key, tasks[key])
-      })
-    }
+  if (tasks.flow) { // single named function
+    return { [tasks._operation.name]: tasks }
+  } else { // list of named objects
+    return tasks
   }
 }
+
+export default (Vue) => ({
+  created () {
+    const options = this.$options
+    if (!options.tasks) return // no tasks
+    assert(isFn(options.tasks), 'The Tasks property must be a function')
+
+    if (!options.computed) options.computed = {}
+    if (!this.$registeredTasks) this.$registeredTasks = []
+
+    const tasks = createTasks(this, options.tasks)
+
+    Object.keys(tasks).forEach(key => {
+      Vue.util.defineReactive(this, key, tasks[key])
+      this.$registeredTasks.push(this[key].abort)
+    })
+  },
+
+  beforeDestroy () {
+    this.$registeredTasks.forEach(abort => abort())
+  }
+})

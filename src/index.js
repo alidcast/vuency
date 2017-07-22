@@ -1,8 +1,8 @@
-import applyMixin from './mixin'
+import initMixin from './mixin'
 
 function plugin (Vue) {
   if (plugin.installed) return
-  applyMixin(Vue)
+  Vue.mixin(initMixin(Vue))
 }
 
 // auto install in dist mode
