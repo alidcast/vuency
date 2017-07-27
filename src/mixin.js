@@ -34,6 +34,6 @@ export default (Vue) => ({
   },
 
   beforeDestroy () {
-    this.$registeredTasks.forEach(abort => abort())
+    if (this.$registeredTasks) this.$registeredTasks.forEach(abort => abort())
   }
 })
