@@ -29,11 +29,13 @@ export default (Vue) => ({
 
     Object.keys(tasks).forEach(key => {
       Vue.util.defineReactive(this, key, tasks[key])
-      this.$registeredTasks.push(this[key].abort)
+      this.$registeredTasks.push(this[key])
     })
   },
 
   beforeDestroy () {
-    if (this.$registeredTasks) this.$registeredTasks.forEach(abort => abort())
+    if (this.$registeredTasks) {
+      this.$registeredTasks.forEach(task => task.abort())
+    }
   }
 })

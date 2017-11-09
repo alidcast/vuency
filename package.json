@@ -1,7 +1,7 @@
 {
   "name": "vuency",
   "description": "a vuejs concurrency management plugin",
-  "version": "0.1.1",
+  "version": "0.1.6",
   "author": "Alid Castano <alidcastano@gmail.com>",
   "main": "dist/build.js",
   "private": false,
@@ -16,9 +16,8 @@
     "unit": "cross-env NODE_ENV=development karma start test/unit/karma.conf.js",
     "test": "npm run unit -- --single-run",
     "codecov": "codecov",
-    "purge": "rm -rf dist/",
     "bundle": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "build": "npm run purge && npm run bundle",
+    "build": "npm run bundle",
     "bump": "npm --no-git-tag-version version patch && npm run build && npm publish"
   },
   "dependencies": {
