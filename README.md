@@ -42,7 +42,7 @@ Vue.use(Vuency)
 
 ## Documentation
 
-The [Vuency documentation](ency.now.sh/vuency) is a [nuxt.js](https://github.com/nuxt/nuxt.js) and [nuxtent](https://github.com/nuxt-community/nuxtent) generated static site with interactive examples.
+The [Vuency documentation](https://ency.now.sh/vuency) is a [nuxt.js](https://github.com/nuxt/nuxt.js) and [nuxtent](https://github.com/nuxt-community/nuxtent) generated static site with interactive examples.
 
 ## License
 
